@@ -16,7 +16,7 @@ class ViewModel  @Inject constructor(
     val screenModifiers: StateFlow<ScreenModifiers> = _screenModifiers
 
     fun getCalList(): List<String> {
-
+        return listOf("a", "b")
     }
 
     fun showList(b: Boolean) {
