@@ -1,4 +1,4 @@
-package com.capa1.switchcontrol.data.model
+package com.capa1.switchcontrol.data
 
 class ColorList
 {
