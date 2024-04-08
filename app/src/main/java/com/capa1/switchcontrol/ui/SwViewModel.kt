@@ -19,15 +19,6 @@ class SwViewModel  @Inject constructor(
     private val _screenModifiers = MutableStateFlow(ScreenModifiers())
     val screenModifiers: StateFlow<ScreenModifiers> = _screenModifiers
 
-    fun getSwList(): List<SwData> {
-        return controller.getSwList()
-    }
-
-    fun startMqtt(){
-        subscribeToChanges()
-        controller.initMqtt()
-
-    }
 
     private fun subscribeToChanges() {
         viewModelScope.launch {

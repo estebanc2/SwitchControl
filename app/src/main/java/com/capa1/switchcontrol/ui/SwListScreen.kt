@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.data.model.SwStatus
 
 @Composable
 fun MainScreen(
@@ -35,7 +36,7 @@ fun MainScreen(
     Box(Modifier.fillMaxSize()) {
         if (!screenModifiers.showList) {
             ShowSwitches(
-                list = swViewModel.getSwList()
+                list = screenModifiers.swList
             )
         }
     }
@@ -75,7 +76,7 @@ fun ShowSwitches(
 @Composable
 fun ScreenPreview() {
     Box(Modifier.fillMaxSize()) {
-        ShowSwitches(listOf(SwData("velador", "00AB", 1, 1),
-                            SwData("luz cocina", "10AB", 2, 1), ))
+        ShowSwitches(listOf(SwData("velador", "00AB", 1, 1, SwStatus.DISCONNECTED),
+                            SwData("luz cocina", "10AB", 2, 1, SwStatus.DISCONNECTED), ))
     }
 }
