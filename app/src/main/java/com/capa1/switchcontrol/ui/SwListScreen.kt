@@ -25,11 +25,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwStatus
 
 @Composable
-fun MainScreen(
+fun SwListScreen(
+    navController: NavController,
     swViewModel: SwViewModel = hiltViewModel()
 ) {
     val screenModifiers by swViewModel.screenModifiers.collectAsState()
@@ -66,10 +68,11 @@ fun ShowSwitches(
             Spacer(modifier = Modifier.height(20.dp))
         }
         items(list) { calValue ->
-            SwitchRowScreen(calValue, "nada que mostrar", {})
+            SwRow(calValue, "nada que mostrar")
         }
     }
 }
+
 
 
 @Preview (showBackground = true)

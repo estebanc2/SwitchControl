@@ -19,15 +19,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.ui.navigation.AppScreens
 
 
 @Composable
-fun SwitchRowScreen(
+fun SwRow(
+    navController: NavController,
     item: SwData,
     leyenda: String,
-    goToSwConfig: () -> Unit
 ){
     Box(
         modifier = Modifier
@@ -41,7 +43,7 @@ fun SwitchRowScreen(
                 Text(
                     text = item.name,
                     style = TextStyle(fontSize = 24.sp),
-                    modifier = Modifier.clickable { goToSwConfig() }
+                    modifier = Modifier.clickable { navController.navigate(route = AppScreens.ConfigScreen.route) }
                     //color = MaterialTheme.colorScheme.primary
                 )
                 Text (

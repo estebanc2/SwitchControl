@@ -1,15 +1,13 @@
 package com.capa1.switchcontrol.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -29,10 +27,14 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.ui.navigation.AppNavigation
+import com.capa1.switchcontrol.ui.navigation.AppScreens
 
 @Composable
-fun SwConfigScreen(
+fun ConfigScreen(
+    navController: NavController,
     setSwData: (SwData) -> Unit,
 ){
     val tokenValue = remember {
@@ -105,15 +107,16 @@ fun SwConfigScreen(
                 text = "cielo",
                 style = TextStyle(fontSize = 20.sp),
                 color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.clickable { navController.navigate(route = AppScreens.ConfigScreen.route) }
 
             )
         }
     }
 }
-
+/*
 @Preview (showBackground = true)
 @Composable
 fun SwConfigPreview()
 {
-    SwConfigScreen({})
-}
+    ConfigScreen(, {})
+}*/
