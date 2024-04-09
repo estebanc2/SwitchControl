@@ -1,5 +1,6 @@
 package com.capa1.switchcontrol.ui
 
+import android.media.Image
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capa1.switchcontrol.data.Controller
@@ -28,5 +29,8 @@ class SwViewModel  @Inject constructor(
                 }
             }
         }
+    }
+    fun swImage(topic: String): Image{
+        return im(R.mipmap.open_foreground)
     }
 }

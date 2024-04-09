@@ -1,5 +1,6 @@
 package com.capa1.switchcontrol.ui
 
+import android.media.Image
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,7 +30,8 @@ import com.capa1.switchcontrol.ui.navigation.AppScreens
 fun SwRow(
     navController: NavController,
     item: SwData,
-    leyenda: String,
+    leyend: String,
+    swImage: (String) -> Unit
 ){
     Box(
         modifier = Modifier
@@ -47,10 +49,10 @@ fun SwRow(
                     //color = MaterialTheme.colorScheme.primary
                 )
                 Text (
-                    text = leyenda
+                    text = leyend
                 )
             }
-            Image(painter = painterResource(id = R.mipmap.open_foreground),
+            Image(swImage(item.topic)), //id = R.mipmap.open_foreground),
                 contentDescription = "",
                 Modifier
                     .clickable { }

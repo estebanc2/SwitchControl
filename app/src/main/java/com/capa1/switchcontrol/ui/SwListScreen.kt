@@ -25,6 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavController
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwStatus
@@ -32,12 +34,14 @@ import com.capa1.switchcontrol.data.model.SwStatus
 @Composable
 fun SwListScreen(
     navController: NavController,
-    swViewModel: SwViewModel = hiltViewModel()
+    viewModel: SwViewModel = hiltViewModel()
 ) {
-    val screenModifiers by swViewModel.screenModifiers.collectAsState()
+    val screenModifiers by viewModel.screenModifiers.collectAsState()
     Box(Modifier.fillMaxSize()) {
         if (!screenModifiers.showList) {
             ShowSwitches(
+                navController,
+                viewModel,
                 list = screenModifiers.swList
             )
         }
@@ -46,6 +50,8 @@ fun SwListScreen(
 
 @Composable
 fun ShowSwitches(
+    navController: NavController,
+    viewModel: ViewModel,
     list: List<SwData>
 ) {
     LazyColumn(
@@ -68,7 +74,10 @@ fun ShowSwitches(
             Spacer(modifier = Modifier.height(20.dp))
         }
         items(list) { calValue ->
-            SwRow(calValue, "nada que mostrar")
+            SwRow(navController = navController,
+                calValue,
+                "nada que mostrar",
+                swImage = {topic -> viewModel.swImage(topic)})
         }
     }
 }
