@@ -23,15 +23,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.data.model.SwImages
+import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.ui.navigation.AppScreens
 
 
 @Composable
 fun SwRow(
-    navController: NavController,
     item: SwData,
-    leyend: String,
-    //swImage: (String) -> Unit
+    swScreenData: SwScreenData,
+    config: () -> Unit,
+    click: () -> Unit
 ){
     Box(
         modifier = Modifier
@@ -45,12 +47,23 @@ fun SwRow(
                 Text(
                     text = item.name,
                     style = TextStyle(fontSize = 24.sp),
-                    modifier = Modifier.clickable { navController.navigate(route = AppScreens.ConfigScreen.route) }
+                    modifier = Modifier.clickable{ config() }
                     //color = MaterialTheme.colorScheme.primary
                 )
                 Text (
-                    text = leyend
+                    text = swScreenData.timerInfo
                 )
+            }
+            when(swScreenData.swImage){
+                SwImages.OPEN -> TODO()
+                SwImages.CLOSE -> TODO()
+                SwImages.OPENING -> TODO()
+                SwImages.CLOSING -> TODO()
+                SwImages.CLOSE_LOCK -> TODO()
+                SwImages.OPEN_LOCK -> TODO()
+                SwImages.NC -> TODO()
+                SwImages.NA -> TODO()
+                SwImages.NO_INFO -> TODO()
             }
             //Image(swImage(item.topic)), //id = R.mipmap.open_foreground),
               //  contentDescription = "",

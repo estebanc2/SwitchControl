@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class Controller @Inject constructor (context: Context) : MqttListener {
+class Controller @Inject constructor (val context: Context) : MqttListener {
     private val mqttManager = MqttManager(this)
     private lateinit var initialList : List<SwData>
     val swList:   MutableStateFlow<List<SwData>> = MutableStateFlow(listOf())

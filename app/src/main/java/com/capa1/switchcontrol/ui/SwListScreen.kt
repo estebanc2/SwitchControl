@@ -33,14 +33,12 @@ import com.capa1.switchcontrol.data.model.SwStatus
 
 @Composable
 fun SwListScreen(
-    navController: NavController,
     viewModel: SwViewModel = hiltViewModel()
 ) {
     val screenModifiers by viewModel.screenModifiers.collectAsState()
     Box(Modifier.fillMaxSize()) {
         if (!screenModifiers.showList) {
             ShowSwitches(
-                navController,
                 viewModel,
                 list = screenModifiers.swList
             )
@@ -50,7 +48,6 @@ fun SwListScreen(
 
 @Composable
 fun ShowSwitches(
-    navController: NavController,
     viewModel: ViewModel,
     list: List<SwData>
 ) {
@@ -74,7 +71,7 @@ fun ShowSwitches(
             Spacer(modifier = Modifier.height(20.dp))
         }
         items(list) { calValue ->
-            SwRow(navController = navController,
+            SwRow(
                 calValue,
                 "nada que mostrar")
                 //swImage = {topic -> viewModel.swImage(topic)})
