@@ -2,8 +2,10 @@ package com.capa1.switchcontrol.data.mqtt
 
 import android.content.Context
 import android.util.Log
+import com.capa1.switchcontrol.data.Global.FROM_SW
 import com.capa1.switchcontrol.data.Global.MQTT_HOST_AND_PORT
 import com.capa1.switchcontrol.data.Global.TAG
+import com.capa1.switchcontrol.data.Global.TO_SW
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
@@ -25,6 +27,7 @@ class MqttManager @Inject constructor(
         mqttClient = MqttAndroidClient(context, MQTT_HOST_AND_PORT, "kotlin_client")
         mqttClient.setCallback(object : MqttCallback {
             override fun messageArrived(topic: String, message: MqttMessage?) {
+                val mac = topic.split("/").last()
                 listener.notifyNewMessage(topic, message.toString())
                 Log.d(TAG, "Receive message: ${message.toString()} from topic: $topic")
             }
@@ -56,7 +59,7 @@ class MqttManager @Inject constructor(
     }
     fun subscribe(topic: String, qos: Int = 1) {
         try {
-            mqttClient.subscribe(topic, qos, null, object : IMqttActionListener {
+            mqttClient.subscribe(FROM_SW + topic, qos, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     Log.d(TAG, "Subscribed to $topic")
                 }
@@ -91,7 +94,7 @@ class MqttManager @Inject constructor(
             message.payload = msg.toByteArray()
             message.qos = qos
             message.isRetained = retained
-            mqttClient.publish(topic, message, null, object : IMqttActionListener {
+            mqttClient.publish(TO_SW + topic, message, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     Log.d(TAG, "$msg published to $topic")
                 }

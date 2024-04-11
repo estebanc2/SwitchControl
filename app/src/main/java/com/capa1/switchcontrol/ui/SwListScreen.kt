@@ -76,19 +76,8 @@ fun ShowSwitches(
         items(list) { calValue ->
             SwRow(navController = navController,
                 calValue,
-                "nada que mostrar",
-                swImage = {topic -> viewModel.swImage(topic)})
+                "nada que mostrar")
+                //swImage = {topic -> viewModel.swImage(topic)})
         }
-    }
-}
-
-
-
-@Preview (showBackground = true)
-@Composable
-fun ScreenPreview() {
-    Box(Modifier.fillMaxSize()) {
-        ShowSwitches(listOf(SwData("velador", "00AB", 1, 1, SwStatus.DISCONNECTED),
-                            SwData("luz cocina", "10AB", 2, 1, SwStatus.DISCONNECTED), ))
     }
 }

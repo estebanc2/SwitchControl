@@ -31,7 +31,7 @@ fun SwRow(
     navController: NavController,
     item: SwData,
     leyend: String,
-    swImage: (String) -> Unit
+    //swImage: (String) -> Unit
 ){
     Box(
         modifier = Modifier
@@ -52,12 +52,12 @@ fun SwRow(
                     text = leyend
                 )
             }
-            Image(swImage(item.topic)), //id = R.mipmap.open_foreground),
-                contentDescription = "",
-                Modifier
-                    .clickable { }
-                    .size(70.dp, 70.dp)
-            )
+            //Image(swImage(item.topic)), //id = R.mipmap.open_foreground),
+              //  contentDescription = "",
+                //Modifier
+                  //  .clickable { }
+                    //.size(70.dp, 70.dp)
+            //)
         }
     }
 }

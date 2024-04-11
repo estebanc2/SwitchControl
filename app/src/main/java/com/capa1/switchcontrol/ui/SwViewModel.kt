@@ -1,8 +1,12 @@
 package com.capa1.switchcontrol.ui
 
 import android.media.Image
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Controller
 import com.capa1.switchcontrol.data.model.SwData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +34,5 @@ class SwViewModel  @Inject constructor(
             }
         }
     }
-    fun swImage(topic: String): Image{
-        return im(R.mipmap.open_foreground)
-    }
+
 }

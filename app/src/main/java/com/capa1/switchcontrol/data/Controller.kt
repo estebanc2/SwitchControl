@@ -9,6 +9,7 @@ import com.capa1.switchcontrol.data.model.EspData
 import com.capa1.switchcontrol.data.model.FlashData
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwMode
+import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.SwState
 import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.data.model.WeeklyProgram
@@ -16,28 +17,31 @@ import com.capa1.switchcontrol.data.mqtt.MqttListener
 import com.capa1.switchcontrol.data.mqtt.MqttManager
 import com.capa1.switchcontrol.data.mqtt.MqttState
 import com.google.gson.Gson
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class Controller @Inject constructor (val context: Context) : MqttListener {
+class Controller @Inject constructor (context: Context) : MqttListener {
     private val mqttManager = MqttManager(this)
     private lateinit var initialList : List<SwData>
     val swList:   MutableStateFlow<List<SwData>> = MutableStateFlow(listOf())
-    val infoList: MutableStateFlow<List<String>> = MutableStateFlow(listOf())
+    val swScreenMap: MutableStateFlow<Map<String, SwScreenData>> = MutableStateFlow(mapOf())
+    val swMap: MutableStateFlow<Map<String, EspData>> = MutableStateFlow(mapOf())
     private val swDataStore = SwDataStore(context)
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-
     init{
         initMqtt()
         loadSomething()
         actualizeSwList(getStoredSwList())
     }
     private fun actualizeSwList( newSwList: List<SwData>){
+        initializeSwList(newSwList)
         coroutineScope.launch { swList.emit(newSwList) }
     }
+
     private fun initializeSwList (swList: List<SwData>) {
         for(sw in swList){
             subscribeToTopic(sw.topic)

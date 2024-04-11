@@ -16,10 +16,10 @@ fun AppNavigation(){
             SwListScreen(navController)
         }
         composable(route = AppScreens.ConfigScreen.route){
-            ConfigScreen(navController)
+            //ConfigScreen(navController)
         }
         composable(route = AppScreens.ColorPickerScreen.route){
-            ColorPickerScreen(navController)
+            //ColorPickerScreen(navController)
         }
     }
 }
