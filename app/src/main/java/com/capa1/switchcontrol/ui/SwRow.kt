@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -54,23 +55,25 @@ fun SwRow(
                     text = swScreenData.timerInfo
                 )
             }
+            var painter: Painter
             when(swScreenData.swImage){
-                SwImages.OPEN -> TODO()
-                SwImages.CLOSE -> TODO()
-                SwImages.OPENING -> TODO()
-                SwImages.CLOSING -> TODO()
-                SwImages.CLOSE_LOCK -> TODO()
-                SwImages.OPEN_LOCK -> TODO()
-                SwImages.NC -> TODO()
-                SwImages.NA -> TODO()
-                SwImages.NO_INFO -> TODO()
+                SwImages.OPEN -> painter = painterResource(id = R.mipmap.open)
+                SwImages.CLOSE -> painter = painterResource(id = R.mipmap.close)
+                SwImages.OPENING -> painter = painterResource(id = R.mipmap.opening)
+                SwImages.CLOSING -> painter = painterResource(id = R.mipmap.closing)
+                SwImages.CLOSE_LOCK -> painter = painterResource(id = R.mipmap.close_lock)
+                SwImages.OPEN_LOCK -> painter = painterResource(id = R.mipmap.open_lock)
+                SwImages.NC -> painter = painterResource(id = R.mipmap.nc)
+                SwImages.NA -> painter = painterResource(id = R.mipmap.na)
+                SwImages.NO_INFO -> painter = painterResource(id = R.mipmap.no_info)
             }
-            //Image(swImage(item.topic)), //id = R.mipmap.open_foreground),
-              //  contentDescription = "",
-                //Modifier
-                  //  .clickable { }
-                    //.size(70.dp, 70.dp)
-            //)
+            Image(
+                painter,
+                contentDescription = "",
+                Modifier
+                  .clickable { }
+                  .size(70.dp, 70.dp)
+            )
         }
     }
 }
