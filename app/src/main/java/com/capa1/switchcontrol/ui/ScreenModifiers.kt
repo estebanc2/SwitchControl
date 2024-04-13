@@ -1,9 +1,10 @@
 package com.capa1.switchcontrol.ui
 
 import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.data.model.SwScreenData
 
 data class ScreenModifiers(
     val showList: Boolean = false,
     val swList: List<SwData> = listOf(),
-    val swInfo: List<String> = listOf()
+    val swScreenMap: Map<String, SwScreenData> = mapOf()
 )
