@@ -135,15 +135,15 @@ fun SwRow(
                 )
             }
             val painter: Painter = when(swScreenData.swImage){
-                SwImages.OPEN -> painterResource(id = R.drawable.ic_louncher_background)
-                SwImages.CLOSE -> painterResource(id = R.mipmap.close)
-                SwImages.OPENING -> painterResource(id = R.mipmap.opening)
-                SwImages.CLOSING -> painterResource(id = R.mipmap.closing)
-                SwImages.CLOSE_LOCK -> painterResource(id = R.mipmap.close_lock)
-                SwImages.OPEN_LOCK -> painterResource(id = R.mipmap.open_lock)
-                SwImages.NC -> painterResource(id = R.mipmap.nc)
-                SwImages.NA -> painterResource(id = R.mipmap.na)
-                SwImages.NO_INFO -> painterResource(id = R.mipmap.no_info)
+                SwImages.OPEN -> painterResource(id = R.drawable.open)
+                SwImages.CLOSE -> painterResource(id = R.drawable.close)
+                SwImages.OPENING -> painterResource(id = R.drawable.opening)
+                SwImages.CLOSING -> painterResource(id = R.drawable.closing)
+                SwImages.CLOSE_LOCK -> painterResource(id = R.drawable.close_lock)
+                SwImages.OPEN_LOCK -> painterResource(id = R.drawable.open_lock)
+                SwImages.NC -> painterResource(id = R.drawable.nc)
+                SwImages.NA -> painterResource(id = R.drawable.na)
+                SwImages.NO_INFO -> painterResource(id = R.drawable.no_info)
             }
             Image(
                 painter,
