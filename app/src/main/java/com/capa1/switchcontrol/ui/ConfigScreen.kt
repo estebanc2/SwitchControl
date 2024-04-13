@@ -24,17 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.capa1.switchcontrol.data.model.SwData
-import com.capa1.switchcontrol.ui.navigation.AppNavigation
-import com.capa1.switchcontrol.ui.navigation.AppScreens
 
 @Composable
 fun ConfigScreen(
-    navController: NavController,
     setSwData: (SwData) -> Unit,
 ){
     val tokenValue = remember {
@@ -107,7 +103,7 @@ fun ConfigScreen(
                 text = "cielo",
                 style = TextStyle(fontSize = 20.sp),
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.clickable { navController.navigate(route = AppScreens.ConfigScreen.route) }
+                modifier = Modifier.clickable { }
 
             )
         }

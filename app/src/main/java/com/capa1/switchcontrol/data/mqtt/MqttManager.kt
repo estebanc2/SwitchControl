@@ -1,19 +1,20 @@
 package com.capa1.switchcontrol.data.mqtt
 
-import android.content.Context
 import android.util.Log
 import com.capa1.switchcontrol.data.Global.FROM_SW
 import com.capa1.switchcontrol.data.Global.MQTT_HOST_AND_PORT
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.Global.TO_SW
-import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient
 import org.eclipse.paho.client.mqttv3.MqttCallback
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttMessage
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
+import java.util.UUID
 import javax.inject.Inject
 
 enum class MqttState {
@@ -22,9 +23,12 @@ enum class MqttState {
 class MqttManager @Inject constructor(
     private val listener: MqttListener
 ) {
-    private lateinit var mqttClient: MqttAndroidClient
-    fun connect(context: Context) {
-        mqttClient = MqttAndroidClient(context, MQTT_HOST_AND_PORT, "kotlin_client")
+    private lateinit var mqttClient: MqttAsyncClient
+    fun connect() {
+        mqttClient = MqttAsyncClient(MQTT_HOST_AND_PORT,
+            UUID.randomUUID().toString(),
+            MemoryPersistence()
+        )
         mqttClient.setCallback(object : MqttCallback {
             override fun messageArrived(topic: String, message: MqttMessage?) {
                 val mac = topic.split("/").last()

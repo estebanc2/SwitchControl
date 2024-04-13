@@ -17,14 +17,13 @@ import com.capa1.switchcontrol.data.mqtt.MqttListener
 import com.capa1.switchcontrol.data.mqtt.MqttManager
 import com.capa1.switchcontrol.data.mqtt.MqttState
 import com.google.gson.Gson
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class Controller @Inject constructor (val context: Context) : MqttListener {
+class Controller @Inject constructor (context: Context) : MqttListener {
     private val mqttManager = MqttManager(this)
     private lateinit var initialList : List<SwData>
     val swList:   MutableStateFlow<List<SwData>> = MutableStateFlow(listOf())
@@ -64,7 +63,7 @@ class Controller @Inject constructor (val context: Context) : MqttListener {
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.getList.collect { flashData ->
                 val gson = Gson()
-                myList = gson.fromJson(flashData, FlashData::class.java)
+                myList = gson.fromJson(flashData, FlashData::class.java) ?: FlashData("", emptyList())
             }
         }
         return myList.swList
@@ -82,7 +81,7 @@ class Controller @Inject constructor (val context: Context) : MqttListener {
     }
 
     private fun initMqtt() {
-        mqttManager.connect(context)
+        mqttManager.connect()
     }
 
     private fun initSw( topic: String){

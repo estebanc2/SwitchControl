@@ -34,5 +34,13 @@ class SwViewModel  @Inject constructor(
             }
         }
     }
+    fun imageClick(){
 
+    }
+    fun showConfig(show: Boolean){
+
+    }
+    fun changeName (name: String){
+
+    }
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -76,7 +77,7 @@ fun ConfigDialog( //1
                                 },
                             ) {
                                 Icon(
-                                    Icons.Default.AddTask,
+                                    Icons.Default.Add,
                                     contentDescription = "",
                                 )
                                 Text(text = "conectar")

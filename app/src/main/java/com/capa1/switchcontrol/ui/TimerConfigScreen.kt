@@ -5,7 +5,6 @@ import androidx.navigation.NavController
 
 @Composable
 fun TimerConfigScreen(
-    navController: NavController,
 ){
 
 }
