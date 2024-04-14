@@ -30,10 +30,14 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.data.model.SwScreenData
 
 @Composable
 fun ConfigDialog( //1
     show: Boolean,
+    swData: SwData,
+    swScreenData: SwScreenData,
     setName: (String) -> Unit,
     onExit: () -> Unit
 ) {
@@ -48,11 +52,15 @@ fun ConfigDialog( //1
                 Box(
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
                         Text(
-                            text = "Cargá el código válido",
-                            style = TextStyle(fontSize = 20.sp),
-                            color = MaterialTheme.colorScheme.primary
+                            text = "INTERRUPTOR WiFi",
+                            style = TextStyle(fontSize = 10.sp),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
                         Spacer(modifier = Modifier.height(20.dp))
                         TextField(modifier = Modifier.fillMaxWidth(),

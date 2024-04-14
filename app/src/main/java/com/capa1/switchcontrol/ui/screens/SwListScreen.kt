@@ -1,4 +1,4 @@
-package com.capa1.switchcontrol.ui
+package com.capa1.switchcontrol.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -35,41 +36,42 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwImages
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.SwStatus
+import com.capa1.switchcontrol.ui.ConfigDialog
+import com.capa1.switchcontrol.ui.SwViewModel
+import com.capa1.switchcontrol.ui.navigation.AppScreens
 
 @Composable
 fun SwListScreen(
+    navController: NavController,
     viewModel: SwViewModel = hiltViewModel()
 ) {
     val screenModifiers by viewModel.screenModifiers.collectAsState()
-    ConfigDialog (
-        show = screenModifiers.showConfig,
-        setName = {name -> viewModel.changeName(name)},
-        onExit = {viewModel.showConfig(false)}
-    )
+    LaunchedEffect(key1 = true) {
+        viewModel.start()
+    }
 
     Box(Modifier.fillMaxSize()) {
-        if (!screenModifiers.showList) {
-            ShowSwitches(
-                switches = screenModifiers.swList,
-                swScreenMap = screenModifiers.swScreenMap,
-                config = {viewModel.showConfig(true)},
-                click = {viewModel.imageClick()}
-            )
-        }
+        ShowSwitches(
+            navController = navController,
+            switches = screenModifiers.swList,
+            swScreenMap = screenModifiers.swScreenMap,
+            click = {topic -> viewModel.imageClick(topic)}
+        )
     }
 }
 
 @Composable
 fun ShowSwitches(
+    navController: NavController,
     switches:List<SwData>,
     swScreenMap: Map<String, SwScreenData>,
-    config: () -> Unit,
-    click: () -> Unit
+    click: (String) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(all = 20.dp),
@@ -85,19 +87,19 @@ fun ShowSwitches(
                 Icon(
                     Icons.Default.Add,
                     contentDescription = "",
-                    modifier = Modifier.clickable {  }
+                    modifier = Modifier.clickable { navController.navigate(route = AppScreens.MaintenanceScreen.route) }
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
         }
         items(switches) { calValue ->
             SwRow(
+                navController = navController,
                 item = calValue,
                 swScreenData = swScreenMap [calValue.topic] ?: SwScreenData(
                     swImage = SwImages.NO_INFO,
                     timerInfo = "Sin información"),
-                config = config,
-                click = click
+                click = { click(calValue.topic) }
             )
         }
     }
@@ -105,9 +107,9 @@ fun ShowSwitches(
 
 @Composable
 fun SwRow(
+    navController: NavController,
     item: SwData,
     swScreenData: SwScreenData,
-    config: () -> Unit,
     click: () -> Unit
 ){
     Box(
@@ -127,7 +129,7 @@ fun SwRow(
                 Text(
                     text = item.name,
                     style = TextStyle(fontSize = 24.sp),
-                    modifier = Modifier.clickable{ config() }
+                    modifier = Modifier.clickable{ navController.navigate(route = AppScreens.ConfigScreen.route) }
                     //color = MaterialTheme.colorScheme.primary
                 )
                 Text (
@@ -155,14 +157,38 @@ fun SwRow(
         }
     }
 }
+
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL,
     showBackground = true
 )
 @Composable
-fun ScreenPreview() {
-    SwRow(item = SwData("luz cocina", "100AA56F", 1, 0xEFB8C8, SwStatus.CONNECTING),
-        swScreenData = SwScreenData(SwImages.CLOSE, "frafrafra"),
-        config = {},
-        click = {})
+fun ScreenPreview(value: Int = 2) {
+    val navController = null
+    when (value) {
+        1 -> navController?.let {
+            SwRow(
+                navController = it,
+                item = SwData("luz cocina", "100AA56F", 1, 0xEFB8C8, SwStatus.CONNECTING),
+                swScreenData = SwScreenData(SwImages.CLOSE, "frafrafra"),
+                click = {})
+        }
+        2 -> navController?.let {
+            ShowSwitches(
+                navController = it,
+                switches = listOf(
+                    SwData("velador", "00AB", 1, 1, SwStatus.DISCONNECTED),
+                    SwData("luz cocina", "10AB", 2, 0x00FF00, SwStatus.DISCONNECTED),
+                    SwData("riego", "20AB", 3, 1, SwStatus.DISCONNECTED),
+                    SwData("TV", "30AB", 4, 1, SwStatus.DISCONNECTED)
+                ),
+                swScreenMap = mapOf (
+                    "00AB" to SwScreenData(SwImages.CLOSE, "frafrafra"),
+                    "10AB" to SwScreenData(SwImages.OPENING, "todo liso"),
+                    "20AB" to SwScreenData(SwImages.NC, "faltan 16h"),
+                    "30AB" to SwScreenData(SwImages.CLOSE_LOCK, "cuando quiera"),
+                ) ,
+                click = {})
+        }
+    }
 }

@@ -7,6 +7,8 @@ import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.Global.TO_SW
 import com.capa1.switchcontrol.data.model.EspData
 import com.capa1.switchcontrol.data.model.FlashData
+import com.capa1.switchcontrol.data.model.KeepSwData
+import com.capa1.switchcontrol.data.model.KeepSwDataListener
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.SwScreenData
@@ -23,92 +25,47 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class Controller @Inject constructor (context: Context) : MqttListener {
+class Controller @Inject constructor (context: Context) : KeepSwDataListener, MqttListener {
     private val mqttManager = MqttManager(this)
-    private lateinit var initialList : List<SwData>
-    val swList:   MutableStateFlow<List<SwData>> = MutableStateFlow(listOf())
+    private val keepSwData = KeepSwData(context, this)
+    val swList: MutableStateFlow<List<SwData>> = MutableStateFlow(listOf())
     val swScreenMap: MutableStateFlow<Map<String, SwScreenData>> = MutableStateFlow(mapOf())
     val swMap: MutableStateFlow<Map<String, EspData>> = MutableStateFlow(mapOf())
-    private val swDataStore = SwDataStore(context)
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-    init{
-        initMqtt()
-        loadSomething()
-        actualizeSwList(getStoredSwList())
-    }
-    private fun actualizeSwList( newSwList: List<SwData>){
-        initializeSwList(newSwList)
-        coroutineScope.launch { swList.emit(newSwList) }
-    }
 
-    private fun initializeSwList (swList: List<SwData>) {
-        for(sw in swList){
-            subscribeToTopic(sw.topic)
-            initSw(sw.topic)
-        }
-    }
-
-
-    private fun loadSomething() {
-        val something = listOf(
-           SwData("velador", "00AB", 1, 1, SwStatus.DISCONNECTED),
-           SwData("luz cocina", "10AB", 2, 1, SwStatus.DISCONNECTED),
-           SwData("riego", "20AB", 3, 1, SwStatus.DISCONNECTED),
-           SwData("TV", "30AB", 4, 1, SwStatus.DISCONNECTED)
-        )
-        saveSwList(something)
-    }
-    private fun getStoredSwList() : List<SwData> {
-        var myList = FlashData("", emptyList())
-        CoroutineScope(Dispatchers.IO).launch {
-            swDataStore.getList.collect { flashData ->
-                val gson = Gson()
-                myList = gson.fromJson(flashData, FlashData::class.java) ?: FlashData("", emptyList())
-            }
-        }
-        return myList.swList
-    }
-    private fun saveSwList (listToSave: List<SwData>) {
-        val flashData = FlashData("version 0", listToSave)
-        val gson = Gson()
-        CoroutineScope(Dispatchers.IO).launch {
-            swDataStore.saveList(gson.toJson(flashData))
-        }
-    }
-
-    fun subscribeToTopic(topic: String) {
-        mqttManager.subscribe(FROM_SW + topic)
-    }
-
-    private fun initMqtt() {
+    fun initOperation() {
         mqttManager.connect()
+        keepSwData.actualizeSwList()
     }
 
-    private fun initSw( topic: String){
-        val gson = Gson()
-        mqttManager.publish(TO_SW + topic, gson.toJson(
-            EspData(
-               "",
-                SwState.GET_DATA.ordinal,
-                SwMode.TIMERS.ordinal,
-               0,
-                listOf( WeeklyProgram(0,0,0),
-                        WeeklyProgram(0,0,0),
-                        WeeklyProgram(0,0,0),
-                        WeeklyProgram(0,0,0)
-                ),
-               0)
-            )
-        )
-    }
-
-    override fun notifyNewMessage(topic: String, msg: String) {
+     override fun notifyNewMessage(topic: String, msg: String) {
         val gson = Gson()
         val newEspData = gson.fromJson(msg, EspData::class.java)
+        keepSwData.newMsg(topic, newEspData)
     }
 
     override fun notifyMqttState(mqttState: MqttState) {
         Log.i(TAG, "$mqttState")
+    }
+
+    override fun notifySwList(swList: List<SwData>) {
+        coroutineScope.launch { this@Controller.swList.emit(swList)}
+    }
+
+    override fun notifySwMap(swMap: Map<String, EspData>) {
+        coroutineScope.launch { this@Controller.swMap.emit(swMap)}
+    }
+
+    override fun notifySwScreenMap(swScreenMap: Map<String, SwScreenData>) {
+        coroutineScope.launch { this@Controller.swScreenMap.emit(swScreenMap)}
+    }
+
+    override fun subscribe(topic: String) {
+        mqttManager.subscribe(topic)
+    }
+
+    override fun publish(topic: String, msg: String) {
+        mqttManager.publish(topic, msg)
     }
 
 }

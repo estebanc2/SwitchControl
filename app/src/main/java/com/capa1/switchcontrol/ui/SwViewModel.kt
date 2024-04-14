@@ -1,14 +1,10 @@
 package com.capa1.switchcontrol.ui
 
-import android.media.Image
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Controller
-import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.data.Global.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,10 +16,13 @@ import javax.inject.Inject
 class SwViewModel  @Inject constructor(
     private val controller: Controller
 ) : ViewModel() {
-
     private val _screenModifiers = MutableStateFlow(ScreenModifiers())
     val screenModifiers: StateFlow<ScreenModifiers> = _screenModifiers
 
+    fun start(){
+        controller.initOperation()
+        subscribeToChanges()
+    }
 
     private fun subscribeToChanges() {
         viewModelScope.launch {
@@ -33,11 +32,24 @@ class SwViewModel  @Inject constructor(
                 }
             }
         }
-    }
-    fun imageClick(){
+        viewModelScope.launch {
+            controller.swMap.collect { result ->
+                _screenModifiers.update { currentState ->
+                    currentState.copy(swMap = result)
+                }
+            }
+        }
+        viewModelScope.launch {
+            controller.swScreenMap.collect { result ->
+                _screenModifiers.update { currentState ->
+                    currentState.copy(swScreenMap = result)
+                }
+            }
+        }
 
     }
-    fun showConfig(show: Boolean){
+    fun imageClick(topic: String){
+        Log.i(TAG,"recivo desde la ui el topico = $topic")
 
     }
     fun changeName (name: String){

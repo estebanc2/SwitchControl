@@ -1,4 +1,4 @@
-package com.capa1.switchcontrol.ui
+package com.capa1.switchcontrol.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.capa1.switchcontrol.data.ColorObject
@@ -22,8 +21,8 @@ import com.capa1.switchcontrol.data.ColorObject
 @Composable
 fun ColorPickerScreen(
     navController: NavController,
-    list: List<ColorObject>
 ){
+    val list = listOf(Color.Red, Color.Blue)
     LazyColumn(
         contentPadding = PaddingValues(all = 20.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
@@ -33,11 +32,11 @@ fun ColorPickerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(shape = MaterialTheme.shapes.small)
-                    .background(color = Color(value.hex.toInt()))
+                    .background(color = value)
                     .padding(horizontal = 16.dp, vertical = 10.dp)
             ){
                 Text(
-                    text = value.name
+                    text = value.toString()
                 )
             }
         }

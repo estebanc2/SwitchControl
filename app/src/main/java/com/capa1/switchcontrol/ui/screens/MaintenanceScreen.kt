@@ -1,10 +1,11 @@
-package com.capa1.switchcontrol.ui
+package com.capa1.switchcontrol.ui.screens
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 
 @Composable
-fun TimerConfigScreen(
+fun MaintenanceScreen(
+    navController: NavController,
 ){
 
 }

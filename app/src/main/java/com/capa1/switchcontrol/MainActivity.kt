@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.capa1.switchcontrol.ui.SwListScreen
+import com.capa1.switchcontrol.ui.navigation.AppNavigation
 import com.capa1.switchcontrol.ui.theme.SwitchControlTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SwListScreen()
+                    AppNavigation()
                 }
             }
         }
