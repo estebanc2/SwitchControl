@@ -42,7 +42,6 @@ import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwImages
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.SwStatus
-import com.capa1.switchcontrol.ui.ConfigDialog
 import com.capa1.switchcontrol.ui.SwViewModel
 import com.capa1.switchcontrol.ui.navigation.AppScreens
 
@@ -61,7 +60,7 @@ fun SwListScreen(
             navController = navController,
             switches = screenModifiers.swList,
             swScreenMap = screenModifiers.swScreenMap,
-            click = {topic -> viewModel.imageClick(topic)}
+            click = {id -> viewModel.imageClick(id)}
         )
     }
 }
@@ -81,7 +80,7 @@ fun ShowSwitches(
             Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                 Text(
                     text = "Interruptores WiFi",
-                    style = TextStyle(fontSize = 20.sp),
+                    style = TextStyle(fontSize = 30.sp),
                     color = MaterialTheme.colorScheme.primary
                 )
                 Icon(
@@ -96,10 +95,10 @@ fun ShowSwitches(
             SwRow(
                 navController = navController,
                 item = calValue,
-                swScreenData = swScreenMap [calValue.topic] ?: SwScreenData(
+                swScreenData = swScreenMap [calValue.id] ?: SwScreenData(
                     swImage = SwImages.NO_INFO,
                     timerInfo = "Sin información"),
-                click = { click(calValue.topic) }
+                click = { click(calValue.id) }
             )
         }
     }

@@ -18,6 +18,7 @@ class ExampleUnitTest {
     fun getMacFromTopic(){
         val topic = "/mtc/to_sw/1018A"
         val mac = topic.split("/").last()
+        println(String.format("%s es realmente 1018A", mac))
         assert(mac == "1018A")
     }
 }

@@ -2,6 +2,9 @@ package com.capa1.switchcontrol.data.model
 
 import android.content.Context
 import com.capa1.switchcontrol.data.Global
+import com.capa1.switchcontrol.data.Global.SEND_GET
+import com.capa1.switchcontrol.data.Global.SEND_OFF
+import com.capa1.switchcontrol.data.Global.SEND_ON
 import com.capa1.switchcontrol.data.SwDataStore
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
@@ -9,7 +12,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
-    private var swList: List<SwData> = listOf()
+    private var swList = listOf<SwData>()
+    private var swMap = mutableMapOf<String, EspData>()
+    private val allSwId = "000"
+    private var swScreenMap = mutableMapOf<String, SwScreenData>()
     private val swDataStore = SwDataStore(context)
     private val something = listOf(
         SwData("velador", "00AB", 1, 1, SwStatus.DISCONNECTED),
@@ -18,20 +24,36 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
         SwData("TV", "30AB", 4, 1, SwStatus.DISCONNECTED)
     )
 
+    fun newMsg(id: String, newEspData: EspData) {
+        for (data in swList){
+            if (data.id == id){
+                swMap[id] = newEspData
+                swScreenMap[id] = SwScreenData(getSwImage(id), getLeyend(id))
+                data.status = SwStatus.CONNECTED
+            } else if(allSwId == id){
+                //todo
+            }
+        }
+    }
 
+    private fun getLeyend(id: String): String{
+        return "frafra"
+    }
 
-    fun newMsg(topic: String, newEspData: EspData) {
-        TODO("Not yet implemented")
+    private fun getSwImage (id: String): SwImages{
+        
+        return SwImages.CLOSE_LOCK
     }
 
     fun actualizeSwList(){
-        val storedList = something //getStoredSwList()
-        initializeSwList(storedList)
+        swList = something //getStoredSwList()
+        listener.notifySwList(swList)
+        initializeSwList(swList)
     }
     private fun initializeSwList (swList: List<SwData>) {
         for(sw in swList){
-            subscribeToTopic(sw.topic)
-            initSw(sw.topic)
+            listener.subscribe(sw.id)
+            initSw(sw.id)
         }
     }
     private fun getStoredSwList() : List<SwData> {
@@ -52,28 +74,22 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
         }
     }
 
-    fun subscribeToTopic(topic: String) {
-        listener.subscribe(Global.FROM_SW + topic)
+    private fun initSw( id: String){
+        listener.publish(id, SEND_GET)
     }
 
-    private fun initSw( topic: String){
-        val gson = Gson()
-        listener.publish(
-            Global.TO_SW + topic, gson.toJson(
-            EspData(
-                "",
-                SwState.GET_DATA.ordinal,
-                SwMode.TIMERS.ordinal,
-                0,
-                listOf( WeeklyProgram(0,0,0),
-                    WeeklyProgram(0,0,0),
-                    WeeklyProgram(0,0,0),
-                    WeeklyProgram(0,0,0)
-                ),
-                0)
-        )
-        )
+    fun imageClick(id: String) {
+        for (data in swList) {
+            if (data.id == id) {
+                if (data.status == SwStatus.CONNECTED) {
+                    data.status = SwStatus.CONNECTING
+                    when ( swMap[id]?.state ?: SwState.GET_DATA.ordinal) {
+                        SwState.OFF.ordinal -> listener.publish(id, SEND_ON)
+                        SwState.ON.ordinal -> listener.publish(id, SEND_OFF)
+                    }
+                }
+            }
+        }
     }
-
 
 }

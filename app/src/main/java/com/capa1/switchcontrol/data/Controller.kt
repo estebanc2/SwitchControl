@@ -38,16 +38,6 @@ class Controller @Inject constructor (context: Context) : KeepSwDataListener, Mq
         keepSwData.actualizeSwList()
     }
 
-     override fun notifyNewMessage(topic: String, msg: String) {
-        val gson = Gson()
-        val newEspData = gson.fromJson(msg, EspData::class.java)
-        keepSwData.newMsg(topic, newEspData)
-    }
-
-    override fun notifyMqttState(mqttState: MqttState) {
-        Log.i(TAG, "$mqttState")
-    }
-
     override fun notifySwList(swList: List<SwData>) {
         coroutineScope.launch { this@Controller.swList.emit(swList)}
     }
@@ -60,12 +50,29 @@ class Controller @Inject constructor (context: Context) : KeepSwDataListener, Mq
         coroutineScope.launch { this@Controller.swScreenMap.emit(swScreenMap)}
     }
 
-    override fun subscribe(topic: String) {
+    override fun subscribe(id: String) {
+        val topic = FROM_SW + id
         mqttManager.subscribe(topic)
     }
 
-    override fun publish(topic: String, msg: String) {
+    override fun publish(id: String, msg: String) {
+        val topic = TO_SW + id
         mqttManager.publish(topic, msg)
     }
+
+    fun imageClick(id: String){
+        keepSwData.imageClick(id)
+    }
+    override fun notifyNewMessage(topic: String, msg: String) {
+        val gson = Gson()
+        val newEspData = gson.fromJson(msg, EspData::class.java)
+        val id = topic.split("/").last()
+        keepSwData.newMsg(id, newEspData)
+    }
+
+    override fun notifyMqttState(mqttState: MqttState) {
+        Log.i(TAG, "$mqttState")
+    }
+
 
 }

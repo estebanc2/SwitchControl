@@ -48,9 +48,9 @@ class SwViewModel  @Inject constructor(
         }
 
     }
-    fun imageClick(topic: String){
-        Log.i(TAG,"recivo desde la ui el topico = $topic")
-
+    fun imageClick(id: String){
+        Log.i(TAG,"recivo desde la ui el topico = $id")
+        controller.imageClick(id)
     }
     fun changeName (name: String){
 
