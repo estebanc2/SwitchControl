@@ -10,6 +10,11 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.Math.pow
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import kotlin.math.pow
 
 class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
     private var swList = listOf<SwData>()
@@ -37,7 +42,71 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
     }
 
     private fun getLeyend(id: String): String{
-        return "frafra"
+        if ((swMap[id]?.mode ?: null) == null){
+            return "Sin información"
+        }
+        when(swMap[id]!!.mode){
+            SwMode.PULSE_NA.ordinal -> return "Pulso de ${swMap[id]!!.modeAux} segundos"
+            SwMode.PULSE_NC.ordinal -> return "Pulso de ${swMap[id]!!.modeAux} segundos"
+            SwMode.TEMP.ordinal -> return "Enciende si temp < $${swMap[id]!!.tempX10/10}°"
+            else -> {
+                if(swMap[id]!!.state != SwState.OFF.ordinal &&
+                    swMap[id]!!.state != SwState.ON.ordinal){
+                    return "Sin información"
+                }
+                val calendar = Calendar.getInstance()
+                val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                val min = calendar.get(Calendar.MINUTE)
+                val today = calendar.get(Calendar.DAY_OF_WEEK)
+                val tomorrow = (today + 1) % 7
+                val rightNow = (hour * 60) + min
+                var delta = 24 * 60
+                if (swMap[id]!!.state == SwState.OFF.ordinal){
+                    for (prg in swMap[id]!!.swPrograms){
+                        if( 2.0.pow(today.toDouble()) != 0.0 && prg.days != 0){
+                            val deltaTrans = prg.start - rightNow
+                            if(deltaTrans in 1..<delta){
+                                delta = deltaTrans
+                            }
+                        }
+                        if( 2.0.pow(tomorrow.toDouble()) != 0.0 && prg.days != 0){
+                            val deltaTrans = prg.start + 24 * 60 - rightNow
+                            if(deltaTrans < delta){
+                                delta = deltaTrans
+                            }
+                        }
+                    }
+                }
+                else{
+                    for (prg in swMap[id]!!.swPrograms){
+                        if( 2.0.pow(today.toDouble()) != 0.0 && prg.days != 0){
+                            val deltaTrans = prg.stop - rightNow
+                            if(deltaTrans in 1..<delta){
+                                delta = deltaTrans
+                            }
+                        }
+                        if( 2.0.pow(tomorrow.toDouble()) != 0.0 && prg.days != 0){
+                            val deltaTrans = prg.stop + 24 * 60 - rightNow
+                            if(deltaTrans < delta){
+                                delta = deltaTrans
+                            }
+                        }
+                    }
+                }
+                val deltaHours = delta / 60
+                val deltaMin =  String.format(Locale.ENGLISH, "%02d", delta % 60)
+                val tempText = if(true){
+                    " si temp < ${swMap[id]!!.modeAux / 10}°. Actual: ${swMap[id]!!.tempX10 / 10}"
+                    }
+                else{ "" }
+                if (deltaHours < 24){
+                    return "Cambia en $deltaHours:$deltaMin h$tempText"
+                }
+                else{
+                    return "Cambia en más de 24 h$tempText"
+                }
+            }
+        }
     }
 
     private fun getSwImage (id: String): SwImages{
