@@ -1,7 +1,6 @@
 package com.capa1.switchcontrol.data.model
 
 import android.content.Context
-import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.Global.SEND_GET
 import com.capa1.switchcontrol.data.Global.SEND_OFF
 import com.capa1.switchcontrol.data.Global.SEND_ON
@@ -10,9 +9,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Math.pow
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 import kotlin.math.pow
 
@@ -33,18 +30,16 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
         for (data in swList){
             if (data.id == id){
                 swMap[id] = newEspData
-                swScreenMap[id] = SwScreenData(getSwImage(id), getLeyend(id))
                 data.status = SwStatus.CONNECTED
+                swScreenMap[id] = SwScreenData(getSwImage(id), getLegend(id))
+
             } else if(allSwId == id){
                 //todo
             }
         }
     }
 
-    private fun getLeyend(id: String): String{
-        if ((swMap[id]?.mode ?: null) == null){
-            return "Sin información"
-        }
+    private fun getLegend(id: String): String{
         when(swMap[id]!!.mode){
             SwMode.PULSE_NA.ordinal -> return "Pulso de ${swMap[id]!!.modeAux} segundos"
             SwMode.PULSE_NC.ordinal -> return "Pulso de ${swMap[id]!!.modeAux} segundos"
@@ -95,10 +90,10 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
                 }
                 val deltaHours = delta / 60
                 val deltaMin =  String.format(Locale.ENGLISH, "%02d", delta % 60)
-                val tempText = if(true){
-                    " si temp < ${swMap[id]!!.modeAux / 10}°. Actual: ${swMap[id]!!.tempX10 / 10}"
+                val tempText = if(swMap[id]!!.mode == SwMode.TIMERS_TEMP.ordinal){
+                        " si temp < ${swMap[id]!!.modeAux / 10}°. Actual: ${swMap[id]!!.tempX10 / 10}"
                     }
-                else{ "" }
+                    else{ "" }
                 if (deltaHours < 24){
                     return "Cambia en $deltaHours:$deltaMin h$tempText"
                 }
@@ -110,8 +105,25 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
     }
 
     private fun getSwImage (id: String): SwImages{
-        
-        return SwImages.CLOSE_LOCK
+        when(swMap[id]!!.mode to swMap[id]!!.state){
+            (SwMode.TIMERS.ordinal to SwState.ON.ordinal),
+            (SwMode.TIMERS_TEMP.ordinal to SwState.ON.ordinal),
+            (SwMode.TIMERS_CONTACT.ordinal to SwState.ON.ordinal)-> {
+                return SwImages.CLOSE
+            }
+            (SwMode.TIMERS.ordinal to SwState.OFF.ordinal),
+            (SwMode.TIMERS_TEMP.ordinal to SwState.OFF.ordinal),
+            (SwMode.TIMERS_CONTACT.ordinal to SwState.OFF.ordinal)-> {
+                return SwImages.OPEN
+            }
+            (SwMode.PULSE_NA.ordinal to SwState.ON.ordinal) -> return SwImages.NC
+            (SwMode.PULSE_NA.ordinal to SwState.OFF.ordinal) -> return SwImages.NA
+            (SwMode.PULSE_NC.ordinal to SwState.ON.ordinal) -> return SwImages.NA
+            (SwMode.PULSE_NC.ordinal to SwState.OFF.ordinal) -> return SwImages.NC
+            (SwMode.TEMP.ordinal to SwState.ON.ordinal) -> return SwImages.CLOSE_LOCK
+            (SwMode.TEMP.ordinal to SwState.OFF.ordinal) -> return SwImages.OPEN_LOCK
+            else -> return SwImages.NO_INFO
+        }
     }
 
     fun actualizeSwList(){
@@ -153,8 +165,14 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
                 if (data.status == SwStatus.CONNECTED) {
                     data.status = SwStatus.CONNECTING
                     when ( swMap[id]?.state ?: SwState.GET_DATA.ordinal) {
-                        SwState.OFF.ordinal -> listener.publish(id, SEND_ON)
-                        SwState.ON.ordinal -> listener.publish(id, SEND_OFF)
+                        SwState.OFF.ordinal -> {
+                            listener.publish(id, SEND_ON)
+                            swScreenMap[id]!!.swImage = SwImages.OPENING
+                        }
+                        SwState.ON.ordinal -> {
+                            listener.publish(id, SEND_OFF)
+                            swScreenMap[id]!!.swImage = SwImages.CLOSING
+                        }
                     }
                 }
             }
