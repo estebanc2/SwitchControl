@@ -1,5 +1,7 @@
 package com.capa1.switchcontrol.data
 
+
+import androidx.compose.ui.graphics.Color
 import com.capa1.switchcontrol.data.model.EspData
 import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.SwState
@@ -15,7 +17,26 @@ object Global {
 
     const val TAG = "switchcontrol"
     const val FLASH_VERSION = "1.8"
-    val SEND_ON = gson.toJson(
+
+    data class MyColor(
+        val backColor: Color,
+        val textColor: Color
+    )
+    val MyColors: Map<String, MyColor> = mapOf(
+        "nada"    to  MyColor(Color(0xFFFFFFFF), Color(0xFF000000)),
+        "limon"   to  MyColor(Color(0xFFFDD835), Color(0xFF000000)),
+        "pomelo"  to  MyColor(Color(0xFFFFAA00), Color(0xFF000000)),
+        "naranja" to  MyColor(Color(0xFFFB8C00), Color(0xFF000000)),
+        "rosa"    to  MyColor(Color(0xFFFCA0C2), Color(0xFF000000)),
+        "lila"    to  MyColor(Color(0xFFCA57E9), Color(0xFFFFFFFF)),
+        "cielo"   to  MyColor(Color(0xFF85D0F5), Color(0xFF000000)),
+        "mar"     to  MyColor(Color(0xFF4F66F5), Color(0xFFFFFFFF)),
+        "palta"   to  MyColor(Color(0xFFA3F8A7), Color(0xFF000000)),
+        "pasto"   to  MyColor(Color(0xFF05800A), Color(0xFFFFFFFF)),
+        "metal"   to  MyColor(Color(0xFF8F8C8F), Color(0xFFFFFFFF)),
+        "madera"  to  MyColor(Color(0xFF793E2B), Color(0xFFFFFFFF)),
+    )
+    val SEND_ON: String = gson.toJson(
                     EspData(
                     name = "",
                     state = SwState.ON.ordinal,
@@ -28,7 +49,7 @@ object Global {
                     ),
                     tempX10 = 0)
                 )
-    val SEND_OFF = gson.toJson(
+    val SEND_OFF: String = gson.toJson(
         EspData(
             name = "",
             state = SwState.OFF.ordinal,
@@ -41,10 +62,23 @@ object Global {
             ),
             tempX10 = 0)
     )
-    val SEND_GET = gson.toJson(
+    val SEND_GET: String = gson.toJson(
         EspData(
             name = "",
             state = SwState.GET_DATA.ordinal,
+            mode = SwMode.TIMERS.ordinal,
+            modeAux = 0,
+            swPrograms = listOf( WeeklyProgram(0,0,0),
+                WeeklyProgram(0,0,0),
+                WeeklyProgram(0,0,0),
+                WeeklyProgram(0,0,0)
+            ),
+            tempX10 = 0)
+    )
+    val SEND_ERASE: String = gson.toJson(
+        EspData(
+            name = "",
+            state = SwState.ERASE.ordinal,
             mode = SwMode.TIMERS.ordinal,
             modeAux = 0,
             swPrograms = listOf( WeeklyProgram(0,0,0),

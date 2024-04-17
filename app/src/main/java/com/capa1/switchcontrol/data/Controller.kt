@@ -6,15 +6,10 @@ import com.capa1.switchcontrol.data.Global.FROM_SW
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.Global.TO_SW
 import com.capa1.switchcontrol.data.model.EspData
-import com.capa1.switchcontrol.data.model.FlashData
 import com.capa1.switchcontrol.data.model.KeepSwData
 import com.capa1.switchcontrol.data.model.KeepSwDataListener
 import com.capa1.switchcontrol.data.model.SwData
-import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.SwScreenData
-import com.capa1.switchcontrol.data.model.SwState
-import com.capa1.switchcontrol.data.model.SwStatus
-import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.mqtt.MqttListener
 import com.capa1.switchcontrol.data.mqtt.MqttManager
 import com.capa1.switchcontrol.data.mqtt.MqttState

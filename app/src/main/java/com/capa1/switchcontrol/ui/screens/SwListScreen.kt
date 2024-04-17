@@ -37,7 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.capa1.switchcontrol.R
+import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwImages
 import com.capa1.switchcontrol.data.model.SwScreenData
@@ -115,18 +117,17 @@ fun SwRow(
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape = MaterialTheme.shapes.small)
-            .background(color = MaterialTheme.colorScheme.secondary)
+            .background(MyColors[item.bkColor]!!.backColor)
             .padding(horizontal = 16.dp, vertical = 10.dp)
     ){
         Row(
-            Modifier
-                .fillMaxWidth()
-                .background(Color(item.bkColor)),
+            Modifier.fillMaxWidth(),
             Arrangement.SpaceBetween,
             ){
             Column {
                 Text(
                     text = item.name,
+                    color = MyColors[item.bkColor]!!.textColor,
                     style = TextStyle(fontSize = 24.sp),
                     modifier = Modifier.clickable{ navController.navigate(route = AppScreens.ConfigScreen.route) }
                     //color = MaterialTheme.colorScheme.primary
@@ -163,23 +164,19 @@ fun SwRow(
 )
 @Composable
 fun ScreenPreview(value: Int = 2) {
-    val navController = null
     when (value) {
-        1 -> navController?.let {
-            SwRow(
-                navController = it,
-                item = SwData("luz cocina", "100AA56F", 1, 0xEFB8C8, SwStatus.CONNECTING),
+        1 -> SwRow(
+                navController = rememberNavController(),
+                item = SwData("luz cocina", "100AA56F", 1, "palta", SwStatus.CONNECTING),
                 swScreenData = SwScreenData(SwImages.CLOSE, "frafrafra"),
                 click = {})
-        }
-        2 -> navController?.let {
-            ShowSwitches(
-                navController = it,
+        2 -> ShowSwitches(
+                navController = rememberNavController(),
                 switches = listOf(
-                    SwData("velador", "00AB", 1, 1, SwStatus.DISCONNECTED),
-                    SwData("luz cocina", "10AB", 2, 0x00FF00, SwStatus.DISCONNECTED),
-                    SwData("riego", "20AB", 3, 1, SwStatus.DISCONNECTED),
-                    SwData("TV", "30AB", 4, 1, SwStatus.DISCONNECTED)
+                    SwData("velador", "00AB", 1, "nada", SwStatus.DISCONNECTED),
+                    SwData("luz cocina", "10AB", 2, "metal", SwStatus.DISCONNECTED),
+                    SwData("riego", "20AB", 3, "madera", SwStatus.DISCONNECTED),
+                    SwData("TV", "30AB", 4, "mar", SwStatus.DISCONNECTED)
                 ),
                 swScreenMap = mapOf (
                     "00AB" to SwScreenData(SwImages.CLOSE, "frafrafra"),
@@ -188,6 +185,5 @@ fun ScreenPreview(value: Int = 2) {
                     "30AB" to SwScreenData(SwImages.CLOSE_LOCK, "cuando quiera"),
                 ) ,
                 click = {})
-        }
     }
 }

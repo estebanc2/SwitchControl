@@ -20,10 +20,10 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
     private var swScreenMap = mutableMapOf<String, SwScreenData>()
     private val swDataStore = SwDataStore(context)
     private val something = listOf(
-        SwData("velador", "00AB", 1, 1, SwStatus.DISCONNECTED),
-        SwData("luz cocina", "10AB", 2, 1, SwStatus.DISCONNECTED),
-        SwData("riego", "20AB", 3, 1, SwStatus.DISCONNECTED),
-        SwData("TV", "30AB", 4, 1, SwStatus.DISCONNECTED)
+        SwData("velador", "00AB", 1, "nada", SwStatus.DISCONNECTED),
+        SwData("luz cocina", "10AB", 2, "metal", SwStatus.DISCONNECTED),
+        SwData("riego", "20AB", 3, "limon", SwStatus.DISCONNECTED),
+        SwData("TV", "30AB", 4, "palta", SwStatus.DISCONNECTED)
     )
 
     fun newMsg(id: String, newEspData: EspData) {

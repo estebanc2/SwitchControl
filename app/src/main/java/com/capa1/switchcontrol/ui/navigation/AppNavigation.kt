@@ -17,9 +17,7 @@ import com.capa1.switchcontrol.ui.screens.TimerConfigScreen
 fun AppNavigation(){
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = AppScreens.SwListScreen.route){
-        composable(route = AppScreens.ColorPickerScreen.route){
-            ColorPickerScreen(navController)
-        }
+
         composable(route = AppScreens.ConfigScreen.route){
             ConfigScreen(navController)
         }
@@ -39,7 +37,7 @@ fun AppNavigation(){
 }
 sealed class AppScreens(val route: String) {
     data object SwListScreen: AppScreens("list")
-    data object ConfigScreen: AppScreens("config")
+    data object ConfigScreen: AppScreens("config/id")
     data object ModeConfigScreen: AppScreens("mode")
     data object MaintenanceScreen: AppScreens("maintenance")
     data object ColorPickerScreen: AppScreens("colorPicker")

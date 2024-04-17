@@ -4,6 +4,6 @@ data class SwData(
     val name: String,
     val id: String,
     val row: Int,
-    val bkColor: Int,
+    val bkColor: String = "nada",
     var status: SwStatus
 )
