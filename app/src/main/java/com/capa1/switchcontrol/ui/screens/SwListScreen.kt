@@ -45,7 +45,6 @@ import com.capa1.switchcontrol.data.model.SwImages
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.ui.SwViewModel
-import com.capa1.switchcontrol.ui.navigation.AppScreens
 
 @Composable
 fun SwListScreen(
@@ -88,7 +87,7 @@ fun ShowSwitches(
                 Icon(
                     Icons.Default.Add,
                     contentDescription = "",
-                    modifier = Modifier.clickable { navController.navigate(route = AppScreens.MaintenanceScreen.route) }
+                    modifier = Modifier.clickable { navController.navigate("Load") }
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -113,6 +112,7 @@ fun SwRow(
     swScreenData: SwScreenData,
     click: () -> Unit
 ){
+    val frula = "1234"
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -129,7 +129,8 @@ fun SwRow(
                     text = item.name,
                     color = MyColors[item.bkColor]!!.textColor,
                     style = TextStyle(fontSize = 24.sp),
-                    modifier = Modifier.clickable{ navController.navigate(route = AppScreens.ConfigScreen.route) }
+
+                    modifier = Modifier.clickable{ navController.navigate("Config/$frula")}//${item.id}") }
                     //color = MaterialTheme.colorScheme.primary
                 )
                 Text (

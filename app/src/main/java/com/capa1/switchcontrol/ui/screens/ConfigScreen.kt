@@ -33,19 +33,20 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.ui.SwViewModel
 
 @Composable
 fun ConfigScreen(
-    navController: NavController,
+    id: String?,
     viewModel: SwViewModel = hiltViewModel()
 ) {
     val screenModifiers by viewModel.screenModifiers.collectAsState()
     val tokenValue = remember {
         mutableStateOf(TextFieldValue())
     }
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
         Column(
             Modifier.fillMaxSize(),
             //contentPadding = PaddingValues(all = 20.dp),
@@ -71,7 +72,7 @@ fun ConfigScreen(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "luz cocina",
+                    text = id?:"no vino nada", //screenModifiers.swMap[id]?.name?: "nada",
                     style = TextStyle(fontSize = 30.sp),
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -102,11 +103,13 @@ fun ConfigScreen(
                 )
                 Icon(
                     Icons.Default.KeyboardArrowUp,
-                    contentDescription = ""
+                    contentDescription = "",
+                    modifier = Modifier.padding(horizontal = 10.dp)
                 )
                 Icon(
                     Icons.Default.KeyboardArrowDown,
-                    contentDescription = ""
+                    contentDescription = "",
+                    modifier = Modifier.padding(horizontal = 10.dp)
                 )
                 Spacer(modifier = Modifier.padding(horizontal = 70.dp))
                 Text(
@@ -125,5 +128,5 @@ fun ConfigScreen(
 @Composable
 fun SwConfigPreview()
 {
-    ConfigScreen(navController = rememberNavController())
+    ConfigScreen(id = "001A")
 }
