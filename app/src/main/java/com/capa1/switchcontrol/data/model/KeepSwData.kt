@@ -20,10 +20,10 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
     private var swScreenMap = mutableMapOf<String, SwScreenData>()
     private val swDataStore = SwDataStore(context)
     private val something = listOf(
-        SwData("velador", "00AB", 1, "nada", SwStatus.DISCONNECTED),
-        SwData("luz cocina", "10AB", 2, "metal", SwStatus.DISCONNECTED),
-        SwData("riego", "20AB", 3, "limon", SwStatus.DISCONNECTED),
-        SwData("TV", "30AB", 4, "palta", SwStatus.DISCONNECTED)
+        SwData("velador", "483fda877368", 2, "limon", SwStatus.DISCONNECTED),
+        SwData("luz cocina", "98f4abb33d5a", 1, "lila", SwStatus.DISCONNECTED),
+        SwData("riego", "483fda878e46", 3, "pasto", SwStatus.DISCONNECTED),
+        SwData("TV", "483fda879484", 4, "madera", SwStatus.DISCONNECTED)
     )
 
     fun newMsg(id: String, newEspData: EspData) {
@@ -41,8 +41,8 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
 
     private fun getLegend(id: String): String{
         when(swMap[id]!!.mode){
-            SwMode.PULSE_NA.ordinal -> return "Pulso de ${swMap[id]!!.modeAux} segundos"
-            SwMode.PULSE_NC.ordinal -> return "Pulso de ${swMap[id]!!.modeAux} segundos"
+            SwMode.PULSE_NA.ordinal -> return "Pulso de ${swMap[id]!!.secs} segundos"
+            SwMode.PULSE_NC.ordinal -> return "Pulso de ${swMap[id]!!.secs} segundos"
             SwMode.TEMP.ordinal -> return "Enciende si temp < $${swMap[id]!!.tempX10/10}°"
             else -> {
                 if(swMap[id]!!.state != SwState.OFF.ordinal &&
@@ -57,7 +57,7 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
                 val rightNow = (hour * 60) + min
                 var delta = 24 * 60
                 if (swMap[id]!!.state == SwState.OFF.ordinal){
-                    for (prg in swMap[id]!!.swPrograms){
+                    for (prg in swMap[id]!!.prgs){
                         if( 2.0.pow(today.toDouble()) != 0.0 && prg.days != 0){
                             val deltaTrans = prg.start - rightNow
                             if(deltaTrans in 1..<delta){
@@ -73,7 +73,7 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
                     }
                 }
                 else{
-                    for (prg in swMap[id]!!.swPrograms){
+                    for (prg in swMap[id]!!.prgs){
                         if( 2.0.pow(today.toDouble()) != 0.0 && prg.days != 0){
                             val deltaTrans = prg.stop - rightNow
                             if(deltaTrans in 1..<delta){
@@ -91,7 +91,7 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
                 val deltaHours = delta / 60
                 val deltaMin =  String.format(Locale.ENGLISH, "%02d", delta % 60)
                 val tempText = if(swMap[id]!!.mode == SwMode.TIMERS_TEMP.ordinal){
-                        " si temp < ${swMap[id]!!.modeAux / 10}°. Actual: ${swMap[id]!!.tempX10 / 10}"
+                        " si temp < ${swMap[id]!!.secs / 10}°. Actual: ${swMap[id]!!.tempX10 / 10}"
                     }
                     else{ "" }
                 if (deltaHours < 24){
@@ -129,8 +129,13 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
     fun actualizeSwList(){
         swList = something //getStoredSwList()
         listener.notifySwList(swList)
+    }
+
+    fun initMqttOperation() {
         initializeSwList(swList)
     }
+
+
     private fun initializeSwList (swList: List<SwData>) {
         for(sw in swList){
             listener.subscribe(sw.id)

@@ -9,7 +9,7 @@ import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.google.gson.Gson
 
 object Global {
-    val gson = Gson()
+    private val gson = Gson()
     const val TO_SW = "/mtc/to_sw/"
     const val FROM_SW = "/mtc/from_sw/"
     const val MQTT_HOST_AND_PORT =
@@ -36,17 +36,19 @@ object Global {
         "metal"   to  MyColor(Color(0xFF8F8C8F), Color(0xFFFFFFFF)),
         "madera"  to  MyColor(Color(0xFF793E2B), Color(0xFFFFFFFF)),
     )
+    val NO_TIMERS: List<WeeklyProgram> = listOf( WeeklyProgram(0,0,0),
+                WeeklyProgram(0,0,0),
+                WeeklyProgram(0,0,0),
+                WeeklyProgram(0,0,0)
+    )
+
     val SEND_ON: String = gson.toJson(
                     EspData(
                     name = "",
                     state = SwState.ON.ordinal,
                     mode = SwMode.TIMERS.ordinal,
-                    modeAux = 0,
-                    swPrograms = listOf( WeeklyProgram(0,0,0),
-                        WeeklyProgram(0,0,0),
-                        WeeklyProgram(0,0,0),
-                        WeeklyProgram(0,0,0)
-                    ),
+                    secs = 0,
+                    prgs = NO_TIMERS,
                     tempX10 = 0)
                 )
     val SEND_OFF: String = gson.toJson(
@@ -54,12 +56,8 @@ object Global {
             name = "",
             state = SwState.OFF.ordinal,
             mode = SwMode.TIMERS.ordinal,
-            modeAux = 0,
-            swPrograms = listOf( WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0)
-            ),
+            secs = 0,
+            prgs =  NO_TIMERS,
             tempX10 = 0)
     )
     val SEND_GET: String = gson.toJson(
@@ -67,12 +65,8 @@ object Global {
             name = "",
             state = SwState.GET_DATA.ordinal,
             mode = SwMode.TIMERS.ordinal,
-            modeAux = 0,
-            swPrograms = listOf( WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0)
-            ),
+            secs = 0,
+            prgs =  NO_TIMERS,
             tempX10 = 0)
     )
     val SEND_ERASE: String = gson.toJson(
@@ -80,12 +74,8 @@ object Global {
             name = "",
             state = SwState.ERASE.ordinal,
             mode = SwMode.TIMERS.ordinal,
-            modeAux = 0,
-            swPrograms = listOf( WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0)
-            ),
+            secs = 0,
+            prgs =  NO_TIMERS,
             tempX10 = 0)
     )
 

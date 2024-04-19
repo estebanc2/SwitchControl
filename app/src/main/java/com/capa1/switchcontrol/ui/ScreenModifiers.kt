@@ -8,5 +8,6 @@ data class ScreenModifiers(
     val swList: List<SwData> = listOf(),
     val swMap: Map<String, EspData> = mapOf(),
     val swScreenMap: Map<String, SwScreenData> = mapOf(),
-    val showConfig: Boolean = false
+    val showConfig: Boolean = false,
+    val timersInfo: Map<String,List<String>> = mapOf()
 )

@@ -112,7 +112,6 @@ fun SwRow(
     swScreenData: SwScreenData,
     click: () -> Unit
 ){
-    val frula = "1234"
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -130,7 +129,7 @@ fun SwRow(
                     color = MyColors[item.bkColor]!!.textColor,
                     style = TextStyle(fontSize = 24.sp),
 
-                    modifier = Modifier.clickable{ navController.navigate("Config/$frula")}//${item.id}") }
+                    modifier = Modifier.clickable{ navController.navigate("Config/${item.id}") }
                     //color = MaterialTheme.colorScheme.primary
                 )
                 Text (

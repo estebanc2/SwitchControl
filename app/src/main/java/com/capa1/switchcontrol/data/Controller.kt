@@ -66,8 +66,9 @@ class Controller @Inject constructor (context: Context) : KeepSwDataListener, Mq
     }
 
     override fun notifyMqttState(mqttState: MqttState) {
-        Log.i(TAG, "$mqttState")
+        if (mqttState == MqttState.INIT){
+            keepSwData.initMqttOperation()
+        }
+        Log.i(TAG, "en el controller llega: $mqttState")
     }
-
-
 }
