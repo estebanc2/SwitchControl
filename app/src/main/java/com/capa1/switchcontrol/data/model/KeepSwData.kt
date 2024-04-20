@@ -8,13 +8,16 @@ import com.capa1.switchcontrol.data.SwDataStore
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
+import javax.inject.Inject
 import kotlin.math.pow
 
-class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
+class KeepSwData @Inject constructor (context: Context, private val listener: KeepSwDataListener) {
     private var swList = listOf<SwData>()
+    val mutableSwList: MutableStateFlow<List<SwData>> = MutableStateFlow(listOf())
     private var swMap = mutableMapOf<String, EspData>()
     private val allSwId = "000"
     private var swScreenMap = mutableMapOf<String, SwScreenData>()
@@ -25,6 +28,11 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
         SwData("riego", "483fda878e46", 3, "pasto", SwStatus.DISCONNECTED),
         SwData("TV", "483fda879484", 4, "madera", SwStatus.DISCONNECTED)
     )
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+
+    private fun swListChange(swList: List<SwData>) {
+        coroutineScope.launch { mutableSwList.emit(swList)}
+    }
 
     fun newMsg(id: String, newEspData: EspData) {
         for (data in swList){
@@ -128,6 +136,7 @@ class KeepSwData(context: Context, private val listener: KeepSwDataListener) {
 
     fun actualizeSwList(){
         swList = something //getStoredSwList()
+        coroutineScope.launch { mutableSwList.emit(swList)}
         listener.notifySwList(swList)
     }
 

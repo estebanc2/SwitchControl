@@ -5,16 +5,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capa1.switchcontrol.data.Controller
 import com.capa1.switchcontrol.data.Global.TAG
+import com.capa1.switchcontrol.data.model.KeepSwData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SwViewModel  @Inject constructor(
-    private val controller: Controller
+    private val controller: Controller,
+    private val keepSwData: KeepSwData
 ) : ViewModel() {
     private val _screenModifiers = MutableStateFlow(ScreenModifiers())
     val screenModifiers: StateFlow<ScreenModifiers> = _screenModifiers
@@ -29,6 +32,13 @@ class SwViewModel  @Inject constructor(
             controller.swList.collect { result ->
                 _screenModifiers.update { currentState ->
                     currentState.copy(swList = result)
+                }
+            }
+        }
+        viewModelScope.launch {
+            keepSwData.mutableSwList.collect() { result ->
+                _screenModifiers.update { currentState ->
+                    currentState.copy(mSwList = result)
                 }
             }
         }
