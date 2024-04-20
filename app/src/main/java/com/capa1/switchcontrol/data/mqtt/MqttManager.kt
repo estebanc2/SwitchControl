@@ -64,15 +64,15 @@ class MqttManager @Inject constructor(
             e.printStackTrace()
         }
     }
-    fun subscribe(topic: String, qos: Int = 1) {
+    fun subscribe(id: String, qos: Int = 1) {
         try {
-            mqttClient.subscribe(FROM_SW + topic, qos, null, object : IMqttActionListener {
+            mqttClient.subscribe(FROM_SW + id, qos, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    Log.i(TAG, "Subscribed to $topic")
+                    Log.i(TAG, "Subscribed to $id")
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    Log.i(TAG, "Failed to subscribe $topic")
+                    Log.i(TAG, "Failed to subscribe $id")
                 }
             })
         } catch (e: MqttException) {
@@ -96,19 +96,19 @@ class MqttManager @Inject constructor(
             e.printStackTrace()
         }
     }
-    fun publish(topic: String, msg: String, qos: Int = 1, retained: Boolean = false) {
+    fun publish(id: String, msg: String, qos: Int = 1, retained: Boolean = false) {
         try {
             val message = MqttMessage()
             message.payload = msg.toByteArray()
             message.qos = qos
             message.isRetained = retained
-            mqttClient.publish(TO_SW + topic, message, null, object : IMqttActionListener {
+            mqttClient.publish(TO_SW + id, message, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    Log.i(TAG, "$msg published to $topic")
+                    Log.i(TAG, "$msg published to $id")
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    Log.i(TAG, "Failed to publish $msg to $topic")
+                    Log.i(TAG, "Failed to publish $msg to $id")
                 }
             })
         } catch (e: MqttException) {

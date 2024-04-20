@@ -28,7 +28,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -167,7 +166,7 @@ fun ScreenPreview(value: Int = 2) {
     when (value) {
         1 -> SwRow(
                 navController = rememberNavController(),
-                item = SwData("luz cocina", "100AA56F", 1, "palta", SwStatus.CONNECTING),
+                item = SwData("luz cocina", "100AA56F", 1, "palta", SwStatus.DISCONNECTED),
                 swScreenData = SwScreenData(SwImages.CLOSE, "frafrafra"),
                 click = {})
         2 -> ShowSwitches(

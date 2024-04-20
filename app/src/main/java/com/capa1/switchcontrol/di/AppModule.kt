@@ -1,8 +1,7 @@
 package com.capa1.switchcontrol.di
 
-import android.bluetooth.BluetoothAdapter
 import android.content.Context
-import com.capa1.switchcontrol.data.Controller
+import com.capa1.switchcontrol.data.model.KeepSwData
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,11 +14,10 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun providesController(
+    fun providesKeepSwData(
         @ApplicationContext context: Context
-    ): Controller
+    ): KeepSwData
     {
-        return Controller(context)
+        return KeepSwData(context)
     }
-
 }
