@@ -52,11 +52,11 @@ android {
 }
 
 dependencies {
-    implementation ("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
-    implementation("androidx.core:core-ktx:1.12.0")
+
+    implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.5")
-    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.6")
+    implementation("androidx.activity:activity-compose:1.9.0")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
@@ -72,9 +72,9 @@ dependencies {
     //Screen Navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")
     // store
-    implementation("androidx.datastore:datastore-preferences-core:1.0.0")
-    implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
-    implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
+    implementation("androidx.datastore:datastore-preferences-core:1.1.0")
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.0")
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.0")
     //extra icons
     implementation("androidx.compose.material:material-icons-extended-android:1.6.6")
     //di

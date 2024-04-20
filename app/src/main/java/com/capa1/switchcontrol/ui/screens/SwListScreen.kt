@@ -19,9 +19,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,6 +49,7 @@ import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwImages
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.SwStatus
+import com.capa1.switchcontrol.ui.AddSwDialog
 import com.capa1.switchcontrol.ui.SwViewModel
 
 @Composable
@@ -54,12 +61,17 @@ fun SwListScreen(
     LaunchedEffect(key1 = true) {
         viewModel.start()
     }
-
+    AddSwDialog(
+        show = screenModifiers.showAdd,
+        navController = navController,
+        exit = {viewModel.showAdd(false)}
+    )
     Box(Modifier.fillMaxSize()) {
         ShowSwitches(
             navController = navController,
             switches = screenModifiers.swList,
             swScreenMap = screenModifiers.swScreenMap,
+            showAdd = {viewModel.showAdd(true)},
             click = {id -> viewModel.imageClick(id)}
         )
     }
@@ -70,6 +82,7 @@ fun ShowSwitches(
     navController: NavController,
     switches:List<SwData>,
     swScreenMap: Map<String, SwScreenData>,
+    showAdd: () -> Unit,
     click: (String) -> Unit
 ) {
     LazyColumn(
@@ -86,7 +99,7 @@ fun ShowSwitches(
                 Icon(
                     Icons.Default.Add,
                     contentDescription = "",
-                    modifier = Modifier.clickable { navController.navigate("Load") }
+                    modifier = Modifier.clickable { showAdd() }
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
@@ -183,6 +196,7 @@ fun ScreenPreview(value: Int = 2) {
                     "20AB" to SwScreenData(SwImages.NC, "faltan 16h"),
                     "30AB" to SwScreenData(SwImages.CLOSE_LOCK, "cuando quiera"),
                 ) ,
+            {},
                 click = {})
     }
 }

@@ -6,7 +6,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.capa1.switchcontrol.ui.screens.AddIdSwScreen
+import com.capa1.switchcontrol.ui.screens.AddSwScreen
 import com.capa1.switchcontrol.ui.screens.ConfigScreen
+import com.capa1.switchcontrol.ui.screens.ReceiveAllScreen
+import com.capa1.switchcontrol.ui.screens.SendAllScreen
 import com.capa1.switchcontrol.ui.screens.SwListScreen
 
 
@@ -17,6 +21,22 @@ fun AppNavigation(){
         composable(route = "List"){
             SwListScreen(navController)
         }
+        composable(route = "AddSw"){
+            AddSwScreen()
+        }
+        composable(route = "AddId"){
+            AddIdSwScreen()
+        }
+        composable(route = "SendAll"){
+            SendAllScreen()
+        }
+        composable(route = "ReceiveAll"){
+            ReceiveAllScreen()
+        }
+        composable(route = "AddSw"){
+            AddSwScreen()
+        }
+
         composable(
             route = "Config/{id}",
             arguments = listOf(

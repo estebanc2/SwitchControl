@@ -12,8 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.MoodBad
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -33,9 +38,85 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.capa1.switchcontrol.data.model.SwData
-import com.capa1.switchcontrol.data.model.SwScreenData
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.capa1.switchcontrol.data.model.WeeklyProgram
+
+@Composable
+fun AddSwDialog( //4
+    show: Boolean,
+    navController: NavController,
+    exit: () -> Unit
+) {
+    if (show) {
+        Dialog(onDismissRequest = {}) {
+            Surface(
+                //shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+            ) {
+                Box(
+                    contentAlignment = Alignment.TopEnd//   .Center
+                ) {
+                    Column(
+                        //horizontalAlignment  =  Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Agregar interruptor/es",
+                            style = TextStyle(fontSize = 16.sp),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        TextButton(
+                            onClick = { navController.navigate("AddSw") },
+                        ) {
+                            Icon(
+                                Icons.Default.AddCircleOutline,
+                                contentDescription = "",
+                            )
+                            Text(text = "agregar un interruptor nuevo")
+                        }
+                        TextButton(
+                            onClick = { navController.navigate("AddId") },
+                        ) {
+                            Icon(
+                                Icons.Default.CheckCircleOutline,
+                                contentDescription = "",
+                            )
+                            Text(text = "agregar un interruptor con un Id")
+                        }
+                        TextButton(
+                            onClick = { navController.navigate("ReceiveAll") },
+                        ) {
+                            Icon(
+                                Icons.Default.FileDownload,
+                                contentDescription = "",
+                            )
+                            Text(text = "recibir configuración completa")
+                        }
+                        TextButton(
+                            onClick = { navController.navigate("SendAll") },
+                        ) {
+                            Icon(
+                                Icons.Default.FileUpload,
+                                contentDescription = "",
+                            )
+                            Text(text = "enviar configuración completa")
+                        }
+                        TextButton(
+                            onClick = { exit() },
+                        ) {
+                            Icon(
+                                Icons.Default.MoodBad,
+                                contentDescription = "",
+                            )
+                            Text(text = "nada de esto por ahora")
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun NameDialog( //1
@@ -220,13 +301,14 @@ fun TimerDialog( //3
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 1) {
+fun ShowDialog(value: Int = 4) {
     //Column
     when (value) {
 
         1 -> NameDialog(true, "luz cocina", {""}, {})
         2 -> ColorDialog(true, "cielo", {""},{} )
         3 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
+        4 -> AddSwDialog(true, navController = rememberNavController(),{})
         else -> {}
     }
 }

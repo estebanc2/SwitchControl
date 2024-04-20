@@ -26,7 +26,7 @@ class SwViewModel  @Inject constructor(
 
     private fun subscribeToChanges() {
         viewModelScope.launch {
-            keepSwData.swList.collect() { result ->
+            keepSwData.swList.collect { result ->
                 _screenModifiers.update { currentState ->
                     currentState.copy(swList = result)
                 }
@@ -41,6 +41,7 @@ class SwViewModel  @Inject constructor(
         }
         viewModelScope.launch {
             keepSwData.swScreenMap.collect() { result ->
+                Log.i(TAG, "swSceenMap changed!!")
                 _screenModifiers.update { currentState ->
                     currentState.copy(swScreenMap = result)
                 }
@@ -48,7 +49,6 @@ class SwViewModel  @Inject constructor(
         }
     }
     fun imageClick(id: String){
-        Log.i(TAG,"recivo desde la ui el id = $id")
         keepSwData.imageClick(id)
     }
     fun changeName (name: String){
@@ -64,6 +64,16 @@ class SwViewModel  @Inject constructor(
     }
 
     fun picker() {
+        TODO("Not yet implemented")
+    }
+
+    fun showAdd(show: Boolean) {
+        _screenModifiers.update { currentState ->
+            currentState.copy(showAdd = show)
+        }
+    }
+
+    fun newId() {
         TODO("Not yet implemented")
     }
 }
