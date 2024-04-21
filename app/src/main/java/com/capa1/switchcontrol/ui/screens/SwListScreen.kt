@@ -41,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.capa1.switchcontrol.R
@@ -57,7 +58,7 @@ fun SwListScreen(
     navController: NavController,
     viewModel: SwViewModel = hiltViewModel()
 ) {
-    val screenModifiers by viewModel.screenModifiers.collectAsState()
+    val screenModifiers by viewModel.screenModifiers.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = true) {
         viewModel.start()
     }

@@ -14,6 +14,8 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -26,7 +28,7 @@ class KeepSwData @Inject constructor (
     context: Context
 ): MqttListener {
     private val mqttManager = MqttManager(this)
-    private var _swList = mutableListOf<SwData>()
+    private var _swList = listOf<SwData>()
     private var _swMap = mutableMapOf<String, EspData>()
     private val allSwId = "000"
     private val newSwId = "11111"
@@ -73,6 +75,7 @@ class KeepSwData @Inject constructor (
                     _swMap[id] = newEspData
                     data.status = SwStatus.CONNECTED
                     _swScreenMap[id] = SwScreenData(getSwImage(id), getLegend(id))
+                    Log.i(TAG, "------- ${id} HA CAMBIADO -----")
                     coroutineScope.launch { swList.emit(_swList) }
                     coroutineScope.launch { swMap.emit(_swMap) }
                     coroutineScope.launch { swScreenMap.emit(_swScreenMap) }
@@ -202,6 +205,8 @@ class KeepSwData @Inject constructor (
     private fun checkSwitches(){
         val timerInSec = 10L
         fixedRateTimer("timer", false, 0L, timerInSec * 1000){
+
+            coroutineScope.launch { swMap.emit(_swMap) }
             for (sw in _swList){
                 if(sw.status == SwStatus.DISCONNECTED){
                     initSw(sw.id)
@@ -219,7 +224,7 @@ class KeepSwData @Inject constructor (
         for (data in _swList) {
             if (data.id == id) {
                 if (data.status == SwStatus.CONNECTED) {
-                    data.status = SwStatus.DISCONNECTED
+                    data.status = SwStatus.CONNECTING
                     when ( _swMap[id]?.state ?: SwState.GET_DATA.ordinal) {
                         SwState.OFF.ordinal -> {
                             mqttManager.publish(id, SEND_ON)

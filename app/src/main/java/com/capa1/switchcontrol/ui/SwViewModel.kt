@@ -35,6 +35,7 @@ class SwViewModel  @Inject constructor(
         }
         viewModelScope.launch {
             keepSwData.swMap.collect() { result ->
+                Log.i(TAG, "swMap changed!!")
                 _screenModifiers.update { currentState ->
                     currentState.copy(swMap = result)
                 }
