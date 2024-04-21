@@ -200,7 +200,8 @@ class KeepSwData @Inject constructor (
     }
 
     private fun checkSwitches(){
-        fixedRateTimer("timer", false, 0L, 60 * 1000){
+        val timerInSec = 10L
+        fixedRateTimer("timer", false, 0L, timerInSec * 1000){
             for (sw in _swList){
                 if(sw.status == SwStatus.DISCONNECTED){
                     initSw(sw.id)

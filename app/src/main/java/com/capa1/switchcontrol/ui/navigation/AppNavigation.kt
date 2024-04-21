@@ -33,10 +33,6 @@ fun AppNavigation(){
         composable(route = "ReceiveAll"){
             ReceiveAllScreen()
         }
-        composable(route = "AddSw"){
-            AddSwScreen()
-        }
-
         composable(
             route = "Config/{id}",
             arguments = listOf(

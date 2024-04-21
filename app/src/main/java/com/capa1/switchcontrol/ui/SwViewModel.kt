@@ -27,6 +27,7 @@ class SwViewModel  @Inject constructor(
     private fun subscribeToChanges() {
         viewModelScope.launch {
             keepSwData.swList.collect { result ->
+                Log.i(TAG, "swList changed!!")
                 _screenModifiers.update { currentState ->
                     currentState.copy(swList = result)
                 }
