@@ -19,37 +19,24 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.MyColors
-import com.capa1.switchcontrol.data.model.SwData
-import com.capa1.switchcontrol.data.model.SwImages
 import com.capa1.switchcontrol.data.model.SwScreenData
-import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.ui.AddSwDialog
 import com.capa1.switchcontrol.ui.SwViewModel
 
@@ -58,21 +45,20 @@ fun SwListScreen(
     navController: NavController,
     viewModel: SwViewModel = hiltViewModel()
 ) {
-    val screenModifiers by viewModel.screenModifiers.collectAsStateWithLifecycle()
+    //val screenModifiers by viewModel.screenModifiers.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = true) {
         viewModel.start()
     }
     AddSwDialog(
-        show = screenModifiers.showAdd,
+        show = viewModel.showAdd,
         navController = navController,
-        exit = {viewModel.showAdd(false)}
+        exit = {viewModel.onShowAdd(false)}
     )
     Box(Modifier.fillMaxSize()) {
         ShowSwitches(
             navController = navController,
-            switches = viewModel.swList,
-            swScreenMap = viewModel.swScreenMap,
-            showAdd = {viewModel.showAdd(true)},
+            switches = viewModel.swScreenList,
+            onShowAdd = {viewModel.onShowAdd(true)},
             click = {id -> viewModel.imageClick(id)}
         )
     }
@@ -81,9 +67,8 @@ fun SwListScreen(
 @Composable
 fun ShowSwitches(
     navController: NavController,
-    switches:List<SwData>,
-    swScreenMap: Map<String, SwScreenData>,
-    showAdd: () -> Unit,
+    switches:List<SwScreenData>,
+    onShowAdd: () -> Unit,
     click: (String) -> Unit
 ) {
     LazyColumn(
@@ -100,19 +85,16 @@ fun ShowSwitches(
                 Icon(
                     Icons.Default.Add,
                     contentDescription = "",
-                    modifier = Modifier.clickable { showAdd() }
+                    modifier = Modifier.clickable { onShowAdd() }
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
         }
-        items(switches) { calValue ->
+        items(switches) { switch ->
             SwRow(
                 navController = navController,
-                item = calValue,
-                swScreenData = swScreenMap [calValue.id] ?: SwScreenData(
-                    swImage = SwImages.NO_INFO,
-                    timerInfo = "Sin información"),
-                click = { click(calValue.id) }
+                item = switch,
+                click = { click(switch.id) }
             )
         }
     }
@@ -121,8 +103,7 @@ fun ShowSwitches(
 @Composable
 fun SwRow(
     navController: NavController,
-    item: SwData,
-    swScreenData: SwScreenData,
+    item: SwScreenData,
     click: () -> Unit
 ){
     Box(
@@ -146,22 +127,11 @@ fun SwRow(
                     //color = MaterialTheme.colorScheme.primary
                 )
                 Text (
-                    text = swScreenData.timerInfo
+                    text = item.timerInfo
                 )
             }
-            val painter: Painter = when(swScreenData.swImage){
-                SwImages.OPEN -> painterResource(id = R.drawable.open)
-                SwImages.CLOSE -> painterResource(id = R.drawable.close)
-                SwImages.OPENING -> painterResource(id = R.drawable.opening)
-                SwImages.CLOSING -> painterResource(id = R.drawable.closing)
-                SwImages.CLOSE_LOCK -> painterResource(id = R.drawable.close_lock)
-                SwImages.OPEN_LOCK -> painterResource(id = R.drawable.open_lock)
-                SwImages.NC -> painterResource(id = R.drawable.nc)
-                SwImages.NA -> painterResource(id = R.drawable.na)
-                SwImages.NO_INFO -> painterResource(id = R.drawable.no_info)
-            }
-            Image(
-                painter,
+        Image(
+                painterResource(id = item.swImageId),
                 contentDescription = "",
                 Modifier
                     .clickable { click() }
@@ -180,23 +150,16 @@ fun ScreenPreview(value: Int = 2) {
     when (value) {
         1 -> SwRow(
                 navController = rememberNavController(),
-                item = SwData("luz cocina", "100AA56F", 1, "palta", SwStatus.DISCONNECTED),
-                swScreenData = SwScreenData(SwImages.CLOSE, "frafrafra"),
+                item = SwScreenData("luz cocina", "100AA56F", "limon", 1, R.drawable.close_lock, "Cambia en mas de 24h"),
                 click = {})
         2 -> ShowSwitches(
                 navController = rememberNavController(),
                 switches = listOf(
-                    SwData("velador", "00AB", 1, "nada", SwStatus.DISCONNECTED),
-                    SwData("luz cocina", "10AB", 2, "metal", SwStatus.DISCONNECTED),
-                    SwData("riego", "20AB", 3, "madera", SwStatus.DISCONNECTED),
-                    SwData("TV", "30AB", 4, "mar", SwStatus.DISCONNECTED)
+                    SwScreenData("velador", "00AB",  "nada",1, R.drawable.close, "sin informacion"),
+                    SwScreenData("luz cocina", "10AB", "metal", 2, R.drawable.close, "sin informacion"),
+                    SwScreenData("riego", "20AB",  "madera",3, R.drawable.close, "sin informacion"),
+                    SwScreenData("TV", "30AB",  "mar",4, R.drawable.close, "sin informacion")
                 ),
-                swScreenMap = mapOf (
-                    "00AB" to SwScreenData(SwImages.CLOSE, "frafrafra"),
-                    "10AB" to SwScreenData(SwImages.OPENING, "todo liso"),
-                    "20AB" to SwScreenData(SwImages.NC, "faltan 16h"),
-                    "30AB" to SwScreenData(SwImages.CLOSE_LOCK, "cuando quiera"),
-                ) ,
             {},
                 click = {})
     }

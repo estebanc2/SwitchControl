@@ -21,13 +21,10 @@ import javax.inject.Inject
 class SwViewModel  @Inject constructor(
     private val keepSwData: KeepSwData
 ) : ViewModel() {
-    var swList by mutableStateOf<List<SwData>>(listOf())
+    var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
         private set
-    var swScreenMap by mutableStateOf<Map<String, SwScreenData>>(mapOf())
+    var showAdd by mutableStateOf<Boolean> (false)
         private set
-    private val _screenModifiers = MutableStateFlow(ScreenModifiers())
-    val screenModifiers: StateFlow<ScreenModifiers> = _screenModifiers
-
     fun start(){
         keepSwData.initOperation()
         subscribeToChanges()
@@ -35,40 +32,17 @@ class SwViewModel  @Inject constructor(
 
     private fun subscribeToChanges() {
         viewModelScope.launch {
-            keepSwData.swList.collect { result ->
-                Log.i(TAG, "swList changed!!")
-                swList = result
-                _screenModifiers.update { currentState ->
-                    currentState.copy(swList = result)
-                }
+            keepSwData.swScreenList.collect { result ->
+                Log.i(TAG, "swScreenList changed!!")
+                swScreenList = result
             }
-        }
-        viewModelScope.launch {
-            keepSwData.swMap.collect() { result ->
-                Log.i(TAG, "swMap changed!!")
-                _screenModifiers.update { currentState ->
-                    currentState.copy(swMap = result)
-                }
-            }
-        }
-        viewModelScope.launch {
-            keepSwData.swScreenMap.collect() { result ->
-                Log.i(TAG, "swSceenMap changed!!")
-                swScreenMap = result
-                _screenModifiers.update { currentState ->
-                    currentState.copy(swScreenMap = result)
-                }
-            }
-        }
-        viewModelScope.launch {
-            keepSwData.counter.collect() { result ->
-                Log.i(TAG, "counter changed!!: new value = $result")
-                }
         }
     }
+
     fun imageClick(id: String){
         keepSwData.imageClick(id)
     }
+
     fun changeName (name: String){
 
     }
@@ -85,10 +59,8 @@ class SwViewModel  @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    fun showAdd(show: Boolean) {
-        _screenModifiers.update { currentState ->
-            currentState.copy(showAdd = show)
-        }
+    fun onShowAdd(show: Boolean) {
+        showAdd = show
     }
 
     fun newId() {

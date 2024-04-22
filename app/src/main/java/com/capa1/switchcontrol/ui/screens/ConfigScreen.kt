@@ -25,8 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,39 +33,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.capa1.switchcontrol.data.Global
-import com.capa1.switchcontrol.data.model.SwData
-import com.capa1.switchcontrol.data.model.SwStatus
-import com.capa1.switchcontrol.ui.SwViewModel
 
 @Composable
 fun ConfigScreen(
     id: String,
-    viewModel: SwViewModel = hiltViewModel()
 ) {
-    var currentSwData = SwData(
-        "","", 1, "nada", SwStatus.DISCONNECTED
-    )
-    val screenModifiers by viewModel.screenModifiers.collectAsState()
-    for (swData in screenModifiers.swList) {
-        if (id == swData.id) {
-            currentSwData = swData
-        }
-    }
     Box(
         Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         ShowConfig(
-            name = currentSwData.name,
-            bkColor = currentSwData.bkColor,
-            row = currentSwData.row,
-            timersInfo = screenModifiers.timersInfo[id] ?: listOf("inactivo",
+            name = "",
+            bkColor = "nada",
+            row = 1,
+            timersInfo = listOf("inactivo",
                 "inactivo", "inactivo", "inactivo"),
-            exit = {viewModel.exit()},
-            process = {viewModel.process()},
-            picker = {viewModel.picker()}
+            exit = {},
+            process = {},
+            picker = {}
         )
     }
 }
