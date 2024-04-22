@@ -36,7 +36,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.MyColors
+import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwScreenData
+import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.ui.AddSwDialog
 import com.capa1.switchcontrol.ui.SwViewModel
 
@@ -55,21 +57,32 @@ fun SwListScreen(
         exit = {viewModel.onShowAdd(false)}
     )
     Box(Modifier.fillMaxSize()) {
-        ShowSwitches(
-            navController = navController,
-            switches = viewModel.swScreenList,
-            onShowAdd = {viewModel.onShowAdd(true)},
-            click = {id -> viewModel.imageClick(id)}
-        )
+        if (!viewModel.goConfig){
+            ShowSwitches(
+                navController = navController,
+                switches = viewModel.swScreenList,
+                onShowAdd = {viewModel.onShowAdd(true)},
+                click = {id -> viewModel.imageClick(id)},
+                onConfig = {item -> viewModel.onConfig(true, item)}
+            )
+        }else{
+            ShowConfig(
+                data = viewModel.configurableData,
+                showPicker = {},
+                exit = {}
+            )
+        }
     }
 }
+
 
 @Composable
 fun ShowSwitches(
     navController: NavController,
     switches:List<SwScreenData>,
     onShowAdd: () -> Unit,
-    click: (String) -> Unit
+    click: (String) -> Unit,
+    onConfig: (SwScreenData)-> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(all = 20.dp),
@@ -94,7 +107,8 @@ fun ShowSwitches(
             SwRow(
                 navController = navController,
                 item = switch,
-                click = { click(switch.id) }
+                click = { click(switch.id) },
+                onConfig = {item -> onConfig(item)}
             )
         }
     }
@@ -104,8 +118,10 @@ fun ShowSwitches(
 fun SwRow(
     navController: NavController,
     item: SwScreenData,
-    click: () -> Unit
+    click: () -> Unit,
+    onConfig: (SwScreenData) -> Unit
 ){
+    var image = item.swImageId
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -122,20 +138,24 @@ fun SwRow(
                     text = item.name,
                     color = MyColors[item.bkColor]!!.textColor,
                     style = TextStyle(fontSize = 24.sp),
-
-                    modifier = Modifier.clickable{ navController.navigate("Config/${item.id}") }
-                    //color = MaterialTheme.colorScheme.primary
+                    modifier = Modifier.clickable{ onConfig(item) }
                 )
                 Text (
                     text = item.timerInfo
                 )
             }
         Image(
-                painterResource(id = item.swImageId),
-                contentDescription = "",
-                Modifier
-                    .clickable { click() }
-                    .size(70.dp, 70.dp)
+            painterResource(id = image),
+            contentDescription = "",
+            Modifier
+                .clickable {
+                    click()
+                    when(image){
+                        R.drawable.close -> image = R.drawable.opening
+                        R.drawable.open -> image = R.drawable.closing
+                    }
+                }
+                .size(70.dp, 70.dp)
             )
         }
     }
@@ -150,17 +170,18 @@ fun ScreenPreview(value: Int = 2) {
     when (value) {
         1 -> SwRow(
                 navController = rememberNavController(),
-                item = SwScreenData("luz cocina", "100AA56F", "limon", 1, R.drawable.close_lock, "Cambia en mas de 24h"),
-                click = {})
+                item = SwScreenData("luz cocina", "100AA56F", 1,"limon",  R.drawable.close_lock, "Cambia en mas de 24h"),
+                click = {}, {}
+        )
         2 -> ShowSwitches(
                 navController = rememberNavController(),
                 switches = listOf(
-                    SwScreenData("velador", "00AB",  "nada",1, R.drawable.close, "sin informacion"),
-                    SwScreenData("luz cocina", "10AB", "metal", 2, R.drawable.close, "sin informacion"),
-                    SwScreenData("riego", "20AB",  "madera",3, R.drawable.close, "sin informacion"),
-                    SwScreenData("TV", "30AB",  "mar",4, R.drawable.close, "sin informacion")
-                ),
-            {},
-                click = {})
+                    SwScreenData("velador", "483fda877368", 2, "limon", R.drawable.close, "sin informacion"),
+                    SwScreenData("luz cocina", "98f4abb33d5a", 1, "lila", R.drawable.close, "sin informacion"),
+                    SwScreenData("riego", "483fda878e46", 3, "pasto", R.drawable.close, "sin informacion"),
+                    SwScreenData("alargue", "bcddc247dbc9", 5, "palta", R.drawable.close, "sin informacion"),
+                    SwScreenData("TV", "483fda879484", 4, "madera", R.drawable.close, "sin informacion")
+                ), {}, {}, {}
+        )
     }
 }

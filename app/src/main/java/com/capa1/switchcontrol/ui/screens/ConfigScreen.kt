@@ -34,36 +34,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.data.Global
+import com.capa1.switchcontrol.data.model.ConfigurableData
 
 @Composable
-fun ConfigScreen(
-    id: String,
-) {
-    Box(
-        Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        ShowConfig(
-            name = "",
-            bkColor = "nada",
-            row = 1,
-            timersInfo = listOf("inactivo",
-                "inactivo", "inactivo", "inactivo"),
-            exit = {},
-            process = {},
-            picker = {}
-        )
-    }
-}
-@Composable
 fun ShowConfig(
-    name: String,
-    bkColor: String,
-    row: Int,
-    timersInfo: List<String>,
-    exit: ()-> Unit,
-    process: ()-> Unit,
-    picker:()-> Unit
+    data: ConfigurableData,
+    showPicker: (String)-> Unit,
+    exit:()->Unit
 ){
     Column(
         Modifier
@@ -93,7 +70,7 @@ fun ShowConfig(
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = name,
+                text = data.name,
                 style = TextStyle(fontSize = 30.sp),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -119,7 +96,7 @@ fun ShowConfig(
                 contentDescription = ""
             )
             Text(
-                text = "$row",
+                text = "$data.row",
                 style = TextStyle(fontSize = 20.sp),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -141,14 +118,14 @@ fun ShowConfig(
                 contentDescription = "",
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
-            Text(text = bkColor,
+            Text(text = data.bkColor,
                 style = TextStyle(fontSize = 16.sp),
-                color = Global.MyColors[bkColor]!!.textColor,
+                color = Global.MyColors[data.bkColor]!!.textColor,
                 modifier = Modifier
                     .background(
-                        color = Global.MyColors[bkColor]!!.backColor
+                        color = Global.MyColors[data.bkColor]!!.backColor
                     )
-                    .clickable { picker() }
+                    .clickable { showPicker(data.bkColor)}
                     .padding(all = 8.dp)
                     .clip(shape = MaterialTheme.shapes.medium)
             )
@@ -174,7 +151,7 @@ fun ShowConfig(
                     contentDescription = ""
                 )
                 Text(
-                    text = timersInfo[0],
+                    text = data.timersInfo[0],
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
@@ -186,7 +163,7 @@ fun ShowConfig(
                     contentDescription = ""
                 )
                 Text(
-                    text = timersInfo[1],
+                    text = data.timersInfo[1],
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
@@ -198,7 +175,7 @@ fun ShowConfig(
                     contentDescription = ""
                 )
                 Text(
-                    text = timersInfo[2],
+                    text = data.timersInfo[2],
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
@@ -210,7 +187,7 @@ fun ShowConfig(
                     contentDescription = ""
                 )
                 Text(
-                    text = timersInfo[3],
+                    text = data.timersInfo[3],
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
@@ -276,7 +253,7 @@ fun ShowConfig(
                     )
             }
             Spacer(modifier = Modifier.padding(horizontal = 25.dp))
-            TextButton(onClick = {process()}) {
+            TextButton(onClick = {  }) {
                 Icon(
                     Icons.Default.Check,
                     contentDescription = "",
@@ -298,10 +275,7 @@ fun ShowConfig(
 fun ShowConfigPreview()
 {
     ShowConfig(
-        name = "luz cocina",
-        bkColor = "madera",
-        row = 1,
-        timersInfo = listOf("inactivo", "inactivo", "inactivo", "inactivo"),
-        {}, {}, {}
-    )
+        ConfigurableData("", 0,
+            0, Global.NO_TIMERS, "nada", 2, listOf()),
+        {}, {})
 }

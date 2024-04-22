@@ -32,7 +32,7 @@ class KeepSwData @Inject constructor (
 ): MqttListener {
     private val mqttManager = MqttManager(this)
     private var swList = mutableListOf<SwData>()
-    private var swMap = mutableMapOf<String, EspData>()
+    var swMap = mutableMapOf<String, EspData>()
     private val allSwId = "000"
     private val newSwId = "11111"
     val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
@@ -94,6 +94,13 @@ class KeepSwData @Inject constructor (
         if (mqttState == MqttState.UP){
             initializeSwList()
         }
+    }
+
+    fun getTimersInfo(id:String): List<String>{
+        for (i in 0 ..< swMap[id]!!.prgs.size){
+
+        }
+        return listOf()
     }
 
     private fun getLegend(id: String): String{
