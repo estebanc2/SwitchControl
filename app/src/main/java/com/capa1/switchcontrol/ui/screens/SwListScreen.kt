@@ -70,8 +70,8 @@ fun SwListScreen(
     Box(Modifier.fillMaxSize()) {
         ShowSwitches(
             navController = navController,
-            switches = screenModifiers.swList,
-            swScreenMap = screenModifiers.swScreenMap,
+            switches = viewModel.swList,
+            swScreenMap = viewModel.swScreenMap,
             showAdd = {viewModel.showAdd(true)},
             click = {id -> viewModel.imageClick(id)}
         )

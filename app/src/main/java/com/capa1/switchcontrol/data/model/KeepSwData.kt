@@ -13,10 +13,12 @@ import com.capa1.switchcontrol.data.mqtt.MqttState
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
@@ -37,7 +39,8 @@ class KeepSwData @Inject constructor (
     val swScreenMap: MutableStateFlow<Map<String, SwScreenData>> = MutableStateFlow(mapOf())
     val swMap: MutableStateFlow<Map<String, EspData>> = MutableStateFlow(mapOf())
     private val swDataStore = SwDataStore(context)
-
+    val counter: MutableStateFlow<Int> = MutableStateFlow(0)
+    private var count = 0
     private val something = listOf(
         SwData("velador", "483fda877368", 2, "limon", SwStatus.DISCONNECTED),
         SwData("luz cocina", "98f4abb33d5a", 1, "lila", SwStatus.DISCONNECTED),
@@ -205,8 +208,8 @@ class KeepSwData @Inject constructor (
     private fun checkSwitches(){
         val timerInSec = 10L
         fixedRateTimer("timer", false, 0L, timerInSec * 1000){
-
-            coroutineScope.launch { swMap.emit(_swMap) }
+            count += 1
+            coroutineScope.launch { counter.emit(count) }
             for (sw in _swList){
                 if(sw.status == SwStatus.DISCONNECTED){
                     initSw(sw.id)
