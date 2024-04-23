@@ -3,7 +3,6 @@ package com.capa1.switchcontrol.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,13 +32,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.model.ConfigurableData
 
 @Composable
 fun ShowConfig(
     data: ConfigurableData,
-    showPicker: (String)-> Unit,
+    showPicker: ()-> Unit,
+    save:()->Unit,
     exit:()->Unit
 ){
     Column(
@@ -96,7 +97,7 @@ fun ShowConfig(
                 contentDescription = ""
             )
             Text(
-                text = "$data.row",
+                text = "${data.row}",
                 style = TextStyle(fontSize = 20.sp),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -125,7 +126,7 @@ fun ShowConfig(
                     .background(
                         color = Global.MyColors[data.bkColor]!!.backColor
                     )
-                    .clickable { showPicker(data.bkColor)}
+                    .clickable { showPicker() }
                     .padding(all = 8.dp)
                     .clip(shape = MaterialTheme.shapes.medium)
             )
@@ -253,7 +254,7 @@ fun ShowConfig(
                     )
             }
             Spacer(modifier = Modifier.padding(horizontal = 25.dp))
-            TextButton(onClick = {  }) {
+            TextButton(onClick = { save() }) {
                 Icon(
                     Icons.Default.Check,
                     contentDescription = "",
@@ -268,14 +269,15 @@ fun ShowConfig(
     }
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun ShowConfigPreview()
 {
     ShowConfig(
-        ConfigurableData("", 0,
-            0, Global.NO_TIMERS, "nada", 2, listOf()),
-        {}, {})
+        data = ConfigurableData("luz cocina", 0,
+            0, Global.NO_TIMERS, "nada", 2, listOf("inactivo", "inactivo", "inactivo", "lu de 9 a 11")),
+        showPicker = {"nada"},
+        save = {},
+        exit = {}
+    )
 }

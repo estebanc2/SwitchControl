@@ -36,11 +36,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.MyColors
-import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwScreenData
-import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.ui.AddSwDialog
+import com.capa1.switchcontrol.ui.ColorDialog
+import com.capa1.switchcontrol.ui.NameDialog
 import com.capa1.switchcontrol.ui.SwViewModel
+import com.capa1.switchcontrol.ui.TimerDialog
 
 @Composable
 fun SwListScreen(
@@ -54,7 +55,25 @@ fun SwListScreen(
     AddSwDialog(
         show = viewModel.showAdd,
         navController = navController,
-        exit = {viewModel.onShowAdd(false)}
+        onExit = {viewModel.onShowAdd(false)}
+    )
+    NameDialog(
+        show = viewModel.showName,
+        currentName = viewModel.configurableData.name ,
+        setName = {name -> viewModel.changeName(name)},
+        onExit = {viewModel.onShowName(false)}
+    )
+    ColorDialog(
+        show = viewModel.showColor,
+        currentColor = viewModel.configurableData.bkColor,
+        setColor = {color -> viewModel.changeColor(color)},
+        exit = {viewModel.onShowColor(false)}
+    )
+    TimerDialog(
+        show = viewModel.showTimer,
+        currentTimer = viewModel.configurableData.prgs[0],
+        setTimer = {timer -> viewModel.changeTimer(timer)},
+        onExit = {viewModel.onShowTimer(false)}
     )
     Box(Modifier.fillMaxSize()) {
         if (!viewModel.goConfig){
@@ -68,8 +87,9 @@ fun SwListScreen(
         }else{
             ShowConfig(
                 data = viewModel.configurableData,
-                showPicker = {},
-                exit = {}
+                showPicker = {viewModel.onShowColor(true)},
+                save = {viewModel.saveConfig()},
+                exit = {viewModel.exitConfig()}
             )
         }
     }
@@ -150,7 +170,7 @@ fun SwRow(
             Modifier
                 .clickable {
                     click()
-                    when(image){
+                    when (image) {
                         R.drawable.close -> image = R.drawable.opening
                         R.drawable.open -> image = R.drawable.closing
                     }

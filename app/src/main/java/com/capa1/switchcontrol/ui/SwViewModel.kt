@@ -11,6 +11,7 @@ import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.ConfigurableData
 import com.capa1.switchcontrol.data.model.KeepSwData
 import com.capa1.switchcontrol.data.model.SwScreenData
+import com.capa1.switchcontrol.data.model.WeeklyProgram
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,11 +20,21 @@ import javax.inject.Inject
 class SwViewModel  @Inject constructor(
     private val keepSwData: KeepSwData
 ) : ViewModel() {
+    private var lastId = ""
+    var showName by mutableStateOf (false)
+        private set
+    var showColor by mutableStateOf (false)
+        private set
+    var showTimer by mutableStateOf (false)
+        private set
+    var showMode by mutableStateOf (false)
+        private set
+    var showAdd by mutableStateOf (false)
+        private set
+
     var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
         private set
-    var showAdd by mutableStateOf<Boolean> (false)
-        private set
-    var goConfig by mutableStateOf<Boolean> (false)
+    var goConfig by mutableStateOf (false)
         private set
     var configurableData by mutableStateOf<ConfigurableData> (ConfigurableData("", 0,
                                     0, NO_TIMERS, "nada", 2, listOf()))
@@ -45,8 +56,15 @@ class SwViewModel  @Inject constructor(
         keepSwData.imageClick(id)
 
     }
-
+    fun saveConfig(){
+        keepSwData.configUpgrade(configurableData, lastId)
+        goConfig = false
+    }
+    fun exitConfig(){
+        goConfig = false
+    }
     fun onConfig(show: Boolean, item: SwScreenData) {
+        lastId = item.id
         configurableData = ConfigurableData(
             item.name,
             keepSwData.swMap[item.id]?.mode ?: 0,
@@ -58,9 +76,34 @@ class SwViewModel  @Inject constructor(
         )
         goConfig = show
     }
+    fun changeName(name: String){
+
+    }
+    fun changeColor(color: String){
+        configurableData.bkColor = color
+    }
+    fun changeTimer(newPrg: WeeklyProgram){
+
+    }
+    fun changeMode(mode: Int){
+
+    }
+
 
     fun onShowAdd(show: Boolean) {
         showAdd = show
+    }
+    fun onShowName(show: Boolean) {
+        showName = show
+    }
+    fun onShowColor(show: Boolean) {
+        showColor = show
+    }
+    fun onShowTimer(show: Boolean) {
+        showTimer = show
+    }
+    fun onShowAMode(show: Boolean) {
+        showMode = show
     }
 
 }

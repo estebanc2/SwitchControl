@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import java.lang.Math.pow
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
@@ -97,13 +98,37 @@ class KeepSwData @Inject constructor (
     }
 
     fun getTimersInfo(id:String): List<String>{
-        for (i in 0 ..< swMap[id]!!.prgs.size){
-
+        val legend = arrayOf("inactivo", "inactivo", "inactivo", "inactivo")
+        for (i in 0 ..< 4){
+            val days = swMap[id]!!.prgs[i].days
+            val start = swMap[id]!!.prgs[i].start
+            val stop = swMap[id]!!.prgs[i].stop
+            if (days != 0){
+                legend[i] = "${daysList(days)} de ${hours(start)} a ${hours(stop)}"
+            }
         }
-        return listOf()
+        return legend.asList()
+    }
+    private fun hours(min: Int): String{
+        return "${min/60}:${min - (min/60)*60}"
+    }
+    private fun daysList(day:Int): String{
+        var daysIn = ""
+        var i = 0
+        val dayName = listOf("do, ", "lu, ", "ma, ", "mi, ", "ju, ", "vi, ", "sa, ")
+        for (dayString in dayName){
+            if(getBit(day, i) != 0){
+                daysIn += dayString
+            }
+            i += 1
+        }
+        return daysIn
+    }
+    private fun getBit(value: Int, position: Int): Int {
+        return (value shr position) and 1;
     }
 
-    private fun getLegend(id: String): String{
+    private fun getLegend(id: String): String{ // todo revisar getByte en lugar de los pow
         if(!swMap.containsKey(id)){
             return "Sin Información"
         }
@@ -253,6 +278,12 @@ class KeepSwData @Inject constructor (
                     }
                 }
             }
+        }
+    }
+    fun configUpgrade(data: ConfigurableData, id:String){
+        if (data.prgs != swMap[id]!!.prgs ||
+            data.mode != swMap[id]!!.mode){
+
         }
     }
 }
