@@ -89,11 +89,12 @@ fun SwListScreen(
             )
         }else{
             ShowConfig(
+                qty = viewModel.swScreenList.size,
                 data = viewModel.configurableData,
                 showPicker = {viewModel.onShowColor(true)},
-                save = {viewModel.saveConfig()},
-                exit = {viewModel.exitConfig()}
-            )
+                changeRow = { pos -> viewModel.changeRow(pos)},
+                save = {viewModel.saveConfig()}
+            ) { viewModel.exitConfig() }
         }
     }
 }

@@ -24,6 +24,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,11 +41,14 @@ import com.capa1.switchcontrol.data.model.ConfigurableData
 
 @Composable
 fun ShowConfig(
+    qty: Int,
     data: ConfigurableData,
     showPicker: ()-> Unit,
+    changeRow: (Int) -> Unit,
     save:()->Unit,
     exit:()->Unit
 ){
+    var row by remember { mutableStateOf(data.row) }
     Column(
         Modifier
             .fillMaxSize()
@@ -96,7 +103,7 @@ fun ShowConfig(
                 contentDescription = ""
             )
             Text(
-                text = "${data.row}",
+                text = "$row",
                 style = TextStyle(fontSize = 20.sp),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -106,11 +113,21 @@ fun ShowConfig(
                 Icons.Default.Upload,
                 contentDescription = "",
                 modifier = Modifier.padding(horizontal = 10.dp)
+                    .clickable { if(row > 1){
+                                    row -= 1
+                                    changeRow(-1)
+                                }
+                    }
             )
             Icon(
                 Icons.Default.Download,
                 contentDescription = "",
                 modifier = Modifier.padding(horizontal = 10.dp)
+                    .clickable { if(row< qty){
+                                    row += 1
+                                    changeRow(1)
+                                }
+                    }
             )
             Spacer(modifier = Modifier.padding(horizontal = 10.dp))
             Icon(
@@ -273,10 +290,11 @@ fun ShowConfig(
 fun ShowConfigPreview()
 {
     ShowConfig(
+        qty = 5,
         data = ConfigurableData("luz cocina", 0,
             0, Global.NO_TIMERS, "nada", 2, listOf("inactivo", "inactivo", "inactivo", "lu de 9 a 11")),
-        showPicker = {"nada"},
-        save = {},
-        exit = {}
-    )
+        showPicker = {},
+        changeRow = {1},
+        save = {}
+    ) {}
 }

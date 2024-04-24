@@ -88,6 +88,10 @@ class SwViewModel  @Inject constructor(
     fun changeColor(color: String){
         configurableData.bkColor = color
     }
+    fun changeRow(pos: Int) {
+        configurableData.row += pos
+        Log.i(TAG,"row: [${configurableData.row}]")
+    }
     fun changeTimer(newPrg: WeeklyProgram){
 
     }
@@ -99,7 +103,6 @@ class SwViewModel  @Inject constructor(
         showNewId = false
         showAdd = false
     }
-
     fun onShowAdd(show: Boolean) {
         showAdd = show
     }
@@ -124,5 +127,4 @@ class SwViewModel  @Inject constructor(
     fun onShowAll(show: Boolean) {
         showAll = show
     }
-
 }

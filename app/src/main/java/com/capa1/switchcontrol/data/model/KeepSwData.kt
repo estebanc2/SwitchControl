@@ -50,7 +50,7 @@ class KeepSwData @Inject constructor (
     private var mqttUp = false
     fun initOperation() {
         mqttManager.connect()
-        swList = something.toMutableList() //getStoredData()
+        swList = something.sortedBy { it.row }.toMutableList() //getStoredData()
         refreshScreenInfo()
     }
 
@@ -64,11 +64,11 @@ class KeepSwData @Inject constructor (
 
     private fun refreshScreenInfo(){
         val refreshList: MutableList<SwScreenData> = mutableListOf()
-        swList.sortedBy { it.row }.forEachIndexed {index, swData ->
+        swList.forEachIndexed {index, swData ->
             refreshList += SwScreenData(
                 name = swData.name,
                 id = swData.id,
-                row = 2 + index * 2,
+                row = swData.row,
                 bkColor = swData.bkColor,
                 swImageId = getSwImageId(swData.id),
                 timerInfo = getLegend(swData.id)
@@ -86,7 +86,7 @@ class KeepSwData @Inject constructor (
         } else if (id == newSwId) {
             val newEspData = gson.fromJson(msg, EspData::class.java)
             swMap[id] = newEspData
-            swList += SwData( newEspData.name, id,( swList.size + 1 ) * 2,"nada", SwStatus.CONNECTED)
+            swList += SwData( newEspData.name, id,( swList.size + 1 ),"nada", SwStatus.CONNECTED)
             saveData()
         } else {
             for (data in swList) {
@@ -293,13 +293,23 @@ class KeepSwData @Inject constructor (
                     0))
                 mqttManager.publish(id,setData)
         }
+        var someChange = false
         swList.forEachIndexed {index, swData ->
             if(swData.id == id){
-                swList[index].row = data.row
-                swList[index].bkColor = data.bkColor
-                refreshScreenInfo()
-                saveData()
+                if(swList[index].row != data.row){
+
+                    someChange = true
+                    return@forEachIndexed
+                }
+                if(swList[index].bkColor != data.bkColor){
+                    swList[index].bkColor = data.bkColor
+                    someChange = true
+                }
             }
+        }
+        if (someChange){
+            refreshScreenInfo()
+            saveData()
         }
     }
 }
