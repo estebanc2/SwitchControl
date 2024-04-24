@@ -7,3 +7,8 @@ data class SwData(
     var bkColor: String = "nada",
     var status: SwStatus
 )
+enum class SwStatus {
+    CONNECTED,
+    DISCONNECTED,
+    CONNECTING
+}

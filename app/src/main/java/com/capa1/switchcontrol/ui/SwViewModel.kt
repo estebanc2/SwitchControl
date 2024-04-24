@@ -31,6 +31,12 @@ class SwViewModel  @Inject constructor(
         private set
     var showAdd by mutableStateOf (false)
         private set
+    var showNewId by mutableStateOf (false)
+        private set
+    var showNew by mutableStateOf (false)
+        private set
+    var showAll by mutableStateOf (false)
+        private set
 
     var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
         private set
@@ -88,7 +94,11 @@ class SwViewModel  @Inject constructor(
     fun changeMode(mode: Int){
 
     }
-
+    fun addSwId (id: String) {
+        keepSwData.setSwWithId(id)
+        showNewId = false
+        showAdd = false
+    }
 
     fun onShowAdd(show: Boolean) {
         showAdd = show
@@ -102,8 +112,17 @@ class SwViewModel  @Inject constructor(
     fun onShowTimer(show: Boolean) {
         showTimer = show
     }
-    fun onShowAMode(show: Boolean) {
+    fun onShowMode(show: Boolean) {
         showMode = show
+    }
+    fun onShowNewId(show: Boolean) {
+        showNewId = show
+    }
+    fun onShowNew(show: Boolean) {
+        showNew = show
+    }
+    fun onShowAll(show: Boolean) {
+        showAll = show
     }
 
 }

@@ -1,8 +1,6 @@
 package com.capa1.switchcontrol.ui
 
 import android.content.res.Configuration
-import android.graphics.Paint.Align
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CheckCircleOutline
@@ -40,7 +37,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -49,17 +45,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.Global.MyColors
-import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 
 @Composable
 fun AddSwDialog( //4
     show: Boolean,
-    navController: NavController,
+    addSw:()->Unit,
+    addId:()->Unit,
+    addAll:()->Unit,
     onExit: () -> Unit
 ) {
     if (show) {
@@ -79,7 +73,7 @@ fun AddSwDialog( //4
                             color = MaterialTheme.colorScheme.primary
                         )
                         TextButton(
-                            onClick = { navController.navigate("AddSw") },
+                            onClick = { addSw() },
                         ) {
                             Icon(
                                 Icons.Default.AddCircleOutline,
@@ -88,7 +82,7 @@ fun AddSwDialog( //4
                             Text(text = "agregar un interruptor nuevo")
                         }
                         TextButton(
-                            onClick = { navController.navigate("AddId") },
+                            onClick = { addId()},
                         ) {
                             Icon(
                                 Icons.Default.CheckCircleOutline,
@@ -97,7 +91,7 @@ fun AddSwDialog( //4
                             Text(text = "agregar un interruptor con un Id")
                         }
                         TextButton(
-                            onClick = { navController.navigate("ReceiveAll") },
+                            onClick = { addAll() },
                         ) {
                             Icon(
                                 Icons.Default.FileDownload,
@@ -106,7 +100,7 @@ fun AddSwDialog( //4
                             Text(text = "recibir configuración completa")
                         }
                         TextButton(
-                            onClick = { navController.navigate("SendAll") },
+                            onClick = { addAll() },
                         ) {
                             Icon(
                                 Icons.Default.FileUpload,
@@ -130,8 +124,6 @@ fun AddSwDialog( //4
         }
     }
 }
-
-
 @Composable
 fun NameDialog( //1
     show: Boolean,
@@ -203,6 +195,131 @@ fun NameDialog( //1
         }
     }
 }
+
+@Composable
+fun ModeDialog( //1
+    show: Boolean,
+    onExit: () -> Unit
+) {
+
+    if (show) {
+        Dialog(onDismissRequest = {}) {
+            Surface(
+                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        Text(
+                            text = "CAMBIAR NOMBRE DEL INTERRUPTOR",
+                            style = TextStyle(fontSize = 10.sp),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
+                            TextButton(
+                                onClick = {
+
+                                },
+                            ) {
+                                Icon(
+                                    Icons.Default.CheckCircle,
+                                    contentDescription = "",
+                                )
+                                Text(text = "aceptar")
+                            }
+                            TextButton(
+                                onClick = { onExit() },
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "",
+                                )
+                                Text(text = "descartar")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@Composable
+fun NewIdDialog( //1
+    show: Boolean,
+    setId: (String) -> Unit,
+    onExit: () -> Unit
+) {
+    val tokenValue = remember {
+        mutableStateOf(TextFieldValue())
+    }
+    if (show) {
+        Dialog(onDismissRequest = {}) {
+            Surface(
+                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        Text(
+                            text = "AGREGAR INTERRUPTOR CON UN ID",
+                            style = TextStyle(fontSize = 10.sp),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        TextField(modifier = Modifier.fillMaxWidth(),
+                            textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                            //placeholder = { Text(text = currentName) },
+                            value = tokenValue.value,
+                            singleLine = true,
+                            maxLines = 1,
+                            onValueChange = {
+                                tokenValue.value = it
+                            })
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
+                            TextButton(
+                                onClick = {
+                                    val input = tokenValue.value.text
+                                    if (input.length != 8) {
+                                        return@TextButton
+                                    }
+                                    setId(input)
+                                },
+                            ) {
+                                Icon(
+                                    Icons.Default.CheckCircle,
+                                    contentDescription = "",
+                                )
+                                Text(text = "aceptar")
+                            }
+                            TextButton(
+                                onClick = { onExit() },
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "",
+                                )
+                                Text(text = "descartar")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 @Composable
 fun ColorDialog( //2
     show: Boolean,
@@ -227,8 +344,9 @@ fun ColorDialog( //2
                           Row {
                               Box(
                                   contentAlignment = Alignment.Center,
-                                  modifier = Modifier.size(70.dp, 30.dp).
-                                  background(
+                                  modifier = Modifier
+                                      .size(70.dp, 30.dp)
+                                      .background(
                                           color = data.value.backColor
                                       )
                               ){
@@ -317,14 +435,15 @@ fun TimerDialog( //3
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 2) {
+fun ShowDialog(value: Int = 5) {
     //Column
     when (value) {
 
         1 -> NameDialog(true, "luz cocina", {""}, {})
         2 -> ColorDialog(true, "cielo", {},{})
         3 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
-        4 -> AddSwDialog(true, navController = rememberNavController(),{})
+        4 -> AddSwDialog(true, {}, {}, {}, {})
+        5 -> NewIdDialog(show = true, setId = {}, {})
         else -> {}
     }
 }

@@ -1,4 +1,4 @@
-package com.capa1.switchcontrol.ui.screens
+package com.capa1.switchcontrol.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,7 +32,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.model.ConfigurableData
 

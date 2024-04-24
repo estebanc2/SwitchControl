@@ -36,7 +36,7 @@ class KeepSwData @Inject constructor (
     private var swList = mutableListOf<SwData>()
     var swMap = mutableMapOf<String, EspData>()
     private val allSwId = "000"
-    private val newSwId = "11111"
+    private var newSwId = "11111"
     val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
     private val swDataStore = SwDataStore(context)
     private val something = listOf(
@@ -47,25 +47,34 @@ class KeepSwData @Inject constructor (
         SwData("TV", "483fda879484", 4, "madera", SwStatus.DISCONNECTED)
     )
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-
+    private var mqttUp = false
     fun initOperation() {
         mqttManager.connect()
         swList = something.toMutableList() //getStoredData()
         refreshScreenInfo()
     }
+
+    fun setSwWithId(id: String){
+        newSwId = id
+        if (mqttUp){
+            mqttManager.subscribe(id)
+            mqttManager.publish(id, SEND_GET)
+        }
+    }
+
     private fun refreshScreenInfo(){
         val refreshList: MutableList<SwScreenData> = mutableListOf()
-        for (swData in swList){
+        swList.sortedBy { it.row }.forEachIndexed {index, swData ->
             refreshList += SwScreenData(
                 name = swData.name,
                 id = swData.id,
-                row = swData.row,
+                row = 2 + index * 2,
                 bkColor = swData.bkColor,
                 swImageId = getSwImageId(swData.id),
                 timerInfo = getLegend(swData.id)
             )
         }
-        coroutineScope.launch { swScreenList.emit(refreshList.sortedBy { it.row })}
+        coroutineScope.launch { swScreenList.emit(refreshList)}
     }
     override fun notifyNewMessage(id: String, msg: String) {
         val gson = Gson()
@@ -78,6 +87,7 @@ class KeepSwData @Inject constructor (
             val newEspData = gson.fromJson(msg, EspData::class.java)
             swMap[id] = newEspData
             swList += SwData( newEspData.name, id,( swList.size + 1 ) * 2,"nada", SwStatus.CONNECTED)
+            saveData()
         } else {
             for (data in swList) {
                 if (data.id == id) {
@@ -91,6 +101,7 @@ class KeepSwData @Inject constructor (
     }
     override fun notifyMqttState(mqttState: MqttState) {
         if (mqttState == MqttState.UP){
+            mqttUp = true
             initializeSwList()
         }
     }
@@ -287,6 +298,7 @@ class KeepSwData @Inject constructor (
                 swList[index].row = data.row
                 swList[index].bkColor = data.bkColor
                 refreshScreenInfo()
+                saveData()
             }
         }
     }

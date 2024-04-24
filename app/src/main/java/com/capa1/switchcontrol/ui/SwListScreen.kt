@@ -1,4 +1,4 @@
-package com.capa1.switchcontrol.ui.screens
+package com.capa1.switchcontrol.ui
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -32,20 +32,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.model.SwScreenData
-import com.capa1.switchcontrol.ui.AddSwDialog
-import com.capa1.switchcontrol.ui.ColorDialog
-import com.capa1.switchcontrol.ui.NameDialog
-import com.capa1.switchcontrol.ui.SwViewModel
-import com.capa1.switchcontrol.ui.TimerDialog
 
 @Composable
 fun SwListScreen(
-    navController: NavController,
     viewModel: SwViewModel = hiltViewModel()
 ) {
     //val screenModifiers by viewModel.screenModifiers.collectAsStateWithLifecycle()
@@ -54,7 +46,9 @@ fun SwListScreen(
     }
     AddSwDialog(
         show = viewModel.showAdd,
-        navController = navController,
+        addSw = {},
+        addId = {viewModel.onShowNewId(true)},
+        addAll = {},
         onExit = {viewModel.onShowAdd(false)}
     )
     NameDialog(
@@ -62,6 +56,12 @@ fun SwListScreen(
         currentName = viewModel.configurableData.name ,
         setName = {name -> viewModel.changeName(name)},
         onExit = {viewModel.onShowName(false)}
+    )
+    NewIdDialog(
+        show = viewModel.showNewId,
+        setId = {id -> viewModel.addSwId(id)},
+        onExit = {viewModel.onShowNewId(false)
+                    viewModel.onShowAdd(false)}
     )
     ColorDialog(
         show = viewModel.showColor,
@@ -75,10 +75,13 @@ fun SwListScreen(
         setTimer = {timer -> viewModel.changeTimer(timer)},
         onExit = {viewModel.onShowTimer(false)}
     )
+    ModeDialog(
+        show = viewModel.showName,
+        onExit = {viewModel.onShowName(false)}
+    )
     Box(Modifier.fillMaxSize()) {
         if (!viewModel.goConfig){
             ShowSwitches(
-                navController = navController,
                 switches = viewModel.swScreenList,
                 onShowAdd = {viewModel.onShowAdd(true)},
                 click = {id -> viewModel.imageClick(id)},
@@ -98,7 +101,6 @@ fun SwListScreen(
 
 @Composable
 fun ShowSwitches(
-    navController: NavController,
     switches:List<SwScreenData>,
     onShowAdd: () -> Unit,
     click: (String) -> Unit,
@@ -125,7 +127,6 @@ fun ShowSwitches(
         }
         items(switches) { switch ->
             SwRow(
-                navController = navController,
                 item = switch,
                 click = { click(switch.id) },
                 onConfig = {item -> onConfig(item)}
@@ -136,7 +137,6 @@ fun ShowSwitches(
 
 @Composable
 fun SwRow(
-    navController: NavController,
     item: SwScreenData,
     click: () -> Unit,
     onConfig: (SwScreenData) -> Unit
@@ -189,12 +189,10 @@ fun SwRow(
 fun ScreenPreview(value: Int = 2) {
     when (value) {
         1 -> SwRow(
-                navController = rememberNavController(),
                 item = SwScreenData("luz cocina", "100AA56F", 1,"limon",  R.drawable.close_lock, "Cambia en mas de 24h"),
                 click = {}, {}
         )
         2 -> ShowSwitches(
-                navController = rememberNavController(),
                 switches = listOf(
                     SwScreenData("velador", "483fda877368", 2, "limon", R.drawable.close, "sin informacion"),
                     SwScreenData("luz cocina", "98f4abb33d5a", 1, "lila", R.drawable.close, "sin informacion"),
