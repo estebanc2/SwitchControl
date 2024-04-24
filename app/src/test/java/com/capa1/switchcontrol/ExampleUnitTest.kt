@@ -9,6 +9,10 @@ import org.junit.Assert.*
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+data class Element(
+    val a:String,
+    var b: String
+)
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
@@ -20,5 +24,18 @@ class ExampleUnitTest {
         val mac = topic.split("/").last()
         println(String.format("%s es realmente 1018A", mac))
         assert(mac == "1018A")
+    }
+    @Test
+    fun listModif(){
+        val element1 = Element ("carlos", "Castro")
+        val element2 = Element("pilar", "samanes")
+        val element3 = Element("oti", "castro")
+        var testList = listOf(element1, element2, element3)
+        testList.forEachIndexed {index, element ->
+            if(element.a == "pilar"){
+                testList[index].b = "de castro"
+            }
+        }
+        assert(testList[1].b == "de castro")
     }
 }

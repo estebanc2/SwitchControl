@@ -53,7 +53,6 @@ class KeepSwData @Inject constructor (
         swList = something.toMutableList() //getStoredData()
         refreshScreenInfo()
     }
-
     private fun refreshScreenInfo(){
         val refreshList: MutableList<SwScreenData> = mutableListOf()
         for (swData in swList){
@@ -68,7 +67,6 @@ class KeepSwData @Inject constructor (
         }
         coroutineScope.launch { swScreenList.emit(refreshList.sortedBy { it.row })}
     }
-
     override fun notifyNewMessage(id: String, msg: String) {
         val gson = Gson()
         if(id == allSwId) {
@@ -91,13 +89,11 @@ class KeepSwData @Inject constructor (
         }
         refreshScreenInfo()
     }
-
     override fun notifyMqttState(mqttState: MqttState) {
         if (mqttState == MqttState.UP){
             initializeSwList()
         }
     }
-
     fun getTimersInfo(id:String): List<String>{
         val legend = arrayOf("inactivo", "inactivo", "inactivo", "inactivo")
         for (i in 0 ..< 4){
@@ -128,7 +124,6 @@ class KeepSwData @Inject constructor (
     private fun getBit(value: Int, position: Int): Int {
         return (value shr position) and 1;
     }
-
     private fun getLegend(id: String): String{ // todo revisar getByte en lugar de los pow
         if(!swMap.containsKey(id)){
             return "Sin Información"
@@ -195,7 +190,6 @@ class KeepSwData @Inject constructor (
             }
         }
     }
-
     private fun getSwImageId (id: String): Int{
         if( !swMap.containsKey(id) ){
             return R.drawable.no_info
@@ -220,7 +214,6 @@ class KeepSwData @Inject constructor (
             else -> return R.drawable.no_info
         }
     }
-
     private fun initializeSwList () {
         for(sw in swList){
             mqttManager.subscribe(sw.id)
@@ -228,7 +221,6 @@ class KeepSwData @Inject constructor (
         }
         checkSwitches()
     }
-
     private fun getStoredData() : List<SwData> {
         var myList = FlashData("", emptyList())
         CoroutineScope(Dispatchers.IO).launch {
@@ -239,7 +231,6 @@ class KeepSwData @Inject constructor (
         }
         return myList.swList
     }
-
     private fun saveData () {
         val flashData = FlashData("version 0", swList)
         val gson = Gson()
@@ -247,7 +238,6 @@ class KeepSwData @Inject constructor (
             swDataStore.saveList(gson.toJson(flashData))
         }
     }
-
     private fun checkSwitches(){
         val timerInSec = 10L
         fixedRateTimer("timer", false, 0L, timerInSec * 1000){
@@ -259,11 +249,9 @@ class KeepSwData @Inject constructor (
             }
         }
     }
-
     private fun initSw( id: String){
         mqttManager.publish(id, SEND_GET)
     }
-
     fun imageClick(id: String) {
         for (data in swList) {
             if (data.id == id) {
@@ -294,11 +282,11 @@ class KeepSwData @Inject constructor (
                     0))
                 mqttManager.publish(id,setData)
         }
-        for(swData in swList){
-            if (swData.id == id){
-                if(data. bkColor != swData.bkColor ||
-                    data.row != swData.row){
-                }
+        swList.forEachIndexed {index, swData ->
+            if(swData.id == id){
+                swList[index].row = data.row
+                swList[index].bkColor = data.bkColor
+                refreshScreenInfo()
             }
         }
     }
