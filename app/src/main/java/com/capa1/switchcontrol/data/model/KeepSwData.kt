@@ -3,6 +3,7 @@ package com.capa1.switchcontrol.data.model
 import android.content.Context
 import android.util.Log
 import com.capa1.switchcontrol.R
+import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.Global.SEND_GET
 import com.capa1.switchcontrol.data.Global.SEND_OFF
 import com.capa1.switchcontrol.data.Global.SEND_ON
@@ -282,8 +283,23 @@ class KeepSwData @Inject constructor (
     }
     fun configUpgrade(data: ConfigurableData, id:String){
         if (data.prgs != swMap[id]!!.prgs ||
-            data.mode != swMap[id]!!.mode){
-
+            data.mode != swMap[id]!!.mode ||
+            data.secs != swMap[id]!!.secs){
+                val setData = Global.gson.toJson( EspData(
+                    data.name,
+                    SwState.SET_DATA.ordinal,
+                    data.mode,
+                    data.secs,
+                    data.prgs,
+                    0))
+                mqttManager.publish(id,setData)
+        }
+        for(swData in swList){
+            if (swData.id == id){
+                if(data. bkColor != swData.bkColor ||
+                    data.row != swData.row){
+                }
+            }
         }
     }
 }

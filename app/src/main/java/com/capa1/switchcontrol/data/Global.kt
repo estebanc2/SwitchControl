@@ -9,7 +9,7 @@ import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.google.gson.Gson
 
 object Global {
-    private val gson = Gson()
+    val gson = Gson()
     const val TO_SW = "/mtc/to_sw/"
     const val FROM_SW = "/mtc/from_sw/"
     const val MQTT_HOST_AND_PORT =
