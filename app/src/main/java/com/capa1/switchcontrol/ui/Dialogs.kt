@@ -1,9 +1,7 @@
 package com.capa1.switchcontrol.ui
 
 import android.content.res.Configuration
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,9 +24,9 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoodBad
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -37,13 +34,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -367,8 +365,8 @@ fun ColorDialog( //6
                         contentPadding = PaddingValues(all = 20.dp),
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
-                      items(colorsList){ data->
-                          Row {
+                        items(colorsList){ data->
+                            Row {
                               Box(
                                   contentAlignment = Alignment.Center,
                                   modifier = Modifier
@@ -396,7 +394,7 @@ fun ColorDialog( //6
                                   )
                               }
                           }
-                       }
+                        }
                     }
                 }
             }
@@ -423,42 +421,71 @@ fun TimerDialog( //7
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                          Text(
-                            text = "AHORARIO INICIAL",
-                            style = TextStyle(fontSize = 10.sp),
+                            text = "HORARIO INICIAL",
+                            style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
-                        Row{
+                        var startHour by remember { mutableStateOf(currentTimer.start/60) }
+                        var startMin by remember { mutableStateOf((currentTimer.start - (currentTimer.start/60)*60)) }
+                        var stopHour by remember { mutableStateOf(currentTimer.stop/60) }
+                        var stopMin by remember { mutableStateOf((currentTimer.stop/60 - (currentTimer.stop/60)*60)) }
+
+                        Row(Modifier, verticalAlignment = Alignment.CenterVertically){
                             Text(
-                                text = "hora: ${currentTimer.start/60}",
-                                style = TextStyle(fontSize = 10.sp),
+                                text = "hora: $startHour",
+                                style = TextStyle(fontSize = 16.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                             )
+                            Column{
+                                Icon(
+                                    Icons.Default.KeyboardArrowUp,
+                                    contentDescription = "",
+                                    Modifier.clickable { if(startHour > 0) startHour -= 1 }
+                                )
+                                Icon(
+                                    Icons.Default.KeyboardArrowDown,
+                                    contentDescription = "",
+                                    Modifier.clickable { if(startHour < 23) startHour += 1 }
+                                )
+                            }
                             Text(
-                                text = "minutos: ${currentTimer.start - (currentTimer.start/60)*60}",
-                                style = TextStyle(fontSize = 10.sp),
+                                text = "minutos: $startMin",
+                                style = TextStyle(fontSize = 16.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                             )
+                            Column{
+                                Icon(
+                                    Icons.Default.KeyboardArrowUp,
+                                    contentDescription = "",
+                                    Modifier.clickable { if(startMin > 0) startHour -= 1 }
+                                )
+                                Icon(
+                                    Icons.Default.KeyboardArrowDown,
+                                    contentDescription = "",
+                                    Modifier.clickable { if(startMin < 60) startHour += 1 }
+                                )
+                            }
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
                             text = "HORARIO FINAL",
-                            style = TextStyle(fontSize = 10.sp),
+                            style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
                         Row{
                             Text(
-                                text = "hora: ${currentTimer.stop/60}",
-                                style = TextStyle(fontSize = 10.sp),
+                                text = "hora: $stopHour",
+                                style = TextStyle(fontSize = 14.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                             )
                             Text(
-                                text = "minutos: ${currentTimer.stop - (currentTimer.start/60)*60}",
-                                style = TextStyle(fontSize = 10.sp),
+                                text = "minutos: $stopMin",
+                                style = TextStyle(fontSize = 14.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                             )
@@ -466,19 +493,24 @@ fun TimerDialog( //7
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
                             text = "DIAS",
-                            style = TextStyle(fontSize = 10.sp),
+                            style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
-                        var days = 0
+                        var dom by remember { mutableStateOf(false) }
+                        var lu by remember { mutableStateOf(false) }
+                        var ma by remember { mutableStateOf(false) }
+                        var mi by remember { mutableStateOf(false) }
+                        var ju by remember { mutableStateOf(false) }
+                        var vi by remember { mutableStateOf(false) }
+                        var sa by remember { mutableStateOf(false) }
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceEvenly){
-                           Box(
+                            Box(
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(Color.LightGray, CircleShape)
-                                    .clickable {days += 128
-                                    },
+                                    .background(color = if (dom) Color.Blue else Color.LightGray, CircleShape)
+                                    .clickable { dom = !dom },
                                 contentAlignment = Alignment.Center
                             ){
                                 Text(
@@ -492,9 +524,8 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(Color.LightGray, CircleShape)
-                                    .clickable {days += 128
-                                    },
+                                    .background(color = if (lu) Color.Blue else Color.LightGray, CircleShape)
+                                    .clickable { lu = !lu },
                                 contentAlignment = Alignment.Center
                             ){
                                 Text(
@@ -508,9 +539,8 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(Color.LightGray, CircleShape)
-                                    .clickable {days += 128
-                                    },
+                                    .background(color = if (ma) Color.Blue else Color.LightGray, CircleShape)
+                                    .clickable { ma = !ma },
                                 contentAlignment = Alignment.Center
                             ){
                                 Text(
@@ -524,9 +554,8 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(Color.LightGray, CircleShape)
-                                    .clickable {days += 128
-                                    },
+                                    .background(color = if (mi) Color.Blue else Color.LightGray, CircleShape)
+                                    .clickable { mi = !mi },
                                 contentAlignment = Alignment.Center
                             ){
                                 Text(
@@ -540,9 +569,8 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(Color.LightGray, CircleShape)
-                                    .clickable {days += 128
-                                    },
+                                    .background(color = if (ju) Color.Blue else Color.LightGray, CircleShape)
+                                    .clickable { ju = !ju },
                                 contentAlignment = Alignment.Center
                             ){
                                 Text(
@@ -556,9 +584,8 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(Color.LightGray, CircleShape)
-                                    .clickable {days += 128
-                                    },
+                                    .background(color = if (vi) Color.Blue else Color.LightGray, CircleShape)
+                                    .clickable { vi = !vi },
                                 contentAlignment = Alignment.Center
                             ){
                                 Text(
@@ -572,9 +599,8 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(Color.LightGray, CircleShape)
-                                    .clickable {days += 128
-                                    },
+                                    .background(color = if (sa) Color.Blue else Color.LightGray, CircleShape)
+                                    .clickable { sa = !sa },
                                 contentAlignment = Alignment.Center
                             ){
                                 Text(
@@ -588,9 +614,10 @@ fun TimerDialog( //7
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
-                            TextButton(
-                                onClick = {
-
+                            fun Boolean.toInt() = if (this) 1 else 0
+                            val days = dom.toInt()+lu.toInt()*2+ma.toInt()*4+mi.toInt()*8+ju.toInt()*16+vi.toInt()*32+sa.toInt()*64
+                                TextButton(
+                                    onClick = {setTimer(WeeklyProgram(1, 1, days))
                                 },
                             ) {
                                 Icon(
