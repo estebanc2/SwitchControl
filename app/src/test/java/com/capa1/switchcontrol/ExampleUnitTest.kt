@@ -38,4 +38,17 @@ class ExampleUnitTest {
         }
         assert(testList[1].b == "de castro")
     }
+    @Test
+    fun listInsert(){
+        val myList = mutableListOf( 1, 2, 3, 4, 5, 6)
+        val qty = myList.size
+        val element = 4
+        val newRow = 6
+        myList.remove(element)
+        myList.add(newRow -1, element)
+        for (element in myList){
+            println(String.format("%d",element))
+        }
+        assert(myList[newRow - 1] == element)
+    }
 }

@@ -35,8 +35,8 @@ class KeepSwData @Inject constructor (
     private val mqttManager = MqttManager(this)
     private var swList = mutableListOf<SwData>()
     var swMap = mutableMapOf<String, EspData>()
-    private val allSwId = "000"
-    private var newSwId = "11111"
+    val allSwId = "abc12345678f"
+    private var newSwId = ""
     val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
     private val swDataStore = SwDataStore(context)
     private val something = listOf(
@@ -68,7 +68,7 @@ class KeepSwData @Inject constructor (
             refreshList += SwScreenData(
                 name = swData.name,
                 id = swData.id,
-                row = swData.row,
+                row = index + 1,
                 bkColor = swData.bkColor,
                 swImageId = getSwImageId(swData.id),
                 timerInfo = getLegend(swData.id)
@@ -281,7 +281,8 @@ class KeepSwData @Inject constructor (
         }
     }
     fun configUpgrade(data: ConfigurableData, id:String){
-        if (data.prgs != swMap[id]!!.prgs ||
+        if (data.name != swMap[id]!!.name ||
+            data.prgs != swMap[id]!!.prgs ||
             data.mode != swMap[id]!!.mode ||
             data.secs != swMap[id]!!.secs){
                 val setData = Global.gson.toJson( EspData(
@@ -293,23 +294,36 @@ class KeepSwData @Inject constructor (
                     0))
                 mqttManager.publish(id,setData)
         }
-        var someChange = false
-        swList.forEachIndexed {index, swData ->
-            if(swData.id == id){
-                if(swList[index].row != data.row){
-
-                    someChange = true
-                    return@forEachIndexed
-                }
-                if(swList[index].bkColor != data.bkColor){
-                    swList[index].bkColor = data.bkColor
-                    someChange = true
-                }
+        var newSwData = SwData("","", 1, "nada", SwStatus.DISCONNECTED)
+        var newIndex = 0
+        var aChange = false
+        swList.forEachIndexed { index, swData ->
+            if (swData.id == id) {
+                newSwData = swData
+                newIndex = index
             }
         }
-        if (someChange){
+        if(data.name != newSwData.name){
+            swList[newIndex].name = data.name
+            aChange = true
+        }
+        if(data.bkColor != newSwData.bkColor){
+            swList[newIndex].bkColor = data.bkColor
+            aChange = true
+        }
+        if(data.row != newSwData.row){
+            swList.remove(newSwData)
+            swList.add(data.row - 1, newSwData)
+            aChange = true
+        }
+        if(aChange){
             refreshScreenInfo()
             saveData()
         }
+    }
+
+    fun sendConfig(id: String) {
+        val allData = Global.gson.toJson( getStoredData())
+        mqttManager.publish(id,allData)
     }
 }

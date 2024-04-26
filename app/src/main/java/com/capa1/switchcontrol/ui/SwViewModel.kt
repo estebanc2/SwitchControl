@@ -37,7 +37,7 @@ class SwViewModel  @Inject constructor(
         private set
     var showAll by mutableStateOf (false)
         private set
-
+    val allSwId = keepSwData.allSwId
     var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
         private set
     var goConfig by mutableStateOf (false)
@@ -126,5 +126,9 @@ class SwViewModel  @Inject constructor(
     }
     fun onShowAll(show: Boolean) {
         showAll = show
+    }
+
+    fun addAllSw(id: String) {
+        keepSwData.sendConfig(id)
     }
 }

@@ -48,20 +48,26 @@ fun SwListScreen(
         show = viewModel.showAdd,
         addSw = {},
         addId = {viewModel.onShowNewId(true)},
-        addAll = {},
+        addAll = {viewModel.onShowAll(true)},
         onExit = {viewModel.onShowAdd(false)}
-    )
-    NameDialog(
-        show = viewModel.showName,
-        currentName = viewModel.configurableData.name ,
-        setName = {name -> viewModel.changeName(name)},
-        onExit = {viewModel.onShowName(false)}
     )
     NewIdDialog(
         show = viewModel.showNewId,
         setId = {id -> viewModel.addSwId(id)},
         onExit = {viewModel.onShowNewId(false)
                     viewModel.onShowAdd(false)}
+    )
+    NewAllDialog(
+        show = viewModel.showAll,
+        allSwId = viewModel.allSwId,
+        setId = {id -> viewModel.addAllSw(id)},
+        onExit = { viewModel.onShowAll(false)}
+    )
+    NameDialog(
+        show = viewModel.showName,
+        currentName = viewModel.configurableData.name ,
+        setName = {name -> viewModel.changeName(name)},
+        onExit = {viewModel.onShowName(false)}
     )
     ColorDialog(
         show = viewModel.showColor,
@@ -91,6 +97,7 @@ fun SwListScreen(
             ShowConfig(
                 qty = viewModel.swScreenList.size,
                 data = viewModel.configurableData,
+                changeName = {viewModel.onShowName(true)},
                 showPicker = {viewModel.onShowColor(true)},
                 changeRow = { pos -> viewModel.changeRow(pos)},
                 save = {viewModel.saveConfig()}

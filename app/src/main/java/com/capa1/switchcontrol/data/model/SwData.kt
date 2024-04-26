@@ -1,7 +1,7 @@
 package com.capa1.switchcontrol.data.model
 
 data class SwData(
-    val name: String,
+    var name: String,
     val id: String,
     var row: Int,
     var bkColor: String = "nada",

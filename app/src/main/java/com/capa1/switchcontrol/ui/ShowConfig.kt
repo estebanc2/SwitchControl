@@ -10,9 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.ChangeCircle
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Handyman
@@ -43,10 +44,11 @@ import com.capa1.switchcontrol.data.model.ConfigurableData
 fun ShowConfig(
     qty: Int,
     data: ConfigurableData,
+    changeName: () -> Unit,
     showPicker: ()-> Unit,
     changeRow: (Int) -> Unit,
     save:()->Unit,
-    exit:()->Unit
+    onExit:()->Unit
 ){
     var row by remember { mutableStateOf(data.row) }
     Column(
@@ -81,6 +83,12 @@ fun ShowConfig(
                 style = TextStyle(fontSize = 30.sp),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.padding(horizontal = 10.dp))
+            Icon(
+                Icons.Default.ChangeCircle,
+                contentDescription = "",
+                modifier = Modifier.clickable { changeName() }
             )
         }
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
@@ -250,36 +258,24 @@ fun ShowConfig(
 
         }
         Spacer(modifier = Modifier.padding(vertical = 25.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape = MaterialTheme.shapes.small)
-                //.background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(horizontal = 16.dp, vertical = 1.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextButton(onClick = {exit()}) {
+        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
+            TextButton(
+                onClick = {save()},
+            ) {
                 Icon(
-                    Icons.Default.Clear,
+                    Icons.Default.CheckCircle,
                     contentDescription = "",
                 )
-                Text(text = "abandonar",
-                    style = TextStyle(fontSize = 16.sp),
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                    )
+                Text(text = "aceptar")
             }
-            Spacer(modifier = Modifier.padding(horizontal = 25.dp))
-            TextButton(onClick = { save() }) {
+            TextButton(
+                onClick = { onExit() },
+            ) {
                 Icon(
-                    Icons.Default.Check,
+                    Icons.Default.Delete,
                     contentDescription = "",
                 )
-                Text(text = "hecho",
-                    style = TextStyle(fontSize = 16.sp),
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Text(text = "descartar")
             }
         }
     }
@@ -293,6 +289,7 @@ fun ShowConfigPreview()
         qty = 5,
         data = ConfigurableData("luz cocina", 0,
             0, Global.NO_TIMERS, "nada", 2, listOf("inactivo", "inactivo", "inactivo", "lu de 9 a 11")),
+        {},
         showPicker = {},
         changeRow = {1},
         save = {}
