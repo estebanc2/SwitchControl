@@ -1,6 +1,7 @@
 package com.capa1.switchcontrol.ui
 
 import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -39,6 +40,8 @@ class SwViewModel  @Inject constructor(
         private set
     val allSwId = keepSwData.allSwId
     var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
+        private set
+    var currentTimer by mutableStateOf(0)
         private set
     var goConfig by mutableStateOf (false)
         private set
@@ -83,7 +86,7 @@ class SwViewModel  @Inject constructor(
         goConfig = show
     }
     fun changeName(name: String){
-
+        configurableData.name = name
     }
     fun changeColor(color: String){
         configurableData.bkColor = color
@@ -93,7 +96,7 @@ class SwViewModel  @Inject constructor(
         Log.i(TAG,"row: [${configurableData.row}]")
     }
     fun changeTimer(newPrg: WeeklyProgram){
-
+        configurableData.prgs.toMutableList()[currentTimer] = newPrg
     }
     fun changeMode(mode: Int){
 
@@ -112,7 +115,10 @@ class SwViewModel  @Inject constructor(
     fun onShowColor(show: Boolean) {
         showColor = show
     }
-    fun onShowTimer(show: Boolean) {
+    fun onShowTimer(timer: Int, show: Boolean) {
+        if (show){
+            currentTimer = timer
+        }
         showTimer = show
     }
     fun onShowMode(show: Boolean) {

@@ -77,9 +77,9 @@ fun SwListScreen(
     )
     TimerDialog(
         show = viewModel.showTimer,
-        currentTimer = viewModel.configurableData.prgs[0],
+        currentTimer = viewModel.configurableData.prgs[viewModel.currentTimer],
         setTimer = {timer -> viewModel.changeTimer(timer)},
-        onExit = {viewModel.onShowTimer(false)}
+        onExit = {viewModel.onShowTimer(0,false)}
     )
     ModeDialog(
         show = viewModel.showName,
@@ -100,6 +100,7 @@ fun SwListScreen(
                 changeName = {viewModel.onShowName(true)},
                 showPicker = {viewModel.onShowColor(true)},
                 changeRow = { pos -> viewModel.changeRow(pos)},
+                changeTimer = {timer -> viewModel.onShowTimer(timer, true)},
                 save = {viewModel.saveConfig()}
             ) { viewModel.exitConfig() }
         }

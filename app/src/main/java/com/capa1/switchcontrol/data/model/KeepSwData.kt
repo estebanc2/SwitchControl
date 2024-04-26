@@ -314,6 +314,9 @@ class KeepSwData @Inject constructor (
         if(data.row != newSwData.row){
             swList.remove(newSwData)
             swList.add(data.row - 1, newSwData)
+            swList.forEachIndexed { index, _  ->
+                swList[index].row = index + 1
+            }
             aChange = true
         }
         if(aChange){

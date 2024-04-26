@@ -47,6 +47,7 @@ fun ShowConfig(
     changeName: () -> Unit,
     showPicker: ()-> Unit,
     changeRow: (Int) -> Unit,
+    changeTimer: (Int) -> Unit,
     save:()->Unit,
     onExit:()->Unit
 ){
@@ -173,49 +174,57 @@ fun ShowConfig(
             Row {
                 Icon(
                     Icons.Default.Restore,
-                    contentDescription = ""
+                    contentDescription = "",
+                    modifier = Modifier.clickable {changeTimer(0)}
                 )
                 Text(
                     text = data.timersInfo[0],
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
+                        .clickable { changeTimer(0) }
                 )
             }
             Row {
                 Icon(
                     Icons.Default.Restore,
-                    contentDescription = ""
+                    contentDescription = "",
+                    modifier = Modifier.clickable {changeTimer(1)}
                 )
                 Text(
                     text = data.timersInfo[1],
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
+                        .clickable { changeTimer(1) }
                 )
             }
             Row {
                 Icon(
                     Icons.Default.Restore,
-                    contentDescription = ""
+                    contentDescription = "",
+                    modifier = Modifier.clickable {changeTimer(2)}
                 )
                 Text(
                     text = data.timersInfo[2],
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
+                        .clickable { changeTimer(2) }
                 )
             }
             Row {
                 Icon(
                     Icons.Default.Restore,
-                    contentDescription = ""
+                    contentDescription = "",
+                    modifier = Modifier.clickable {changeTimer(3)}
                 )
                 Text(
                     text = data.timersInfo[3],
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
+                        .clickable { changeTimer(3) }
                 )
             }
         }
@@ -289,9 +298,10 @@ fun ShowConfigPreview()
         qty = 5,
         data = ConfigurableData("luz cocina", 0,
             0, Global.NO_TIMERS, "nada", 2, listOf("inactivo", "inactivo", "inactivo", "lu de 9 a 11")),
-        {},
+        changeName = {},
         showPicker = {},
         changeRow = {1},
+        changeTimer = {},
         save = {}
     ) {}
 }
