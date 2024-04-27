@@ -417,42 +417,42 @@ fun TimerDialog( //7
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier.padding(10.dp),
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                          Text(
                             text = "HORARIO INICIAL",
-                            style = TextStyle(fontSize = 14.sp),
+                            style = TextStyle(fontSize = 20.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
                         var startHour by remember { mutableStateOf(currentTimer.start/60) }
                         var startMin by remember { mutableStateOf((currentTimer.start - (currentTimer.start/60)*60)) }
                         var stopHour by remember { mutableStateOf(currentTimer.stop/60) }
-                        var stopMin by remember { mutableStateOf((currentTimer.stop/60 - (currentTimer.stop/60)*60)) }
+                        var stopMin by remember { mutableStateOf((currentTimer.stop - (currentTimer.stop/60)*60)) }
 
                         Row(Modifier, verticalAlignment = Alignment.CenterVertically){
                             Text(
                                 text = "hora: $startHour",
-                                style = TextStyle(fontSize = 16.sp),
+                                style = TextStyle(fontSize = 20.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                             )
                             Column{
                                 Icon(
                                     Icons.Default.KeyboardArrowUp,
-                                    contentDescription = "",
-                                    Modifier.clickable { if(startHour > 0) startHour -= 1 }
-                                )
-                                Icon(
-                                    Icons.Default.KeyboardArrowDown,
                                     contentDescription = "",
                                     Modifier.clickable { if(startHour < 23) startHour += 1 }
+
                                 )
+                                Icon(
+                                    Icons.Default.KeyboardArrowDown,
+                                    contentDescription = "",
+                                    Modifier.clickable { if(startHour > 0) startHour -= 1 }                              )
                             }
                             Text(
-                                text = "minutos: $startMin",
-                                style = TextStyle(fontSize = 16.sp),
+                                text = "min.: $startMin",
+                                style = TextStyle(fontSize = 20.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                             )
@@ -460,40 +460,65 @@ fun TimerDialog( //7
                                 Icon(
                                     Icons.Default.KeyboardArrowUp,
                                     contentDescription = "",
-                                    Modifier.clickable { if(startMin > 0) startHour -= 1 }
+                                    Modifier.clickable { if(startMin < 60) startMin += 1 }
+
                                 )
                                 Icon(
                                     Icons.Default.KeyboardArrowDown,
                                     contentDescription = "",
-                                    Modifier.clickable { if(startMin < 60) startHour += 1 }
+                                    Modifier.clickable { if(startMin > 0) startMin -= 1 }
                                 )
                             }
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
                             text = "HORARIO FINAL",
-                            style = TextStyle(fontSize = 14.sp),
+                            style = TextStyle(fontSize = 20.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
-                        Row{
+                        Row(Modifier, verticalAlignment = Alignment.CenterVertically){
                             Text(
                                 text = "hora: $stopHour",
-                                style = TextStyle(fontSize = 14.sp),
+                                style = TextStyle(fontSize = 20.sp),
                                 color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
-                            )
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp))
+                            Column{
+                                Icon(
+                                    Icons.Default.KeyboardArrowUp,
+                                    contentDescription = "",
+                                    Modifier.clickable { if(stopHour < 23) stopHour += 1 }
+                                )
+                                Icon(
+                                    Icons.Default.KeyboardArrowDown,
+                                    contentDescription = "",
+                                    Modifier.clickable { if(stopHour > 0) stopHour -= 1 }
+                                )
+                            }
                             Text(
-                                text = "minutos: $stopMin",
-                                style = TextStyle(fontSize = 14.sp),
+                                text = "min.: $stopMin",
+                                style = TextStyle(fontSize = 20.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                             )
+                            Column{
+                                Icon(
+                                    Icons.Default.KeyboardArrowUp,
+                                    contentDescription = "",
+                                    Modifier.clickable { if(stopMin < 60) stopMin += 1 }
+                                )
+                                Icon(
+                                    Icons.Default.KeyboardArrowDown,
+                                    contentDescription = "",
+                                    Modifier.clickable { if(stopMin > 0) stopMin -= 1 }
+                                )
+                            }
+
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
                             text = "DIAS",
-                            style = TextStyle(fontSize = 14.sp),
+                            style = TextStyle(fontSize = 20.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
@@ -617,7 +642,8 @@ fun TimerDialog( //7
                             fun Boolean.toInt() = if (this) 1 else 0
                             val days = dom.toInt()+lu.toInt()*2+ma.toInt()*4+mi.toInt()*8+ju.toInt()*16+vi.toInt()*32+sa.toInt()*64
                                 TextButton(
-                                    onClick = {setTimer(WeeklyProgram(1, 1, days))
+                                    onClick = {setTimer(WeeklyProgram(startHour * 60 + startMin,
+                                        stopHour *60 + stopMin, days))
                                 },
                             ) {
                                 Icon(

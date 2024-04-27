@@ -81,12 +81,45 @@ class SwViewModel  @Inject constructor(
             keepSwData.swMap[item.id]?.prgs ?: NO_TIMERS,
             item.bkColor,
             item.row,
-            keepSwData.getTimersInfo(item.id)
+            getTimersInfo(configurableData.prgs)
         )
         goConfig = show
     }
+
+    private fun getTimersInfo(prgs: List<WeeklyProgram>): List<String>{
+        val legend = arrayOf("inactivo", "inactivo", "inactivo", "inactivo")
+        for (i in 0 ..< 4){
+            val days = prgs[i].days
+            val start = prgs[i].start
+            val stop = prgs[i].stop
+            if (days != 0){
+                legend[i] = "${daysList(days)} de ${hours(start)} a ${hours(stop)}"
+            }
+        }
+        return legend.asList()
+    }
+    private fun hours(min: Int): String{
+        return "${min/60}:${min - (min/60)*60}"
+    }
+    private fun daysList(day:Int): String{
+        var daysIn = ""
+        var i = 0
+        val dayName = listOf("do, ", "lu, ", "ma, ", "mi, ", "ju, ", "vi, ", "sa, ")
+        for (dayString in dayName){
+            if(getBit(day, i) != 0){
+                daysIn += dayString
+            }
+            i += 1
+        }
+        return daysIn
+    }
+    private fun getBit(value: Int, position: Int): Int {
+        return (value shr position) and 1;
+    }
+
     fun changeName(name: String){
         configurableData.name = name
+        showName = false
     }
     fun changeColor(color: String){
         configurableData.bkColor = color
@@ -97,9 +130,13 @@ class SwViewModel  @Inject constructor(
     }
     fun changeTimer(newPrg: WeeklyProgram){
         configurableData.prgs.toMutableList()[currentTimer] = newPrg
+        configurableData.timersInfo = getTimersInfo(configurableData.prgs)
+        showTimer = false
     }
-    fun changeMode(mode: Int){
-
+    fun changeMode(mode: Int, secs: Int){
+        configurableData.mode = mode
+        configurableData.secs = secs
+        showMode = false
     }
     fun addSwId (id: String) {
         keepSwData.setSwWithId(id)
