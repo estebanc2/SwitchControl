@@ -52,7 +52,6 @@ android {
 }
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
@@ -71,8 +70,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    //Screen Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.7")
     // store
     implementation("androidx.datastore:datastore-preferences-core:1.1.0")
     implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.0")
@@ -89,4 +86,4 @@ dependencies {
     implementation("org.eclipse.paho:org.eclipse.paho.android.service:1.1.1")
     //json
     implementation("com.google.code.gson:gson:2.10")
-}
+ }

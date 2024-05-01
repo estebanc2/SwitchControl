@@ -12,6 +12,8 @@ import com.capa1.switchcontrol.data.SwDataStore
 import com.capa1.switchcontrol.data.mqtt.MqttListener
 import com.capa1.switchcontrol.data.mqtt.MqttManager
 import com.capa1.switchcontrol.data.mqtt.MqttState
+import com.capa1.switchcontrol.data.wifi.EspTouch
+import com.capa1.switchcontrol.data.wifi.WifiCredentials
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +35,8 @@ class KeepSwData @Inject constructor (
     context: Context
 ): MqttListener {
     private val mqttManager = MqttManager(this)
+    private val wifiCredentials = WifiCredentials(context)
+    private val espTouch = EspTouch(context)
     private var swList = mutableListOf<SwData>()
     var swMap = mutableMapOf<String, EspData>()
     val allSwId = "abc12345678f"
@@ -52,6 +56,7 @@ class KeepSwData @Inject constructor (
         mqttManager.connect()
         swList = something.sortedBy { it.row }.toMutableList() //getStoredData()
         refreshScreenInfo()
+        Log.i(TAG, "ssid: ${wifiCredentials.mSsid}")
     }
 
     fun setSwWithId(id: String){

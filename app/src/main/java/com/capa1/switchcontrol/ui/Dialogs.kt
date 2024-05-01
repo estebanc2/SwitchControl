@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_EXPRESSION")
+
 package com.capa1.switchcontrol.ui
 
 import android.content.res.Configuration
@@ -62,15 +64,11 @@ fun AddSwDialog( //1
 ) {
     if (show) {
         Dialog(onDismissRequest = {}) {
-            Surface(
-                //shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
-            ) {
+            Surface {
                 Box(
                     contentAlignment = Alignment.TopEnd//   .Center
                 ) {
-                    Column(
-                        //horizontalAlignment  =  Alignment.CenterHorizontally
-                    ) {
+                    Column {
                         Text(
                             text = "Agregar interruptor/es",
                             style = TextStyle(fontSize = 16.sp),
@@ -426,14 +424,19 @@ fun TimerDialog( //7
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
-                        var startHour by remember { mutableStateOf(currentTimer.start/60) }
-                        var startMin by remember { mutableStateOf((currentTimer.start - (currentTimer.start/60)*60)) }
-                        var stopHour by remember { mutableStateOf(currentTimer.stop/60) }
-                        var stopMin by remember { mutableStateOf((currentTimer.stop - (currentTimer.stop/60)*60)) }
-
+                        var start by remember { mutableStateOf(currentTimer.start) }
+                        var stop by remember { mutableStateOf(currentTimer.stop) }
+                        fun checkMinStop(){
+                            if(stop <= start){
+                                stop = start + 1
+                            }
+                        }
+                        fun getMinutes(min: Int): Int{
+                            return min - (min/60)*60
+                        }
                         Row(Modifier, verticalAlignment = Alignment.CenterVertically){
                             Text(
-                                text = "hora: $startHour",
+                                text = "hora: ${start/60}",
                                 style = TextStyle(fontSize = 20.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -442,16 +445,19 @@ fun TimerDialog( //7
                                 Icon(
                                     Icons.Default.KeyboardArrowUp,
                                     contentDescription = "",
-                                    Modifier.clickable { if(startHour < 23) startHour += 1 }
-
+                                    Modifier.clickable {
+                                        if(start < 23*60) start += 60
+                                        checkMinStop()
+                                    }
                                 )
                                 Icon(
                                     Icons.Default.KeyboardArrowDown,
                                     contentDescription = "",
-                                    Modifier.clickable { if(startHour > 0) startHour -= 1 }                              )
+                                    Modifier.clickable { if(start > 60) start -= 60 }
+                                )
                             }
                             Text(
-                                text = "min.: $startMin",
+                                text = "min.: ${getMinutes(start)}",
                                 style = TextStyle(fontSize = 20.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -460,13 +466,15 @@ fun TimerDialog( //7
                                 Icon(
                                     Icons.Default.KeyboardArrowUp,
                                     contentDescription = "",
-                                    Modifier.clickable { if(startMin < 60) startMin += 1 }
-
+                                    Modifier.clickable {
+                                        if(getMinutes(start) < 59) start += 1
+                                        checkMinStop()
+                                    }
                                 )
                                 Icon(
                                     Icons.Default.KeyboardArrowDown,
                                     contentDescription = "",
-                                    Modifier.clickable { if(startMin > 0) startMin -= 1 }
+                                    Modifier.clickable { if(getMinutes(start) > 0) start -= 1 }
                                 )
                             }
                         }
@@ -479,7 +487,7 @@ fun TimerDialog( //7
                         )
                         Row(Modifier, verticalAlignment = Alignment.CenterVertically){
                             Text(
-                                text = "hora: $stopHour",
+                                text = "hora: ${stop/60}",
                                 style = TextStyle(fontSize = 20.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp))
@@ -487,16 +495,19 @@ fun TimerDialog( //7
                                 Icon(
                                     Icons.Default.KeyboardArrowUp,
                                     contentDescription = "",
-                                    Modifier.clickable { if(stopHour < 23) stopHour += 1 }
+                                    Modifier.clickable { if(stop < 23*60) stop += 60 }
                                 )
                                 Icon(
                                     Icons.Default.KeyboardArrowDown,
                                     contentDescription = "",
-                                    Modifier.clickable { if(stopHour > 0) stopHour -= 1 }
+                                    Modifier.clickable {
+                                        if(stop > 60) stop -= 60
+                                        checkMinStop()
+                                    }
                                 )
                             }
                             Text(
-                                text = "min.: $stopMin",
+                                text = "min.: ${getMinutes(stop)}",
                                 style = TextStyle(fontSize = 20.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -505,15 +516,17 @@ fun TimerDialog( //7
                                 Icon(
                                     Icons.Default.KeyboardArrowUp,
                                     contentDescription = "",
-                                    Modifier.clickable { if(stopMin < 60) stopMin += 1 }
+                                    Modifier.clickable { if(getMinutes(stop) < 59) stop += 1 }
                                 )
                                 Icon(
                                     Icons.Default.KeyboardArrowDown,
                                     contentDescription = "",
-                                    Modifier.clickable { if(stopMin > 0) stopMin -= 1 }
+                                    Modifier.clickable {
+                                        if(getMinutes(stop) > 0) stop -= 1
+                                        checkMinStop()
+                                    }
                                 )
                             }
-
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
@@ -635,16 +648,14 @@ fun TimerDialog( //7
                                     color = Color.White
                                 )
                             }
-
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                             fun Boolean.toInt() = if (this) 1 else 0
                             val days = dom.toInt()+lu.toInt()*2+ma.toInt()*4+mi.toInt()*8+ju.toInt()*16+vi.toInt()*32+sa.toInt()*64
-                                TextButton(
-                                    onClick = {setTimer(WeeklyProgram(startHour * 60 + startMin,
-                                        stopHour *60 + stopMin, days))
-                                },
+                            TextButton(
+                                onClick = {setTimer(WeeklyProgram(start, stop, days))
+                            },
                             ) {
                                 Icon(
                                     Icons.Default.CheckCircle,
@@ -738,7 +749,7 @@ fun ShowDialog(value: Int = 7) {
         5 -> NameDialog(true, "luz cocina", {""}, {})
         6 -> ColorDialog(true, "cielo", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
-        8 -> ModeDialog(true, {})
+        8 -> ModeDialog(true) {}
         else -> {}
     }
 }
