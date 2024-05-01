@@ -230,7 +230,8 @@ fun NewAllDialog( //4
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
-                        TextField(modifier = Modifier.fillMaxWidth(),
+                        TextField (
+                            modifier = Modifier.fillMaxWidth(),
                             textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                             placeholder = { Text(text = "12 caracteres: 0..9 / a..f") },
                             value = tokenValue.value,
@@ -238,7 +239,8 @@ fun NewAllDialog( //4
                             maxLines = 1,
                             onValueChange = {
                                 tokenValue.value = it
-                            })
+                            }
+                        )
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                             TextButton(
@@ -301,7 +303,8 @@ fun NameDialog( //5
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
                         Spacer(modifier = Modifier.height(20.dp))
-                        TextField(modifier = Modifier.fillMaxWidth(),
+                        TextField (
+                            modifier = Modifier.fillMaxWidth(),
                             textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                             placeholder = {
                                 Text(
@@ -314,7 +317,8 @@ fun NameDialog( //5
                             maxLines = 1,
                             onValueChange = {
                                 tokenValue.value = it
-                            })
+                            }
+                        )
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                             TextButton(
@@ -700,8 +704,8 @@ fun ModeDialog( //8
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = "CAMBIAR NOMBRE DEL INTERRUPTOR",
-                            style = TextStyle(fontSize = 10.sp),
+                            text = "MODO DE FUNCIONAMIENTO",
+                            style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )

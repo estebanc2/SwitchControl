@@ -66,24 +66,24 @@ fun SwListScreen(
     NameDialog(
         show = viewModel.showName,
         currentName = viewModel.configurableData.name ,
-        setName = {name -> viewModel.changeName(name)},
+        setName = {name -> viewModel.newName(name)},
         onExit = {viewModel.onShowName(false)}
     )
     ColorDialog(
         show = viewModel.showColor,
         currentColor = viewModel.configurableData.bkColor,
-        setColor = {color -> viewModel.changeColor(color)},
+        setColor = {color -> viewModel.newColor(color)},
         exit = {viewModel.onShowColor(false)}
     )
     TimerDialog(
         show = viewModel.showTimer,
         currentTimer = viewModel.configurableData.prgs[viewModel.currentTimer],
-        setTimer = {timer -> viewModel.changeTimer(timer)},
+        setTimer = {timer -> viewModel.newTimer(timer)},
         onExit = {viewModel.onShowTimer(0,false)}
     )
     ModeDialog(
-        show = viewModel.showName,
-        onExit = {viewModel.onShowName(false)}
+        show = viewModel.showMode,
+        onExit = {viewModel.onShowMode(false)}
     )
     Box(Modifier.fillMaxSize()) {
         if (!viewModel.goConfig){
@@ -98,7 +98,7 @@ fun SwListScreen(
                 qty = viewModel.swScreenList.size,
                 data = viewModel.configurableData,
                 changeName = {viewModel.onShowName(true)},
-                showPicker = {viewModel.onShowColor(true)},
+                changeColor = {viewModel.onShowColor(true)},
                 changeRow = { pos -> viewModel.changeRow(pos)},
                 changeTimer = {timer -> viewModel.onShowTimer(timer, true)},
                 save = {viewModel.saveConfig()}

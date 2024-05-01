@@ -45,7 +45,7 @@ fun ShowConfig(
     qty: Int,
     data: ConfigurableData,
     changeName: () -> Unit,
-    showPicker: ()-> Unit,
+    changeColor: ()-> Unit,
     changeRow: (Int) -> Unit,
     changeTimer: (Int) -> Unit,
     save:()->Unit,
@@ -152,7 +152,7 @@ fun ShowConfig(
                     .background(
                         color = Global.MyColors[data.bkColor]!!.backColor
                     )
-                    .clickable { showPicker() }
+                    .clickable { changeColor() }
                     .padding(all = 8.dp)
                     .clip(shape = MaterialTheme.shapes.medium)
             )
@@ -300,7 +300,7 @@ fun ShowConfigPreview()
         data = ConfigurableData("luz cocina", 0,
             0, Global.NO_TIMERS, "nada", 2, listOf("inactivo", "inactivo", "inactivo", "lu de 9 a 11")),
         changeName = {},
-        showPicker = {},
+        changeColor = {},
         changeRow = {},
         changeTimer = {},
         save = {}

@@ -116,18 +116,18 @@ class SwViewModel  @Inject constructor(
         return (value shr position) and 1
     }
 
-    fun changeName(name: String){
+    fun newName(name: String){
         configurableData.name = name
         showName = false
     }
-    fun changeColor(color: String){
+    fun newColor(color: String){
         configurableData.bkColor = color
     }
     fun changeRow(pos: Int) {
         configurableData.row += pos
         Log.i(TAG,"row: [${configurableData.row}]")
     }
-    fun changeTimer(newPrg: WeeklyProgram){
+    fun newTimer(newPrg: WeeklyProgram){
         configurableData.prgs[currentTimer] = newPrg
         configurableData.timersInfo = getTimersInfo(configurableData.prgs)
         showTimer = false
