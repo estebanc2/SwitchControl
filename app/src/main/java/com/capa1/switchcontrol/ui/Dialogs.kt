@@ -71,7 +71,7 @@ fun AddSwDialog( //1
                     Column {
                         Text(
                             text = "Agregar interruptor/es",
-                            style = TextStyle(fontSize = 16.sp),
+                            style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary
                         )
                         TextButton(
@@ -140,7 +140,7 @@ fun NewIdDialog( //3: Boolean,
                     ) {
                         Text(
                             text = "AGREGAR INTERRUPTOR CON UN ID",
-                            style = TextStyle(fontSize = 10.sp),
+                            style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
@@ -213,7 +213,7 @@ fun NewAllDialog( //4
                     ) {
                         Text(
                             text = "COPIAR TODO DE/A OTRO MOVIL",
-                            style = TextStyle(fontSize = 20.sp),
+                            style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
@@ -296,14 +296,19 @@ fun NameDialog( //5
                     ) {
                         Text(
                             text = "CAMBIAR NOMBRE DEL INTERRUPTOR",
-                            style = TextStyle(fontSize = 10.sp),
+                            style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
                         Spacer(modifier = Modifier.height(20.dp))
                         TextField(modifier = Modifier.fillMaxWidth(),
                             textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                            placeholder = { Text(text = currentName) },
+                            placeholder = {
+                                Text(
+                                    text = " $currentName ",
+                                    style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                )
+                            },
                             value = tokenValue.value,
                             singleLine = true,
                             maxLines = 1,
@@ -315,9 +320,6 @@ fun NameDialog( //5
                             TextButton(
                                 onClick = {
                                     val input = tokenValue.value.text
-                                    if (input.length != 4) {
-                                        return@TextButton
-                                    }
                                     setName(input)
                                 },
                             ) {
@@ -420,7 +422,7 @@ fun TimerDialog( //7
                     ) {
                          Text(
                             text = "HORARIO INICIAL",
-                            style = TextStyle(fontSize = 20.sp),
+                            style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
@@ -481,7 +483,7 @@ fun TimerDialog( //7
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
                             text = "HORARIO FINAL",
-                            style = TextStyle(fontSize = 20.sp),
+                            style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
@@ -739,7 +741,7 @@ fun ModeDialog( //8
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 7) {
+fun ShowDialog(value: Int = 5) {
     //Column
     when (value) {
 

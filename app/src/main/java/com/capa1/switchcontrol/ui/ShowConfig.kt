@@ -63,7 +63,7 @@ fun ShowConfig(
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Text(
             text = "INTERRUPTOR WiFi",
-            style = TextStyle(fontSize = 12.sp),
+            style = TextStyle(fontSize = 16.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
         )
@@ -96,7 +96,7 @@ fun ShowConfig(
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
         Text(
             text = "VISTA",
-            style = TextStyle(fontSize = 12.sp),
+            style = TextStyle(fontSize = 16.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
         )
@@ -160,7 +160,7 @@ fun ShowConfig(
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
         Text(
             text = "TIMERS",
-            style = TextStyle(fontSize = 12.sp),
+            style = TextStyle(fontSize = 16.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
         )
@@ -232,7 +232,7 @@ fun ShowConfig(
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
         Text(
             text = "CONFIGURACION ADICIONAL",
-            style = TextStyle(fontSize = 12.sp),
+            style = TextStyle(fontSize = 16.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
         )

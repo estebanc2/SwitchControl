@@ -299,7 +299,6 @@ class KeepSwData @Inject constructor (
             saveData()
         }
     }
-
     fun sendConfig(id: String) {
         val allData = Global.gson.toJson( getStoredData())
         mqttManager.publish(id,allData)
