@@ -6,7 +6,7 @@ data class ConfigurableData(
     var name:String,
     var mode: Int,
     var secs: Int,
-    val prgs: List<WeeklyProgram>,
+    val prgs: MutableList<WeeklyProgram>,
     var bkColor:String,
     var row: Int,
     var timersInfo: List<String>

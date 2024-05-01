@@ -5,6 +5,6 @@ data class EspData(
     val state: Int, //SwState,
     val mode: Int, //SwMode,
     val secs: Int,
-    val prgs: List<WeeklyProgram>,
+    val prgs: MutableList<WeeklyProgram>,
     val tempX10:Int
 )

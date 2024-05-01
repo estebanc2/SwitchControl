@@ -52,6 +52,7 @@ fun ShowConfig(
     onExit:()->Unit
 ){
     var row by remember { mutableStateOf(data.row) }
+    //var timerInfo by remember { mutableStateOf(data.timersInfo)}
     Column(
         Modifier
             .fillMaxSize()
@@ -300,7 +301,7 @@ fun ShowConfigPreview()
             0, Global.NO_TIMERS, "nada", 2, listOf("inactivo", "inactivo", "inactivo", "lu de 9 a 11")),
         changeName = {},
         showPicker = {},
-        changeRow = {1},
+        changeRow = {},
         changeTimer = {},
         save = {}
     ) {}

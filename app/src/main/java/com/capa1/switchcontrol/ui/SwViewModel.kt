@@ -1,7 +1,6 @@
 package com.capa1.switchcontrol.ui
 
 import android.util.Log
-import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -45,7 +44,7 @@ class SwViewModel  @Inject constructor(
         private set
     var goConfig by mutableStateOf (false)
         private set
-    var configurableData by mutableStateOf<ConfigurableData> (ConfigurableData("", 0,
+    var configurableData by mutableStateOf (ConfigurableData("", 0,
                                     0, NO_TIMERS, "nada", 2, listOf()))
         private set
 
@@ -78,7 +77,7 @@ class SwViewModel  @Inject constructor(
             item.name,
             keepSwData.swMap[item.id]?.mode ?: 0,
             keepSwData.swMap[item.id]?.secs ?: 0,
-            keepSwData.swMap[item.id]?.prgs ?: NO_TIMERS,
+            (keepSwData.swMap[item.id]?.prgs ?: NO_TIMERS).toMutableList(),
             item.bkColor,
             item.row,
             getTimersInfo(configurableData.prgs)
@@ -114,7 +113,7 @@ class SwViewModel  @Inject constructor(
         return daysIn
     }
     private fun getBit(value: Int, position: Int): Int {
-        return (value shr position) and 1;
+        return (value shr position) and 1
     }
 
     fun changeName(name: String){
@@ -129,9 +128,10 @@ class SwViewModel  @Inject constructor(
         Log.i(TAG,"row: [${configurableData.row}]")
     }
     fun changeTimer(newPrg: WeeklyProgram){
-        configurableData.prgs.toMutableList()[currentTimer] = newPrg
+        configurableData.prgs[currentTimer] = newPrg
         configurableData.timersInfo = getTimersInfo(configurableData.prgs)
         showTimer = false
+        Log.i(TAG,"timer: $currentTimer, starthour : ${newPrg.start/60}, starthour loaded: ${configurableData.prgs[currentTimer].start/60}")
     }
     fun changeMode(mode: Int, secs: Int){
         configurableData.mode = mode
@@ -170,7 +170,6 @@ class SwViewModel  @Inject constructor(
     fun onShowAll(show: Boolean) {
         showAll = show
     }
-
     fun addAllSw(id: String) {
         keepSwData.sendConfig(id)
     }

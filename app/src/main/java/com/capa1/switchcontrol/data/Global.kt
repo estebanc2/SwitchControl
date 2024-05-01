@@ -36,7 +36,7 @@ object Global {
         "metal"   to  MyColor(Color(0xFF8F8C8F), Color(0xFFFFFFFF)),
         "madera"  to  MyColor(Color(0xFF793E2B), Color(0xFFFFFFFF)),
     )
-    val NO_TIMERS: List<WeeklyProgram> = listOf( WeeklyProgram(0,0,0),
+    val NO_TIMERS: MutableList<WeeklyProgram> = mutableListOf( WeeklyProgram(0,0,0),
                 WeeklyProgram(0,0,0),
                 WeeklyProgram(0,0,0),
                 WeeklyProgram(0,0,0)
