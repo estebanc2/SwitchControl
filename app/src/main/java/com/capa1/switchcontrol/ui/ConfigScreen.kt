@@ -42,7 +42,7 @@ import com.capa1.switchcontrol.data.model.ConfigurableData
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 
 @Composable
-fun ShowConfig(
+fun ConfigScreen(
     qty: Int,
     data: ConfigurableData,
     changeName: () -> Unit,
@@ -53,7 +53,7 @@ fun ShowConfig(
     onExit:()->Unit
 ){
     var row by remember { mutableStateOf(data.row) }
-
+    var prgs by remember { mutableStateOf(data.prgs) }
     fun hours(min: Int): String{
         return "${min/60}:${min - (min/60)*60}"
     }
@@ -72,19 +72,16 @@ fun ShowConfig(
         }
         return daysIn
     }
-    fun getTimersInfo(prgs: List<WeeklyProgram>): List<String>{
-        val legend = arrayOf("inactivo", "inactivo", "inactivo", "inactivo")
-        for (i in 0 ..< 4){
-            val days = prgs[i].days
-            val start = prgs[i].start
-            val stop = prgs[i].stop
-            if (days != 0){
-                legend[i] = "${daysList(days)} de ${hours(start)} a ${hours(stop)}"
-            }
+    fun getTimersInfo(prg: WeeklyProgram): String{
+        var legend = "inactivo"
+        val days = prg.days
+        val start = prg.start
+        val stop = prg.stop
+        if (days != 0){
+            legend = "${daysList(days)} de ${hours(start)} a ${hours(stop)}"
         }
-        return legend.asList()
+        return legend
     }
-    var timerInfo by remember { mutableStateOf(getTimersInfo(data.prgs))}
     Column(
         Modifier
             .fillMaxSize()
@@ -211,7 +208,7 @@ fun ShowConfig(
                     modifier = Modifier.clickable {changeTimer(0)}
                 )
                 Text(
-                    text = timerInfo[0],
+                    text = getTimersInfo(prgs[0]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
@@ -225,7 +222,7 @@ fun ShowConfig(
                     modifier = Modifier.clickable {changeTimer(1)}
                 )
                 Text(
-                    text = timerInfo[1],
+                    text = getTimersInfo(prgs[1]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
@@ -239,7 +236,7 @@ fun ShowConfig(
                     modifier = Modifier.clickable {changeTimer(2)}
                 )
                 Text(
-                    text = timerInfo[2],
+                    text = getTimersInfo(prgs[2]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
@@ -253,7 +250,7 @@ fun ShowConfig(
                     modifier = Modifier.clickable {changeTimer(3)}
                 )
                 Text(
-                    text = timerInfo[3],
+                    text = getTimersInfo(prgs[3]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
@@ -327,7 +324,7 @@ fun ShowConfig(
 @Composable
 fun ShowConfigPreview()
 {
-    ShowConfig(
+    ConfigScreen(
         qty = 5,
         data = ConfigurableData("luz cocina", 0, 0, Global.NO_TIMERS, "nada", 2),
         changeName = {},

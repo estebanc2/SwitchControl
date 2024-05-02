@@ -541,13 +541,16 @@ fun TimerDialog( //7
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
-                        var dom by remember { mutableStateOf(false) }
-                        var lu by remember { mutableStateOf(false) }
-                        var ma by remember { mutableStateOf(false) }
-                        var mi by remember { mutableStateOf(false) }
-                        var ju by remember { mutableStateOf(false) }
-                        var vi by remember { mutableStateOf(false) }
-                        var sa by remember { mutableStateOf(false) }
+                        fun isSet( position: Int): Boolean {
+                            return currentWP.days shr position and 1 == 1
+                        }
+                        var dom by remember { mutableStateOf(isSet(0)) }
+                        var lu  by remember { mutableStateOf(isSet(1)) }
+                        var ma  by remember { mutableStateOf(isSet(2)) }
+                        var mi  by remember { mutableStateOf(isSet(3)) }
+                        var ju  by remember { mutableStateOf(isSet(4)) }
+                        var vi  by remember { mutableStateOf(isSet(5)) }
+                        var sa  by remember { mutableStateOf(isSet(6)) }
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceEvenly){
                             Box(
                                 modifier = Modifier

@@ -78,7 +78,11 @@ object Global {
             prgs =  NO_TIMERS,
             tempX10 = 0)
     )
-
-
-
 }
+/*
+SwData("velador", "483fda877368", 2, "limon", SwStatus.DISCONNECTED),
+SwData("luz cocina", "98f4abb33d5a", 1, "lila", SwStatus.DISCONNECTED),
+SwData("riego", "483fda878e46", 3, "pasto", SwStatus.DISCONNECTED),
+SwData("alargue", "bcddc247dbc9", 5, "palta", SwStatus.DISCONNECTED),
+SwData("TV", "483fda879484", 4, "madera", SwStatus.DISCONNECTED)
+*/

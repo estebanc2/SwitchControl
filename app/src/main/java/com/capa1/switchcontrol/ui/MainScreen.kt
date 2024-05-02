@@ -37,7 +37,7 @@ import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.model.SwScreenData
 
 @Composable
-fun SwListScreen(
+fun MainScreen(
     viewModel: SwViewModel = hiltViewModel()
 ) {
     //val screenModifiers by viewModel.screenModifiers.collectAsStateWithLifecycle()
@@ -94,7 +94,7 @@ fun SwListScreen(
                 onConfig = {item -> viewModel.onConfig(true, item)}
             )
         }else{
-            ShowConfig(
+            ConfigScreen(
                 qty = viewModel.swScreenList.size,
                 data = viewModel.configurableData,
                 changeName = {viewModel.onShowName(true)},

@@ -37,15 +37,9 @@ class KeepSwData @Inject constructor (
     private var newSwId = ""
     val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
     private val swDataStore = SwDataStore(context)
-    private val something = listOf(
-        SwData("velador", "483fda877368", 2, "limon", SwStatus.DISCONNECTED),
-        SwData("luz cocina", "98f4abb33d5a", 1, "lila", SwStatus.DISCONNECTED),
-        SwData("riego", "483fda878e46", 3, "pasto", SwStatus.DISCONNECTED),
-        SwData("alargue", "bcddc247dbc9", 5, "palta", SwStatus.DISCONNECTED),
-        SwData("TV", "483fda879484", 4, "madera", SwStatus.DISCONNECTED)
-    )
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private var mqttUp = false
+
     override fun notifyNewMessage(id: String, msg: String) {
         val gson = Gson()
         if (id == allSwId) {
@@ -68,6 +62,7 @@ class KeepSwData @Inject constructor (
                 }
             }
         }
+        Log.i(TAG, "mqtt received data : $msg")
         refreshScreenInfo()
     }
 
@@ -177,6 +172,14 @@ class KeepSwData @Inject constructor (
         coroutineScope.launch { swScreenList.emit(refreshList) }
     }
 
+    private fun isSet( days: Int, position: Int): Boolean {
+        return days shr position and 1 == 1
+    }
+    private fun getBit(days: Int, position: Int): Int {
+        return (days shr position) and 1
+    }
+
+
     private fun getLegend(id: String): String { // todo revisar getByte en lugar de los pow
         if (!swMap.containsKey(id)) {
             return "Sin Información"
@@ -194,19 +197,19 @@ class KeepSwData @Inject constructor (
                 val calendar = Calendar.getInstance()
                 val hour = calendar.get(Calendar.HOUR_OF_DAY)
                 val min = calendar.get(Calendar.MINUTE)
-                val today = calendar.get(Calendar.DAY_OF_WEEK)
+                val today = calendar.get(Calendar.DAY_OF_WEEK) - 1
                 val tomorrow = (today + 1) % 7
                 val rightNow = (hour * 60) + min
                 var delta = 24 * 60
                 if (swMap[id]!!.state == SwState.OFF.ordinal) {
                     for (prg in swMap[id]!!.prgs) {
-                        if (2.0.pow(today.toDouble()) != 0.0 && prg.days != 0) {
+                        if (isSet(prg.days, today)) {
                             val deltaTrans = prg.start - rightNow
                             if (deltaTrans in 1..<delta) {
                                 delta = deltaTrans
                             }
                         }
-                        if (2.0.pow(tomorrow.toDouble()) != 0.0 && prg.days != 0) {
+                        if (isSet(prg.days, tomorrow)) {
                             val deltaTrans = prg.start + 24 * 60 - rightNow
                             if (deltaTrans < delta) {
                                 delta = deltaTrans
@@ -215,13 +218,13 @@ class KeepSwData @Inject constructor (
                     }
                 } else {
                     for (prg in swMap[id]!!.prgs) {
-                        if (2.0.pow(today.toDouble()) != 0.0 && prg.days != 0) {
+                        if (isSet(prg.days, today)) {
                             val deltaTrans = prg.stop - rightNow
                             if (deltaTrans in 1..<delta) {
                                 delta = deltaTrans
                             }
                         }
-                        if (2.0.pow(tomorrow.toDouble()) != 0.0 && prg.days != 0) {
+                        if (isSet(prg.days, tomorrow)) {
                             val deltaTrans = prg.stop + 24 * 60 - rightNow
                             if (deltaTrans < delta) {
                                 delta = deltaTrans
@@ -283,7 +286,6 @@ class KeepSwData @Inject constructor (
     private fun getStoredData() {
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.getFlashData.collect { flashData ->
-                Log.i(TAG,"data in coroutine: $flashData")
                 val gson = Gson()
                 swList = gson.fromJson(flashData, FlashData::class.java).swList
             }
@@ -293,7 +295,6 @@ class KeepSwData @Inject constructor (
     private fun saveData() {
         val gson = Gson()
         val flashData = gson.toJson(FlashData("version 0", swList))
-        Log.i(TAG, "data to save: $flashData")
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.saveFlashData(flashData)
         }
