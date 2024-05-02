@@ -71,6 +71,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     // store
+    implementation("androidx.datastore:datastore-core:1.1.0")
     implementation("androidx.datastore:datastore-preferences-core:1.1.0")
     implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.0")
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.0")

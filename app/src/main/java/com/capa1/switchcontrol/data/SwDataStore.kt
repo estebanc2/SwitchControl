@@ -11,14 +11,15 @@ import kotlinx.coroutines.flow.map
 
 class SwDataStore(private val context: Context) {
     companion object {
-        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("SW_DATA_LIST")
+        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("SW_DATA")
+        private val KEY = stringPreferencesKey("SWITCHES")
     }
-    val getList: Flow<String> = context.dataStore.data.map {preferences ->
-        preferences[stringPreferencesKey("SWITCHES")] ?: ""
+    val getFlashData: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[KEY] ?: ""
     }
-    suspend fun saveList(swList: String) {
+    suspend fun saveFlashData(data: String) {
         context.dataStore.edit { preferences ->
-            preferences[stringPreferencesKey("SWITCHES")] = swList
+            preferences[KEY] = data
         }
     }
 }

@@ -170,7 +170,8 @@ fun SwRow(
                     modifier = Modifier.clickable{ onConfig(item) }
                 )
                 Text (
-                    text = item.timerInfo
+                    text = item.timerInfo,
+                    color = MyColors[item.bkColor]!!.textColor,
                 )
             }
         Image(
