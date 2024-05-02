@@ -408,7 +408,7 @@ fun ColorDialog( //6
 @Composable
 fun TimerDialog( //7
     show: Boolean,
-    currentTimer: WeeklyProgram,
+    currentWP: WeeklyProgram,
     setTimer: (WeeklyProgram) -> Unit,
     onExit: () -> Unit
 ) {
@@ -430,8 +430,8 @@ fun TimerDialog( //7
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
-                        var start by remember { mutableStateOf(currentTimer.start) }
-                        var stop by remember { mutableStateOf(currentTimer.stop) }
+                        var start by remember { mutableStateOf(currentWP.start) }
+                        var stop by remember { mutableStateOf(currentWP.stop) }
                         fun checkMinStop(){
                             if(stop <= start){
                                 stop = start + 1
@@ -745,7 +745,7 @@ fun ModeDialog( //8
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 5) {
+fun ShowDialog(value: Int = 4) {
     //Column
     when (value) {
 

@@ -77,7 +77,7 @@ fun SwListScreen(
     )
     TimerDialog(
         show = viewModel.showTimer,
-        currentTimer = viewModel.configurableData.prgs[viewModel.currentTimer],
+        currentWP = viewModel.configurableData.prgs[viewModel.currentTimer],
         setTimer = {timer -> viewModel.newTimer(timer)},
         onExit = {viewModel.onShowTimer(0,false)}
     )

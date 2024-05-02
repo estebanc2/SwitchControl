@@ -8,6 +8,5 @@ data class ConfigurableData(
     var secs: Int,
     val prgs: MutableList<WeeklyProgram>,
     var bkColor:String,
-    var row: Int,
-    var timersInfo: List<String>
+    var row: Int
 )

@@ -44,8 +44,7 @@ class SwViewModel  @Inject constructor(
         private set
     var goConfig by mutableStateOf (false)
         private set
-    var configurableData by mutableStateOf (ConfigurableData("", 0,
-                                    0, NO_TIMERS, "nada", 2, listOf()))
+    var configurableData by mutableStateOf (ConfigurableData("", 0, 0, NO_TIMERS, "nada", 2))
         private set
 
     fun start(){
@@ -79,43 +78,10 @@ class SwViewModel  @Inject constructor(
             keepSwData.swMap[item.id]?.secs ?: 0,
             (keepSwData.swMap[item.id]?.prgs ?: NO_TIMERS).toMutableList(),
             item.bkColor,
-            item.row,
-            getTimersInfo(configurableData.prgs)
+            item.row
         )
         goConfig = show
     }
-
-    private fun getTimersInfo(prgs: List<WeeklyProgram>): List<String>{
-        val legend = arrayOf("inactivo", "inactivo", "inactivo", "inactivo")
-        for (i in 0 ..< 4){
-            val days = prgs[i].days
-            val start = prgs[i].start
-            val stop = prgs[i].stop
-            if (days != 0){
-                legend[i] = "${daysList(days)} de ${hours(start)} a ${hours(stop)}"
-            }
-        }
-        return legend.asList()
-    }
-    private fun hours(min: Int): String{
-        return "${min/60}:${min - (min/60)*60}"
-    }
-    private fun daysList(day:Int): String{
-        var daysIn = ""
-        var i = 0
-        val dayName = listOf("do, ", "lu, ", "ma, ", "mi, ", "ju, ", "vi, ", "sa, ")
-        for (dayString in dayName){
-            if(getBit(day, i) != 0){
-                daysIn += dayString
-            }
-            i += 1
-        }
-        return daysIn
-    }
-    private fun getBit(value: Int, position: Int): Int {
-        return (value shr position) and 1
-    }
-
     fun newName(name: String){
         configurableData.name = name
         showName = false
@@ -129,9 +95,7 @@ class SwViewModel  @Inject constructor(
     }
     fun newTimer(newPrg: WeeklyProgram){
         configurableData.prgs[currentTimer] = newPrg
-        configurableData.timersInfo = getTimersInfo(configurableData.prgs)
         showTimer = false
-        Log.i(TAG,"timer: $currentTimer, starthour : ${newPrg.start/60}, starthour loaded: ${configurableData.prgs[currentTimer].start/60}")
     }
     fun changeMode(mode: Int, secs: Int){
         configurableData.mode = mode
