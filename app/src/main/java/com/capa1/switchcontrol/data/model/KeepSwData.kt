@@ -175,10 +175,6 @@ class KeepSwData @Inject constructor (
     private fun isSet( days: Int, position: Int): Boolean {
         return days shr position and 1 == 1
     }
-    private fun getBit(days: Int, position: Int): Int {
-        return (days shr position) and 1
-    }
-
 
     private fun getLegend(id: String): String { // todo revisar getByte en lugar de los pow
         if (!swMap.containsKey(id)) {
