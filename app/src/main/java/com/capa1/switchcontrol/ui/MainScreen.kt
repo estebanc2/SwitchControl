@@ -90,6 +90,7 @@ fun MainScreen(
     )
     MaintenanceDialog(
         show = viewModel.showMaintenance,
+        id = viewModel.id,
         onExit = {viewModel.onShowMaintenance(false)}
     )
     Box(Modifier.fillMaxSize()) {
@@ -101,8 +102,9 @@ fun MainScreen(
                 onConfig = {item -> viewModel.onConfig(true, item)}
             )
         }else{
-            ConfigScreen(
+            ConfigScreen (
                 qty = viewModel.swScreenList.size,
+                swState = viewModel.swState,
                 data = viewModel.configurableData,
                 changeName = {viewModel.onShowName(true)},
                 changeColor = {viewModel.onShowColor(true)},
@@ -110,8 +112,9 @@ fun MainScreen(
                 changeTimer = {timer -> viewModel.onShowTimer(timer, true)},
                 changeMode ={viewModel.onShowMode(true)},
                 goMaintenance = { viewModel.onShowMaintenance(true)},
-                save = {viewModel.saveConfig()}
-            ) { viewModel.exitConfig() }
+                save = {viewModel.saveConfig()},
+                onExit = {viewModel.exitConfig()}
+            )
         }
     }
 }

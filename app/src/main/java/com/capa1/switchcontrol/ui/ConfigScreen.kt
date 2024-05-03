@@ -44,6 +44,7 @@ import com.capa1.switchcontrol.data.model.WeeklyProgram
 @Composable
 fun ConfigScreen(
     qty: Int,
+    swState: Boolean,
     data: ConfigurableData,
     changeName: () -> Unit,
     changeColor: ()-> Unit,
@@ -121,7 +122,7 @@ fun ConfigScreen(
             Icon(
                 Icons.Default.ChangeCircle,
                 contentDescription = "",
-                modifier = Modifier.clickable { changeName() }
+                modifier = Modifier.clickable { if(swState) changeName() }
             )
         }
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
@@ -207,56 +208,56 @@ fun ConfigScreen(
                 Icon(
                     Icons.Default.Restore,
                     contentDescription = "",
-                    modifier = Modifier.clickable {changeTimer(0)}
+                    modifier = Modifier.clickable { if(swState) changeTimer(0)}
                 )
                 Text(
                     text = getTimersInfo(prgs[0]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable { changeTimer(0) }
+                        .clickable {  if(swState) changeTimer(0) }
                 )
             }
             Row {
                 Icon(
                     Icons.Default.Restore,
                     contentDescription = "",
-                    modifier = Modifier.clickable {changeTimer(1)}
+                    modifier = Modifier.clickable { if(swState) changeTimer(1)}
                 )
                 Text(
                     text = getTimersInfo(prgs[1]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable { changeTimer(1) }
+                        .clickable {  if(swState) changeTimer(1) }
                 )
             }
             Row {
                 Icon(
                     Icons.Default.Restore,
                     contentDescription = "",
-                    modifier = Modifier.clickable {changeTimer(2)}
+                    modifier = Modifier.clickable { if(swState) changeTimer(2)}
                 )
                 Text(
                     text = getTimersInfo(prgs[2]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable { changeTimer(2) }
+                        .clickable {  if(swState) changeTimer(2) }
                 )
             }
             Row {
                 Icon(
                     Icons.Default.Restore,
                     contentDescription = "",
-                    modifier = Modifier.clickable {changeTimer(3)}
+                    modifier = Modifier.clickable { if(swState) changeTimer(3)}
                 )
                 Text(
                     text = getTimersInfo(prgs[3]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable { changeTimer(3) }
+                        .clickable {  if(swState) changeTimer(3) }
                 )
             }
         }
@@ -284,7 +285,7 @@ fun ConfigScreen(
                 style = TextStyle(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = 10.dp)
-                    .clickable { changeMode() }
+                    .clickable {  if(swState) changeMode() }
             )
             Spacer(modifier = Modifier.padding(horizontal = 25.dp))
             Icon(
@@ -330,6 +331,7 @@ fun ShowConfigPreview()
 {
     ConfigScreen(
         qty = 5,
+        swState = true,
         data = ConfigurableData("luz cocina", 0, 0, Global.NO_TIMERS, "nada", 2),
         changeName = {},
         changeColor = {},
@@ -337,6 +339,7 @@ fun ShowConfigPreview()
         changeTimer = {},
         changeMode = {},
         goMaintenance = {},
-        save = {}
-    ) {}
+        save = {},
+        onExit = {}
+    )
 }

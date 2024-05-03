@@ -845,6 +845,7 @@ fun ModeDialog( //8
 @Composable
 fun MaintenanceDialog( //8
     show: Boolean,
+    id: String,
     onExit: () -> Unit
 ) {
 
@@ -861,11 +862,27 @@ fun MaintenanceDialog( //8
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = "MODO DE FUNCIONAMIENTO",
+                            text = "MANTENIMIENTO",
                             style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row (Modifier, verticalAlignment = Alignment.CenterVertically){
+                            Text(
+                                text = "ID: ",
+                                style = TextStyle(fontSize = 18.sp),
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+                            )
+                            Text(
+                                text = "${id}",
+                                style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp),
+                            )
+                        }
+
                         Spacer(modifier = Modifier.height(20.dp))
 
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
@@ -902,7 +919,7 @@ fun MaintenanceDialog( //8
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 8) {
+fun ShowDialog(value: Int = 9) {
     //Column
     when (value) {
 
@@ -912,14 +929,7 @@ fun ShowDialog(value: Int = 8) {
         5 -> NameDialog(true, "luz cocina", {""}, {})
         6 -> ColorDialog(true, "cielo", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
-        8 -> ModeDialog(
-            show = true,
-            currentMode = 4,
-            currentSecs = 10,
-            setMode = {  },
-            onExit = {}
-        )
-        9 -> MaintenanceDialog(true) {}
-        else -> {}
+        8 -> ModeDialog(true, 4, 10, {  }, {})
+        9 -> MaintenanceDialog(true, "1234", {})
     }
 }

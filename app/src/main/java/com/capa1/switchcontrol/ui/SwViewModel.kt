@@ -6,11 +6,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.NO_TIMERS
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.ConfigurableData
 import com.capa1.switchcontrol.data.model.KeepSwData
-import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +21,8 @@ import javax.inject.Inject
 class SwViewModel  @Inject constructor(
     private val keepSwData: KeepSwData
 ) : ViewModel() {
-    private var lastId = ""
+    var id = ""
+    var swState = false
     var showName by mutableStateOf (false)
         private set
     var showColor by mutableStateOf (false)
@@ -65,14 +66,15 @@ class SwViewModel  @Inject constructor(
         keepSwData.imageClick(id)
     }
     fun saveConfig(){
-        keepSwData.configUpgrade(configurableData, lastId)
+        keepSwData.configUpgrade(configurableData, id)
         goConfig = false
     }
     fun exitConfig(){
         goConfig = false
     }
     fun onConfig(show: Boolean, item: SwScreenData) {
-        lastId = item.id
+        id = item.id
+        swState = item.swImageId != R.drawable.no_info
         configurableData = ConfigurableData(
             item.name,
             keepSwData.swMap[item.id]?.mode ?: 0,
