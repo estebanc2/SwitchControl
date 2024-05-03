@@ -12,8 +12,10 @@ import com.capa1.switchcontrol.data.SwDataStore
 import com.capa1.switchcontrol.data.mqtt.MqttListener
 import com.capa1.switchcontrol.data.mqtt.MqttManager
 import com.capa1.switchcontrol.data.mqtt.MqttState
+import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.EspTouch
 import com.capa1.switchcontrol.data.wifi.WifiCredentials
+import com.capa1.switchcontrol.data.wifi.WifiListener
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,22 +25,22 @@ import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
-import kotlin.math.pow
 
 class KeepSwData @Inject constructor (
     context: Context
-): MqttListener {
+): MqttListener, WifiListener {
     private val mqttManager = MqttManager(this)
-    private val wifiCredentials = WifiCredentials(context)
+    private val wifiCredentials = WifiCredentials(context, this)
     private val espTouch = EspTouch(context)
     private var swList = mutableListOf<SwData>()
-    var swMap = mutableMapOf<String, EspData>()
-    val allSwId = "abc12345678f"
     private var newSwId = ""
-    val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
     private val swDataStore = SwDataStore(context)
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private var mqttUp = false
+    var swMap = mutableMapOf<String, EspData>()
+    val allSwId = "abc12345678f"
+    val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
+    val myApData: MutableStateFlow<ApData> = MutableStateFlow(ApData("no conectado", false))
 
     override fun notifyNewMessage(id: String, msg: String) {
         val gson = Gson()
@@ -73,11 +75,17 @@ class KeepSwData @Inject constructor (
         }
     }
 
+    override fun NotifyApData(myAp: ApData) {
+        coroutineScope.launch { myApData.emit(myAp) }
+    }
+    override fun NotifyId(id: String) {
+        setSwWithId(id)
+    }
     fun initOperation() {
+        wifiCredentials.get()
         mqttManager.connect()
         getStoredData()//something.sortedBy { it.row }.toMutableList() //
         refreshScreenInfo()
-        Log.i(TAG, "ssid: ${wifiCredentials.mSsid}")
     }
 
     fun setSwWithId(id: String) {
@@ -155,6 +163,9 @@ class KeepSwData @Inject constructor (
     fun sendConfig(id: String) {
         val allData = Global.gson.toJson( getStoredData())
         mqttManager.publish(id,allData)
+    }
+    fun discoverSwitches(pass: String){
+        Log.i(TAG,"la clave wifi es: $pass")
     }
 
     private fun refreshScreenInfo() {

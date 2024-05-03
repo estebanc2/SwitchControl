@@ -13,6 +13,7 @@ import com.capa1.switchcontrol.data.model.ConfigurableData
 import com.capa1.switchcontrol.data.model.KeepSwData
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.WeeklyProgram
+import com.capa1.switchcontrol.data.wifi.ApData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,6 +39,8 @@ class SwViewModel  @Inject constructor(
     var showAll by mutableStateOf (false)
         private set
     val allSwId = keepSwData.allSwId
+    var myAp by mutableStateOf (ApData("", false))
+        private set
     var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
         private set
     var currentTimer by mutableStateOf(0)
@@ -59,6 +62,11 @@ class SwViewModel  @Inject constructor(
         viewModelScope.launch {
             keepSwData.swScreenList.collect { result ->
                 swScreenList = result
+            }
+        }
+        viewModelScope.launch {
+            keepSwData.myApData.collect { result ->
+                myAp = result
             }
         }
     }
@@ -105,6 +113,10 @@ class SwViewModel  @Inject constructor(
         configurableData.secs = secs
         showMode = false
     }
+    fun setPass(pass: String) {
+        keepSwData.discoverSwitches(pass)
+    }
+
     fun addSwId (id: String) {
         keepSwData.setSwWithId(id)
         showNewId = false

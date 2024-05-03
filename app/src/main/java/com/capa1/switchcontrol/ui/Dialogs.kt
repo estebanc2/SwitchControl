@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoodBad
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +55,7 @@ import androidx.compose.ui.window.Dialog
 import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.WeeklyProgram
+import com.capa1.switchcontrol.data.wifi.ApData
 
 @Composable
 fun AddSwDialog( //1
@@ -65,15 +67,20 @@ fun AddSwDialog( //1
 ) {
     if (show) {
         Dialog(onDismissRequest = {}) {
-            Surface {
+            Surface(
+                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+            ) {
                 Box(
                     contentAlignment = Alignment.TopEnd//   .Center
                 ) {
-                    Column {
+                    Column (
+                        modifier = Modifier.padding(10.dp)
+                    ){
                         Text(
                             text = "Agregar interruptor/es",
                             style = TextStyle(fontSize = 18.sp),
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
                         )
                         TextButton(
                             onClick = { addSw() },
@@ -82,7 +89,10 @@ fun AddSwDialog( //1
                                 Icons.Default.AddCircleOutline,
                                 contentDescription = "",
                             )
-                            Text(text = "agregar un interruptor nuevo")
+                            Text(text = "agregar un interruptor nuevo",
+                                modifier = Modifier.padding(
+                                    horizontal = 10.dp,
+                                    vertical = 0.dp))
                         }
                         TextButton(
                             onClick = { addId()},
@@ -91,7 +101,10 @@ fun AddSwDialog( //1
                                 Icons.Default.CheckCircleOutline,
                                 contentDescription = "",
                             )
-                            Text(text = "agregar un interruptor con un Id")
+                            Text(text = "agregar un interruptor con un Id",
+                                modifier = Modifier.padding(
+                                    horizontal = 10.dp,
+                                    vertical = 0.dp))
                         }
                         TextButton(
                             onClick = { addAll() },
@@ -100,16 +113,22 @@ fun AddSwDialog( //1
                                 Icons.Default.FileDownload,
                                 contentDescription = "",
                             )
-                            Text(text = "enviar/recibir configuración completa")
+                            Text(text = "enviar/recibir configuración completa",
+                                modifier = Modifier.padding(
+                                    horizontal = 10.dp,
+                                    vertical = 0.dp))
                         }
                         TextButton(
                             onClick = { onExit() },
                         ) {
                             Icon(
                                 Icons.Default.MoodBad,
-                                contentDescription = "",
-                            )
-                            Text(text = " nada de esto por ahora")
+                                contentDescription = ""
+                             )
+                            Text(text = " nada de esto por ahora",
+                                modifier = Modifier.padding(
+                                    horizontal = 10.dp,
+                                    vertical = 0.dp))
                         }
 
                     }
@@ -118,6 +137,119 @@ fun AddSwDialog( //1
         }
     }
 }
+
+
+@Composable
+fun NewDialog( //2
+    show: Boolean,
+    apData: ApData,
+    setPass: (String) -> Unit,
+    onExit: () -> Unit
+) {
+    val pass = remember { mutableStateOf(TextFieldValue()) }
+
+    if (show) {
+        Dialog(onDismissRequest = {}) {
+            Surface(
+                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        Text(
+                            text = "AGREGAR INTERRUPTOR",
+                            style = TextStyle(fontSize = 18.sp),
+                            color = MaterialTheme.colorScheme.primary,
+
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        if(apData.is5G) {
+                            Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.WarningAmber,
+                                    contentDescription = "",
+                                    tint = Color.Red
+                                )
+                                Text(
+                                    text = "Asociado a una red wifi de 5GHz.\n" +
+                                            "Los interruptores requieren 2,4GHz",
+                                    style = TextStyle(fontSize = 14.sp),
+                                    color = Color.Red,
+                                    modifier = Modifier.padding(
+                                        horizontal = 10.dp,
+                                        vertical = 0.dp
+                                    ),
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row (Modifier, verticalAlignment = Alignment.CenterVertically){
+                                Text(
+                                    text = "ssid: ",
+                                    style = TextStyle(fontSize = 18.sp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                                Text(
+                                    text = "${apData.ssid}",
+                                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 0.dp),
+                                )
+                            }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row (Modifier, verticalAlignment = Alignment.CenterVertically){
+                            Text(
+                                text = "clave: ",
+                                style = TextStyle(fontSize = 18.sp),
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                            TextField(modifier = Modifier.fillMaxWidth(),
+                                textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                                placeholder = { Text(text = "") },
+                                value = pass.value,
+                                singleLine = true,
+                                maxLines = 1,
+                                onValueChange = { pass.value = it }
+                            )
+                            Text(
+                                text = "",
+                                style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp),
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
+                            TextButton(
+                                onClick = { setPass(pass.toString()) },
+                            ) {
+                                Icon(
+                                    Icons.Default.CheckCircle,
+                                    contentDescription = "",
+                                )
+                                Text(text = "aceptar")
+                            }
+                            TextButton(
+                                onClick = { onExit() },
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "",
+                                )
+                                Text(text = "descartar")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun NewIdDialog( //3: Boolean,
     show: Boolean,
@@ -154,7 +286,8 @@ fun NewIdDialog( //3: Boolean,
                             maxLines = 1,
                             onValueChange = {
                                 tokenValue.value = it
-                            })
+                            }
+                        )
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
 
@@ -843,7 +976,7 @@ fun ModeDialog( //8
     }
 }
 @Composable
-fun MaintenanceDialog( //8
+fun MaintenanceDialog( //9
     show: Boolean,
     id: String,
     onExit: () -> Unit
@@ -919,11 +1052,12 @@ fun MaintenanceDialog( //8
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 9) {
+fun ShowDialog(value: Int = 1) {
     //Column
     when (value) {
 
         1 -> AddSwDialog(true, {}, {}, {}, {})
+        2 -> NewDialog(true,ApData("fliacastro4", true), {""}, {})
         3 -> NewIdDialog(show = true, setId = {}, {})
         4 -> NewAllDialog(true, "tuti", {}, {})
         5 -> NameDialog(true, "luz cocina", {""}, {})

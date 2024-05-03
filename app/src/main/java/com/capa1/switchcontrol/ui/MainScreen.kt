@@ -46,10 +46,16 @@ fun MainScreen(
     }
     AddSwDialog(
         show = viewModel.showAdd,
-        addSw = {},
+        addSw = {viewModel.onShowNew(true)},
         addId = {viewModel.onShowNewId(true)},
         addAll = {viewModel.onShowAll(true)},
         onExit = {viewModel.onShowAdd(false)}
+    )
+    NewDialog(
+        show = viewModel.showNew,
+        apData = viewModel.myAp,
+        setPass = {pass -> viewModel.setPass(pass)},
+        onExit = {viewModel.onShowNew(false)}
     )
     NewIdDialog(
         show = viewModel.showNewId,
