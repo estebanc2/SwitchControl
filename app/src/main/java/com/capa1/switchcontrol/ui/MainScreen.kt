@@ -85,6 +85,7 @@ fun MainScreen(
         show = viewModel.showMode,
         currentMode = viewModel.configurableData.mode,
         currentSecs = viewModel.configurableData.secs,
+        setMode = {pair -> viewModel.setMode(pair.first, pair.second)},
         onExit = {viewModel.onShowMode(false)}
     )
     MaintenanceDialog(

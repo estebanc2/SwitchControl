@@ -98,7 +98,7 @@ class SwViewModel  @Inject constructor(
         configurableData.prgs[currentTimer] = newPrg
         showTimer = false
     }
-    fun changeMode(mode: Int, secs: Int){
+    fun setMode(mode: Int, secs: Int) {
         configurableData.mode = mode
         configurableData.secs = secs
         showMode = false

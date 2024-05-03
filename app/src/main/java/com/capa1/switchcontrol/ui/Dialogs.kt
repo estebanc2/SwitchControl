@@ -1,11 +1,9 @@
 @file:Suppress("UNUSED_EXPRESSION")
 
 package com.capa1.switchcontrol.ui
-import androidx.compose.material3.SegmentedButton
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,8 +31,6 @@ import androidx.compose.material.icons.filled.MoodBad
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -447,11 +443,11 @@ fun TimerDialog( //7
                         }
                         Row(Modifier, verticalAlignment = Alignment.CenterVertically){
                             Text(
-                                text = "hora: ${start/60}",
-                                style = TextStyle(fontSize = 20.sp),
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
-                            )
+                                    text = "hora: ${start/60}",
+                                    style = TextStyle(fontSize = 20.sp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+                                )
                             Column{
                                 Icon(
                                     Icons.Default.KeyboardArrowUp,
@@ -720,6 +716,7 @@ fun ModeDialog( //8
     show: Boolean,
     currentMode:Int,
     currentSecs: Int,
+    setMode: (Pair<Int,Int>) -> Unit,
     onExit: () -> Unit
 ) {
 
@@ -742,35 +739,86 @@ fun ModeDialog( //8
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
                         Spacer(modifier = Modifier.height(10.dp))
-
-                        var selectedIndex by remember { mutableStateOf(currentMode) }
+                        var secs by remember { mutableStateOf(currentSecs) }
+                        var mode by remember { mutableStateOf(currentMode) }
                         val options : MutableList<String> = mutableListOf()
                         for (mode in SwMode.entries){
                             options += mode.name
                         }
                         options.forEachIndexed { index, label ->
-                            Column{
-                                Row (Modifier, verticalAlignment = Alignment.CenterVertically){
+                            val visible = if (index != mode) Color(0xFFEEEEEA)
+                                        else MaterialTheme.colorScheme.primary
+                            Column {
+                                Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         Icons.Default.Check,
                                         contentDescription = "",
-                                        tint = if (index != selectedIndex) Color(0xFFEEEEEA)
-                                            else MaterialTheme.colorScheme.primary
+                                        tint = visible
                                     )
                                     Text(label,
                                         style = TextStyle(fontSize = 14.sp),
                                         color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 0.dp)
-                                            .clickable {selectedIndex = index  })
+                                        modifier = Modifier.padding(
+                                            horizontal = 8.dp,
+                                            vertical = 10.dp
+                                        )
+                                            .clickable { mode = index }
+                                    )
+                                    if ((index == 2) || (index == 3)) {
+                                        Text(
+                                            text = "seg.: ${secs}",
+                                            style = TextStyle(fontSize = 14.sp),
+                                            color = visible,
+                                            modifier = Modifier.padding(
+                                                horizontal = 16.dp,
+                                                vertical = 0.dp
+                                            ),
+                                        )
+                                        Column {
+                                            Icon(
+                                                Icons.Default.KeyboardArrowUp,
+                                                contentDescription = "",
+                                                tint = visible,
+                                                modifier = Modifier.clickable { if (secs < 120) secs += 1 }
+                                            )
+                                            Icon(
+                                                Icons.Default.KeyboardArrowDown,
+                                                contentDescription = "",
+                                                tint = visible,
+                                                modifier = Modifier.clickable { if (secs > 0) secs -= 1 }
+                                            )
+                                        }
+                                    } else if ((index == 4) || (index == 5)) {
+                                        Text(
+                                            text = "grad.: ${secs}",
+                                            style = TextStyle(fontSize = 14.sp),
+                                            color = visible,
+                                            modifier = Modifier.padding(
+                                                horizontal = 16.dp,
+                                                vertical = 0.dp
+                                            ),
+                                        )
+                                        Column {
+                                            Icon(
+                                                Icons.Default.KeyboardArrowUp,
+                                                contentDescription = "",
+                                                tint = visible,
+                                                modifier = Modifier.clickable { if (secs < 120) secs += 1 }
+                                            )
+                                            Icon(
+                                                Icons.Default.KeyboardArrowDown,
+                                                contentDescription = "",
+                                                tint = visible,
+                                                modifier = Modifier.clickable { if (secs > 0) secs -= 1 }
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
 
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
-                            TextButton(
-                                onClick = {
-
-                                },
+                            TextButton(onClick = { setMode(Pair(mode, secs))},
                             ) {
                                 Icon(
                                     Icons.Default.CheckCircle,
@@ -864,7 +912,13 @@ fun ShowDialog(value: Int = 8) {
         5 -> NameDialog(true, "luz cocina", {""}, {})
         6 -> ColorDialog(true, "cielo", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
-        8 -> ModeDialog(true, 0, 0) {}
+        8 -> ModeDialog(
+            show = true,
+            currentMode = 4,
+            currentSecs = 10,
+            setMode = {  },
+            onExit = {}
+        )
         9 -> MaintenanceDialog(true) {}
         else -> {}
     }
