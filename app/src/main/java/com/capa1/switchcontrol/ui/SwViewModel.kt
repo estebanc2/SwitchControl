@@ -10,6 +10,7 @@ import com.capa1.switchcontrol.data.Global.NO_TIMERS
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.ConfigurableData
 import com.capa1.switchcontrol.data.model.KeepSwData
+import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,8 +28,6 @@ class SwViewModel  @Inject constructor(
         private set
     var showTimer by mutableStateOf (false)
         private set
-    var showMode by mutableStateOf (false)
-        private set
     var showAdd by mutableStateOf (false)
         private set
     var showNewId by mutableStateOf (false)
@@ -42,6 +41,10 @@ class SwViewModel  @Inject constructor(
         private set
     var currentTimer by mutableStateOf(0)
         private set
+    var showMode by mutableStateOf (false)
+        private set
+    var showMaintenance by mutableStateOf (false)
+        private set
     var goConfig by mutableStateOf (false)
         private set
     var configurableData by mutableStateOf (ConfigurableData("", 0, 0, NO_TIMERS, "nada", 2))
@@ -54,14 +57,12 @@ class SwViewModel  @Inject constructor(
     private fun subscribeToChanges() {
         viewModelScope.launch {
             keepSwData.swScreenList.collect { result ->
-                Log.i(TAG, "swScreenList changed!!")
                 swScreenList = result
             }
         }
     }
     fun imageClick(id: String){
         keepSwData.imageClick(id)
-
     }
     fun saveConfig(){
         keepSwData.configUpgrade(configurableData, lastId)
@@ -136,5 +137,8 @@ class SwViewModel  @Inject constructor(
     }
     fun addAllSw(id: String) {
         keepSwData.sendConfig(id)
+    }
+    fun onShowMaintenance(show: Boolean) {
+        showMaintenance = show
     }
 }

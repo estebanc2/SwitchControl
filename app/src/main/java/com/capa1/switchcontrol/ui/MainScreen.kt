@@ -83,7 +83,13 @@ fun MainScreen(
     )
     ModeDialog(
         show = viewModel.showMode,
+        currentMode = viewModel.configurableData.mode,
+        currentSecs = viewModel.configurableData.secs,
         onExit = {viewModel.onShowMode(false)}
+    )
+    MaintenanceDialog(
+        show = viewModel.showMaintenance,
+        onExit = {viewModel.onShowMaintenance(false)}
     )
     Box(Modifier.fillMaxSize()) {
         if (!viewModel.goConfig){
@@ -101,6 +107,8 @@ fun MainScreen(
                 changeColor = {viewModel.onShowColor(true)},
                 changeRow = { pos -> viewModel.changeRow(pos)},
                 changeTimer = {timer -> viewModel.onShowTimer(timer, true)},
+                changeMode ={viewModel.onShowMode(true)},
+                goMaintenance = { viewModel.onShowMaintenance(true)},
                 save = {viewModel.saveConfig()}
             ) { viewModel.exitConfig() }
         }

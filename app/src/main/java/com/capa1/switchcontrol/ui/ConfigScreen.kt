@@ -49,6 +49,8 @@ fun ConfigScreen(
     changeColor: ()-> Unit,
     changeRow: (Int) -> Unit,
     changeTimer: (Int) -> Unit,
+    changeMode: () -> Unit,
+    goMaintenance: ()-> Unit,
     save:()->Unit,
     onExit:()->Unit
 ){
@@ -282,6 +284,7 @@ fun ConfigScreen(
                 style = TextStyle(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = 10.dp)
+                    .clickable { changeMode() }
             )
             Spacer(modifier = Modifier.padding(horizontal = 25.dp))
             Icon(
@@ -293,6 +296,7 @@ fun ConfigScreen(
                 style = TextStyle(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = 10.dp)
+                    .clickable { goMaintenance() }
             )
 
         }
@@ -331,6 +335,8 @@ fun ShowConfigPreview()
         changeColor = {},
         changeRow = {},
         changeTimer = {},
+        changeMode = {},
+        goMaintenance = {},
         save = {}
     ) {}
 }

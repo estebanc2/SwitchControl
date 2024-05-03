@@ -1,10 +1,11 @@
 @file:Suppress("UNUSED_EXPRESSION")
 
 package com.capa1.switchcontrol.ui
-
+import androidx.compose.material3.SegmentedButton
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,8 +30,11 @@ import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoodBad
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.capa1.switchcontrol.data.Global.MyColors
+import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 
 @Composable
@@ -556,7 +561,10 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(color = if (dom) Color.Blue else Color.LightGray, CircleShape)
+                                    .background(
+                                        color = if (dom) Color.Blue else Color.LightGray,
+                                        CircleShape
+                                    )
                                     .clickable { dom = !dom },
                                 contentAlignment = Alignment.Center
                             ){
@@ -571,7 +579,10 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(color = if (lu) Color.Blue else Color.LightGray, CircleShape)
+                                    .background(
+                                        color = if (lu) Color.Blue else Color.LightGray,
+                                        CircleShape
+                                    )
                                     .clickable { lu = !lu },
                                 contentAlignment = Alignment.Center
                             ){
@@ -586,7 +597,10 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(color = if (ma) Color.Blue else Color.LightGray, CircleShape)
+                                    .background(
+                                        color = if (ma) Color.Blue else Color.LightGray,
+                                        CircleShape
+                                    )
                                     .clickable { ma = !ma },
                                 contentAlignment = Alignment.Center
                             ){
@@ -601,7 +615,10 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(color = if (mi) Color.Blue else Color.LightGray, CircleShape)
+                                    .background(
+                                        color = if (mi) Color.Blue else Color.LightGray,
+                                        CircleShape
+                                    )
                                     .clickable { mi = !mi },
                                 contentAlignment = Alignment.Center
                             ){
@@ -616,7 +633,10 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(color = if (ju) Color.Blue else Color.LightGray, CircleShape)
+                                    .background(
+                                        color = if (ju) Color.Blue else Color.LightGray,
+                                        CircleShape
+                                    )
                                     .clickable { ju = !ju },
                                 contentAlignment = Alignment.Center
                             ){
@@ -631,7 +651,10 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(color = if (vi) Color.Blue else Color.LightGray, CircleShape)
+                                    .background(
+                                        color = if (vi) Color.Blue else Color.LightGray,
+                                        CircleShape
+                                    )
                                     .clickable { vi = !vi },
                                 contentAlignment = Alignment.Center
                             ){
@@ -646,7 +669,10 @@ fun TimerDialog( //7
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
-                                    .background(color = if (sa) Color.Blue else Color.LightGray, CircleShape)
+                                    .background(
+                                        color = if (sa) Color.Blue else Color.LightGray,
+                                        CircleShape
+                                    )
                                     .clickable { sa = !sa },
                                 contentAlignment = Alignment.Center
                             ){
@@ -688,8 +714,88 @@ fun TimerDialog( //7
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModeDialog( //8
+    show: Boolean,
+    currentMode:Int,
+    currentSecs: Int,
+    onExit: () -> Unit
+) {
+
+    if (show) {
+        Dialog(onDismissRequest = {}) {
+            Surface(
+                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        Text(
+                            text = "MODO DE FUNCIONAMIENTO",
+                            style = TextStyle(fontSize = 18.sp),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        var selectedIndex by remember { mutableStateOf(currentMode) }
+                        val options : MutableList<String> = mutableListOf()
+                        for (mode in SwMode.entries){
+                            options += mode.name
+                        }
+                        options.forEachIndexed { index, label ->
+                            Column{
+                                Row (Modifier, verticalAlignment = Alignment.CenterVertically){
+                                    Icon(
+                                        Icons.Default.Check,
+                                        contentDescription = "",
+                                        tint = if (index != selectedIndex) Color(0xFFEEEEEA)
+                                            else MaterialTheme.colorScheme.primary
+                                    )
+                                    Text(label,
+                                        style = TextStyle(fontSize = 14.sp),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 0.dp)
+                                            .clickable {selectedIndex = index  })
+                                }
+                            }
+                        }
+
+                        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
+                            TextButton(
+                                onClick = {
+
+                                },
+                            ) {
+                                Icon(
+                                    Icons.Default.CheckCircle,
+                                    contentDescription = "",
+                                )
+                                Text(text = "aceptar")
+                            }
+                            TextButton(
+                                onClick = { onExit() },
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "",
+                                )
+                                Text(text = "descartar")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@Composable
+fun MaintenanceDialog( //8
     show: Boolean,
     onExit: () -> Unit
 ) {
@@ -748,7 +854,7 @@ fun ModeDialog( //8
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 4) {
+fun ShowDialog(value: Int = 8) {
     //Column
     when (value) {
 
@@ -758,7 +864,8 @@ fun ShowDialog(value: Int = 4) {
         5 -> NameDialog(true, "luz cocina", {""}, {})
         6 -> ColorDialog(true, "cielo", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
-        8 -> ModeDialog(true) {}
+        8 -> ModeDialog(true, 0, 0) {}
+        9 -> MaintenanceDialog(true) {}
         else -> {}
     }
 }

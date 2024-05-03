@@ -176,7 +176,7 @@ class KeepSwData @Inject constructor (
         return days shr position and 1 == 1
     }
 
-    private fun getLegend(id: String): String { // todo revisar getByte en lugar de los pow
+    private fun getLegend(id: String): String {
         if (!swMap.containsKey(id)) {
             return "Sin Información"
         }
