@@ -54,6 +54,7 @@ fun MainScreen(
     NewDialog(
         show = viewModel.showNew,
         apData = viewModel.myAp,
+        state = viewModel.touchProgress,
         setPass = {pass -> viewModel.setPass(pass)},
         onExit = {viewModel.onShowNew(false)}
     )

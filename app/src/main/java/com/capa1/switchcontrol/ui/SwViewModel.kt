@@ -14,6 +14,7 @@ import com.capa1.switchcontrol.data.model.KeepSwData
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
+import com.capa1.switchcontrol.data.wifi.TouchState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -51,6 +52,8 @@ class SwViewModel  @Inject constructor(
         private set
     var goConfig by mutableStateOf (false)
         private set
+    var touchProgress by mutableStateOf (TouchState.IN_PROGRESS)
+        private set
     var configurableData by mutableStateOf (ConfigurableData("", 0, 0, NO_TIMERS, "nada", 2))
         private set
 
@@ -64,9 +67,14 @@ class SwViewModel  @Inject constructor(
                 swScreenList = result
             }
         }
-        viewModelScope.launch {
+         viewModelScope.launch {
             keepSwData.myApData.collect { result ->
                 myAp = result
+            }
+        }
+        viewModelScope.launch {
+            keepSwData.touchState.collect { result ->
+                touchProgress = result
             }
         }
     }

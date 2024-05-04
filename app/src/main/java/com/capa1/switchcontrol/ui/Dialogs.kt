@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.MoodBad
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -56,6 +57,7 @@ import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
+import com.capa1.switchcontrol.data.wifi.TouchState
 
 @Composable
 fun AddSwDialog( //1
@@ -143,11 +145,11 @@ fun AddSwDialog( //1
 fun NewDialog( //2
     show: Boolean,
     apData: ApData,
+    state: TouchState,
     setPass: (String) -> Unit,
     onExit: () -> Unit
 ) {
-    val pass = remember { mutableStateOf(TextFieldValue()) }
-
+    var pass by remember { mutableStateOf("") }
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
@@ -207,13 +209,13 @@ fun NewDialog( //2
                                 style = TextStyle(fontSize = 18.sp),
                                 color = MaterialTheme.colorScheme.primary,
                             )
-                            TextField(modifier = Modifier.fillMaxWidth(),
+                            TextField(
+                                modifier = Modifier.fillMaxWidth(),
                                 textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                                placeholder = { Text(text = "") },
-                                value = pass.value,
+                                value = pass,
                                 singleLine = true,
                                 maxLines = 1,
-                                onValueChange = { pass.value = it }
+                                onValueChange = { pass = it }
                             )
                             Text(
                                 text = "",
@@ -223,9 +225,30 @@ fun NewDialog( //2
                             )
                         }
                         Spacer(modifier = Modifier.height(10.dp))
+                        var showProgress by remember { mutableStateOf(false) }
+                        if (showProgress) LinearProgressIndicator(
+                            //progress = { 0.7f }
+                        )
+                        if(state == TouchState.TIMEOUT){
+                            showProgress = false
+                            Text(
+                                text = "Revisa la clave y volve a intentar,\n" +
+                                        "o no hay interruptores accesibles",
+                                style = TextStyle(fontSize = 14.sp),
+                                color = Color.Red,
+                                modifier = Modifier.padding(
+                                    horizontal = 10.dp,
+                                    vertical = 0.dp
+                                ),
+                            )
+                        } else if (state == TouchState.READY) { onExit() }
+                        Spacer(modifier = Modifier.height(10.dp))
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                             TextButton(
-                                onClick = { setPass(pass.toString()) },
+                                onClick = {
+                                    setPass(pass)
+                                    showProgress = true
+                                },
                             ) {
                                 Icon(
                                     Icons.Default.CheckCircle,
@@ -278,7 +301,8 @@ fun NewIdDialog( //3: Boolean,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
                         Spacer(modifier = Modifier.height(20.dp))
-                        TextField(modifier = Modifier.fillMaxWidth(),
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
                             textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                             placeholder = { Text(text = "12 caracteres: 0..9 / a..f") },
                             value = tokenValue.value,
@@ -1052,12 +1076,12 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 1) {
+fun ShowDialog(value: Int = 2) {
     //Column
     when (value) {
 
         1 -> AddSwDialog(true, {}, {}, {}, {})
-        2 -> NewDialog(true,ApData("fliacastro4", true), {""}, {})
+        2 -> NewDialog(true,ApData("fliacastro4", false), TouchState.IN_PROGRESS, {""}, {})
         3 -> NewIdDialog(show = true, setId = {}, {})
         4 -> NewAllDialog(true, "tuti", {}, {})
         5 -> NameDialog(true, "luz cocina", {""}, {})

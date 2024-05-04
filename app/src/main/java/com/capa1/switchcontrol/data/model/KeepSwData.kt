@@ -14,6 +14,7 @@ import com.capa1.switchcontrol.data.mqtt.MqttManager
 import com.capa1.switchcontrol.data.mqtt.MqttState
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.EspTouch
+import com.capa1.switchcontrol.data.wifi.TouchState
 import com.capa1.switchcontrol.data.wifi.WifiCredentials
 import com.capa1.switchcontrol.data.wifi.WifiListener
 import com.google.gson.Gson
@@ -41,6 +42,8 @@ class KeepSwData @Inject constructor (
     val allSwId = "abc12345678f"
     val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
     val myApData: MutableStateFlow<ApData> = MutableStateFlow(ApData("no conectado", false))
+    val touchState: MutableStateFlow<TouchState> = MutableStateFlow(TouchState.IN_PROGRESS)
+
 
     override fun notifyNewMessage(id: String, msg: String) {
         val gson = Gson()
@@ -78,8 +81,11 @@ class KeepSwData @Inject constructor (
     override fun NotifyApData(myAp: ApData) {
         coroutineScope.launch { myApData.emit(myAp) }
     }
-    override fun NotifyId(id: String) {
-        setSwWithId(id)
+    override fun NotifyTouch(id: String, state: TouchState) {
+        coroutineScope.launch { touchState.emit(state) }
+        if(state == TouchState.READY){
+            setSwWithId(id)
+        }
     }
     fun initOperation() {
         wifiCredentials.get()

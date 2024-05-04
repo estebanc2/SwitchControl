@@ -16,7 +16,8 @@ class WifiCredentials @Inject constructor(
             val wifiManager = context.getSystemService(Context.WIFI_SERVICE)!! as WifiManager
             val wifiInfo = wifiManager.connectionInfo
             if (wifiInfo.supplicantState == SupplicantState.COMPLETED) {
-                listener.NotifyApData(ApData(wifiInfo.ssid, wifiInfo.frequency > 3000))
+                val str = wifiInfo.ssid
+                listener.NotifyApData(ApData(str.substring(1, str.length - 1), wifiInfo.frequency > 3000))
             }
             else{
                 listener.NotifyApData(ApData("uknown", false))
