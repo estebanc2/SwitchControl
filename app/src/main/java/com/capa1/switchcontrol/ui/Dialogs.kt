@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoodBad
 import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -58,7 +59,24 @@ import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
-
+@Composable
+fun NoPermissionDialog( //0
+    show: Boolean, onConfirm: () -> Unit
+) {
+    if (show) {
+        AlertDialog(onDismissRequest = {}, confirmButton = {
+            TextButton(onClick = { onConfirm() }) {
+                Text(text = "ok",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold)
+            }
+        }, text = {
+            Text(text = "this app doesn't run without Location permission. Please go to settings and allow it",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+        })
+    }
+}
 @Composable
 fun AddSwDialog( //1
     show: Boolean,

@@ -1,5 +1,6 @@
 package com.capa1.switchcontrol.ui
 
+import android.app.Activity
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,9 +24,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,15 +39,28 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.model.SwScreenData
-
+import com.capa1.switchcontrol.ui.permissions.PermissionUtils
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainScreen(
     viewModel: SwViewModel = hiltViewModel()
 ) {
-    //val screenModifiers by viewModel.screenModifiers.collectAsStateWithLifecycle()
-    LaunchedEffect(key1 = true) {
+    val permissionState =
+        rememberMultiplePermissionsState(permissions = PermissionUtils.permissions)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(key1 = lifecycleOwner){
+        permissionState.launchMultiplePermissionRequest()
+        onDispose {  }
+    }
+    LaunchedEffect(key1 = permissionState.allPermissionsGranted) {
         viewModel.start()
     }
+    val activity = (LocalContext.current as? Activity)
+    NoPermissionDialog(show = !permissionState.allPermissionsGranted,
+        onConfirm = { activity?.finish() }
+    )
     AddSwDialog(
         show = viewModel.showAdd,
         addSw = {viewModel.onShowNew(true)},

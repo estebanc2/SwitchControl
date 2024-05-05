@@ -88,4 +88,6 @@ dependencies {
     implementation("org.eclipse.paho:org.eclipse.paho.android.service:1.1.1")
     //json
     implementation("com.google.code.gson:gson:2.10")
- }
+    //Permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.28.0")
+}
