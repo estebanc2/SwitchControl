@@ -32,12 +32,13 @@ class KeepSwData @Inject constructor (
 ): MqttListener, WifiListener {
     private val mqttManager = MqttManager(this)
     private val wifiCredentials = WifiCredentials(context, this)
-    private val espTouch = EspTouch(context)
+    private val espTouch = EspTouch(context, this)
     private var swList = mutableListOf<SwData>()
     private var newSwId = ""
     private val swDataStore = SwDataStore(context)
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private var mqttUp = false
+    private var currentSsid = ""
     var swMap = mutableMapOf<String, EspData>()
     val allSwId = "abc12345678f"
     val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
@@ -80,6 +81,7 @@ class KeepSwData @Inject constructor (
 
     override fun NotifyApData(myAp: ApData) {
         coroutineScope.launch { myApData.emit(myAp) }
+        currentSsid = myAp.ssid
     }
     override fun NotifyTouch(id: String, state: TouchState) {
         coroutineScope.launch { touchState.emit(state) }
@@ -171,6 +173,7 @@ class KeepSwData @Inject constructor (
         mqttManager.publish(id,allData)
     }
     fun discoverSwitches(pass: String){
+        espTouch.discover(currentSsid, pass)
         Log.i(TAG,"la clave wifi es: $pass")
     }
 
