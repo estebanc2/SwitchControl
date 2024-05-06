@@ -77,6 +77,11 @@ class SwViewModel  @Inject constructor(
                 touchProgress = result
             }
         }
+        viewModelScope.launch {
+            keepSwData.starter.collect { result ->
+                showAdd = result
+            }
+        }
     }
     fun imageClick(id: String){
         keepSwData.imageClick(id)
@@ -124,7 +129,6 @@ class SwViewModel  @Inject constructor(
     fun setPass(pass: String) {
         keepSwData.discoverSwitches(pass)
     }
-
     fun addSwId (id: String) {
         keepSwData.setSwWithId(id)
         showNewId = false

@@ -44,27 +44,31 @@ class KeepSwData @Inject constructor (
     val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
     val myApData: MutableStateFlow<ApData> = MutableStateFlow(ApData("no conectado", false))
     val touchState: MutableStateFlow<TouchState> = MutableStateFlow(TouchState.IN_PROGRESS)
-
+    val starter: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     override fun notifyNewMessage(id: String, msg: String) {
         val gson = Gson()
-        if (id == allSwId) {
-            val newFlashData = gson.fromJson(msg, FlashData::class.java)
-            swList = newFlashData.swList.toMutableList()
-            saveData()
-            initializeSwList()
-        } else if (id == newSwId) {
-            newSwId = ""
-            val newEspData = gson.fromJson(msg, EspData::class.java)
-            swMap[id] = newEspData
-            swList += SwData(newEspData.name, id, (swList.size + 1), "nada", SwStatus.CONNECTED)
-            saveData()
-        } else {
-            for (data in swList) {
-                if (data.id == id) {
-                    val newEspData = gson.fromJson(msg, EspData::class.java)
-                    swMap[id] = newEspData
-                    data.status = SwStatus.CONNECTED
+        when (id) {
+            allSwId -> {
+                val newFlashData = gson.fromJson(msg, FlashData::class.java)
+                swList = newFlashData.swList.toMutableList()
+                saveData()
+                initializeSwList()
+            }
+            newSwId -> {
+                newSwId = ""
+                val newEspData = gson.fromJson(msg, EspData::class.java)
+                swMap[id] = newEspData
+                swList += SwData(newEspData.name, id, (swList.size + 1), "nada", SwStatus.CONNECTED)
+                saveData()
+            }
+            else -> {
+                for (data in swList) {
+                    if (data.id == id) {
+                        val newEspData = gson.fromJson(msg, EspData::class.java)
+                        swMap[id] = newEspData
+                        data.status = SwStatus.CONNECTED
+                    }
                 }
             }
         }
@@ -178,18 +182,23 @@ class KeepSwData @Inject constructor (
     }
 
     private fun refreshScreenInfo() {
-        val refreshList: MutableList<SwScreenData> = mutableListOf()
-        swList.forEachIndexed { index, swData ->
-            refreshList += SwScreenData(
-                name = swData.name,
-                id = swData.id,
-                row = index + 1,
-                bkColor = swData.bkColor,
-                swImageId = getSwImageId(swData.id),
-                timerInfo = getLegend(swData.id)
-            )
+        if (swList.size > 0){
+            val refreshList: MutableList<SwScreenData> = mutableListOf()
+            swList.forEachIndexed { index, swData ->
+                refreshList += SwScreenData(
+                    name = swData.name,
+                    id = swData.id,
+                    row = index + 1,
+                    bkColor = swData.bkColor,
+                    swImageId = getSwImageId(swData.id),
+                    timerInfo = getLegend(swData.id)
+                )
+            }
+            coroutineScope.launch { swScreenList.emit(refreshList) }
         }
-        coroutineScope.launch { swScreenList.emit(refreshList) }
+        else{
+            coroutineScope.launch {starter.emit(true) }
+        }
     }
 
     private fun isSet( days: Int, position: Int): Boolean {
@@ -302,8 +311,12 @@ class KeepSwData @Inject constructor (
     private fun getStoredData() {
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.getFlashData.collect { flashData ->
-                val gson = Gson()
-                swList = gson.fromJson(flashData, FlashData::class.java).swList
+                swList = if (flashData != "") {
+                    val gson = Gson()
+                    gson.fromJson(flashData, FlashData::class.java).swList
+                } else{
+                    mutableListOf()
+                }
             }
         }
     }
