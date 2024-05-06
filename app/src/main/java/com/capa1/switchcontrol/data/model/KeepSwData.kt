@@ -196,9 +196,6 @@ class KeepSwData @Inject constructor (
             }
             coroutineScope.launch { swScreenList.emit(refreshList) }
         }
-        else{
-            coroutineScope.launch {starter.emit(true) }
-        }
     }
 
     private fun isSet( days: Int, position: Int): Boolean {
@@ -311,12 +308,13 @@ class KeepSwData @Inject constructor (
     private fun getStoredData() {
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.getFlashData.collect { flashData ->
-                swList = if (flashData != "") {
+                if (flashData != "") {
                     val gson = Gson()
-                    gson.fromJson(flashData, FlashData::class.java).swList
-                } else{
-                    mutableListOf()
-                }
+                    swList = gson.fromJson(flashData, FlashData::class.java).swList
+                } else {
+                    swList = mutableListOf()
+                    coroutineScope.launch {starter.emit(true) }
+               }
             }
         }
     }

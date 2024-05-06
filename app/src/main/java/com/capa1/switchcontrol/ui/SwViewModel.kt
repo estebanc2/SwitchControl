@@ -79,6 +79,7 @@ class SwViewModel  @Inject constructor(
         }
         viewModelScope.launch {
             keepSwData.starter.collect { result ->
+                Log.i(TAG,"aunque no deberia llega un starter = $result ?")
                 showAdd = result
             }
         }
