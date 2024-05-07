@@ -1099,7 +1099,7 @@ fun ShowDialog(value: Int = 2) {
     when (value) {
 
         1 -> AddSwDialog(true, {}, {}, {}, {})
-        2 -> NewDialog(true,ApData("fliacastro4", false), TouchState.IN_PROGRESS, {""}, {})
+        2 -> NewDialog(true,ApData("fliacastro4", "",false), TouchState.IN_PROGRESS, {""}, {})
         3 -> NewIdDialog(show = true, setId = {}, {})
         4 -> NewAllDialog(true, "tuti", {}, {})
         5 -> NameDialog(true, "luz cocina", {""}, {})

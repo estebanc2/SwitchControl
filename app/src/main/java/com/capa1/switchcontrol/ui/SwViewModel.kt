@@ -40,7 +40,7 @@ class SwViewModel  @Inject constructor(
     var showAll by mutableStateOf (false)
         private set
     val allSwId = keepSwData.allSwId
-    var myAp by mutableStateOf (ApData("", false))
+    var myAp by mutableStateOf (ApData(""," ",false))
         private set
     var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
         private set

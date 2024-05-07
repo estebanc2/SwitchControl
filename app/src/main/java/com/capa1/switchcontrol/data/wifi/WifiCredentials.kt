@@ -17,10 +17,10 @@ class WifiCredentials @Inject constructor(
             val wifiInfo = wifiManager.connectionInfo
             if (wifiInfo.supplicantState == SupplicantState.COMPLETED) {
                 val str = wifiInfo.ssid
-                listener.NotifyApData(ApData(str.substring(1, str.length - 1), wifiInfo.frequency > 3000))
+                listener.NotifyApData(ApData(str.substring(1, str.length - 1), wifiInfo.bssid, wifiInfo.frequency > 3000))
             }
             else{
-                listener.NotifyApData(ApData("uknown", false))
+                listener.NotifyApData(ApData("unknown", "", false))
             }
         } catch (a: Throwable) {
             Log.w(TAG, "", a)
