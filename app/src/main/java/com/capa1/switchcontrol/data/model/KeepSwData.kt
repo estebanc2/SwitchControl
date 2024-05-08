@@ -5,6 +5,7 @@ import android.util.Log
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.Global.FLASH_VERSION
+import com.capa1.switchcontrol.data.Global.SEND_ERASE
 import com.capa1.switchcontrol.data.Global.SEND_GET
 import com.capa1.switchcontrol.data.Global.SEND_OFF
 import com.capa1.switchcontrol.data.Global.SEND_ON
@@ -350,9 +351,17 @@ class KeepSwData @Inject constructor (
         Log.i(TAG,"server: $server, port: $port")
     }
     fun localErase(id: String){
-
+        for (data in swList){
+            if (data.id == id) {
+                swList.remove(data)
+            }
+        }
+        saveData()
+        refreshScreenInfo()
     }
     fun fullErase(id:String){
-
+        localErase(id)
+        mqttManager.publish(id, SEND_ERASE)
+        mqttManager.unsubscribe(id)
     }
 }
