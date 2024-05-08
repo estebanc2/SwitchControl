@@ -164,8 +164,20 @@ class SwViewModel  @Inject constructor(
     }
     fun addAllSw(id: String) {
         keepSwData.sendConfig(id)
+        showAdd = false
+        showAll = false
     }
     fun onShowMaintenance(show: Boolean) {
         showMaintenance = show
+    }
+
+    fun upgrade(server: String, port: String) {
+        keepSwData.upgrade(server, port)
+    }
+    fun localErase(){
+        keepSwData.localErase(id)
+    }
+    fun fullErase(){
+        keepSwData.fullErase(id)
     }
 }

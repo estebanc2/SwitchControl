@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChangeCircle
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ColorLens
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Handyman
@@ -56,7 +56,7 @@ fun ConfigScreen(
     onExit:()->Unit
 ){
     var row by remember { mutableStateOf(data.row) }
-    var prgs by remember { mutableStateOf(data.prgs) }
+    val prgs by remember { mutableStateOf(data.prgs) }
     fun hours(min: Int): String{
         return "${min/60}:${min - (min/60)*60}"
     }
@@ -316,7 +316,7 @@ fun ConfigScreen(
                 onClick = { onExit() },
             ) {
                 Icon(
-                    Icons.Default.Delete,
+                    Icons.Default.Close,
                     contentDescription = "",
                 )
                 Text(text = "descartar")

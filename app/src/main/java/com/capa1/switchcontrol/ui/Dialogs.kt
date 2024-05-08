@@ -23,13 +23,17 @@ import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CheckCircleOutline
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoodBad
+import androidx.compose.material.icons.filled.PhonelinkErase
+import androidx.compose.material.icons.filled.Upgrade
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -42,6 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,11 +59,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 @Composable
 fun NoPermissionDialog( //0
     show: Boolean, onConfirm: () -> Unit
@@ -214,7 +223,7 @@ fun NewDialog( //2
                                     color = MaterialTheme.colorScheme.primary,
                                 )
                                 Text(
-                                    text = "${apData.ssid}",
+                                    text = apData.ssid,
                                     style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 0.dp),
@@ -244,20 +253,36 @@ fun NewDialog( //2
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                         var showProgress by remember { mutableStateOf(false) }
-                        if (showProgress) LinearProgressIndicator(
-                            //progress = { 0.7f }
-                        )
+                        var currentProgress by remember { mutableStateOf(0f) }
+                        val scope = rememberCoroutineScope() // Create a coroutine scope
+
+                        if (showProgress){
+                            scope.launch {
+                                loadProgress { progress ->
+                                    currentProgress = progress
+                                }
+                                //loading = false // Reset loading when the coroutine finishes
+                            }
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .padding(horizontal = 10.dp)
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                                    .clip(RoundedCornerShape(16.dp)),
+                                progress = { currentProgress }
+                            )
+                        }
                         if(state == TouchState.TIMEOUT){
                             showProgress = false
+                            currentProgress = 0f
                             Text(
                                 text = "Revisa la clave y volve a intentar,\n" +
                                         "o no hay interruptores accesibles",
-                                style = TextStyle(fontSize = 14.sp),
+                                style = TextStyle(fontSize = 16.sp),
                                 color = Color.Red,
-                                modifier = Modifier.padding(
-                                    horizontal = 10.dp,
-                                    vertical = 0.dp
-                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                .padding(horizontal = 10.dp),
                             )
                         } else if (state == TouchState.READY) { onExit() }
                         Spacer(modifier = Modifier.height(10.dp))
@@ -278,7 +303,7 @@ fun NewDialog( //2
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Delete,
+                                    Icons.Default.Close,
                                     contentDescription = "",
                                 )
                                 Text(text = "descartar")
@@ -288,6 +313,13 @@ fun NewDialog( //2
                 }
             }
         }
+    }
+}
+suspend fun loadProgress(updateProgress: (Float) -> Unit) {
+    val max = ESPTOUCH_WAIT_IN_SECS * 1000 / 100
+    for (i in 1..max) {
+        updateProgress(i.toFloat() / max)
+        delay(100)
     }
 }
 
@@ -352,7 +384,7 @@ fun NewIdDialog( //3: Boolean,
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Delete,
+                                    Icons.Default.Close,
                                     contentDescription = "",
                                 )
                                 Text(text = "descartar")
@@ -438,7 +470,7 @@ fun NewAllDialog( //4
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Delete,
+                                    Icons.Default.Close,
                                     contentDescription = "",
                                 )
                                 Text(text = "descartar")
@@ -513,7 +545,7 @@ fun NameDialog( //5
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Delete,
+                                    Icons.Default.Close,
                                     contentDescription = "",
                                 )
                                 Text(text = "descartar")
@@ -873,7 +905,7 @@ fun TimerDialog( //7
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Delete,
+                                    Icons.Default.Close,
                                     contentDescription = "",
                                 )
                                 Text(text = "descartar")
@@ -917,8 +949,8 @@ fun ModeDialog( //8
                         var secs by remember { mutableStateOf(currentSecs) }
                         var mode by remember { mutableStateOf(currentMode) }
                         val options : MutableList<String> = mutableListOf()
-                        for (mode in SwMode.entries){
-                            options += mode.name
+                        for (eachMode in SwMode.entries){
+                            options += eachMode.name
                         }
                         options.forEachIndexed { index, label ->
                             val visible = if (index != mode) Color(0xFFEEEEEA)
@@ -1005,7 +1037,7 @@ fun ModeDialog( //8
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Delete,
+                                    Icons.Default.Close,
                                     contentDescription = "",
                                 )
                                 Text(text = "descartar")
@@ -1021,6 +1053,10 @@ fun ModeDialog( //8
 fun MaintenanceDialog( //9
     show: Boolean,
     id: String,
+    upgrade: (Pair<String, String>) -> Unit,
+    name:String,
+    local: ()->Unit,
+    full: ()->Unit,
     onExit: () -> Unit
 ) {
 
@@ -1037,29 +1073,149 @@ fun MaintenanceDialog( //9
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = "MANTENIMIENTO",
-                            style = TextStyle(fontSize = 18.sp),
+                            text = "ID DE INTERRUPTOR PARA CONFIGURAR EN OTRA APP",
+                            style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+                            modifier = Modifier.padding(start = 0.dp,
+                            top = 10.dp, end = 0.dp, bottom = 0.dp),
                         )
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Row (Modifier, verticalAlignment = Alignment.CenterVertically){
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(shape = MaterialTheme.shapes.medium)
+                                .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                                .padding(horizontal = 10.dp, vertical = 10.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp))
+                        {
+                            Row (Modifier, verticalAlignment = Alignment.CenterVertically){
+                                Text(
+                                    text = "ID: ",
+                                    style = TextStyle(fontSize = 18.sp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+                                )
+                                Text(
+                                    text = id,
+                                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp),
+                                )
+                            }
+                        }
+                        Text(
+                            text = "ACTUALIZAR FIRMWARE",
+                            style = TextStyle(fontSize = 14.sp),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(start = 0.dp,
+                                top = 20.dp, end = 0.dp, bottom = 0.dp),
+                        )
+                        var server by remember { mutableStateOf("") }
+                        var port by remember { mutableStateOf("") }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(shape = MaterialTheme.shapes.medium)
+                                .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                                .padding(horizontal = 10.dp, vertical = 10.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp))
+                        {
                             Text(
-                                text = "ID: ",
-                                style = TextStyle(fontSize = 18.sp),
+                                text = "Ingresá dirección IP y puerto del servidor http",
+                                style = TextStyle(fontSize = 14.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                             )
-                            Text(
-                                text = "${id}",
-                                style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp),
-                            )
+                            Row (Modifier, verticalAlignment = Alignment.CenterVertically){
+                                Text(
+                                    text = "servidor: ",
+                                    style = TextStyle(fontSize = 18.sp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(start = 0.dp,
+                                        top = 0.dp, end = 0.dp, bottom = 0.dp),
+                                )
+                                TextField(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                                    value = server,
+                                    singleLine = true,
+                                    maxLines = 1,
+                                    onValueChange = { server = it }
+                                )
+                            }
+                            Row (Modifier, verticalAlignment = Alignment.CenterVertically){
+                                Text(
+                                    text = "puerto: ",
+                                    style = TextStyle(fontSize = 18.sp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(start = 0.dp,
+                                        top = 0.dp, end = 10.dp, bottom = 0.dp),
+                                )
+                                TextField(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textStyle = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                                    value = port,
+                                    singleLine = true,
+                                    maxLines = 1,
+                                    onValueChange = { port = it }
+                                )
+                            }
+                            Button(
+                                onClick = { upgrade(Pair(server, port)) },
+                                Modifier.padding(start = 0.dp,
+                                    top = 10.dp, end = 0.dp, bottom = 0.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Upgrade,
+                                    contentDescription = "",
+                                )
+                                Text(text = "actualizar")
+                            }
+
                         }
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
+                        Text(
+                            text = "ELIMINAR INTERRUPTOR",
+                            style = TextStyle(fontSize = 14.sp),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(start = 0.dp,
+                                top = 20.dp, end = 0.dp, bottom = 0.dp),
+                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(shape = MaterialTheme.shapes.medium)
+                                .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                                .padding(horizontal = 10.dp, vertical = 10.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp))
+                        {
+                            Row {
+                                Icon(
+                                      Icons.Default.PhonelinkErase,
+                                            contentDescription = "",
+                                )
+                                Text(
+                                    text = "Eliminar $name en esta aplicación",
+                                    style = TextStyle(fontSize = 14.sp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(start = 5.dp,
+                                        top = 0.dp, end = 0.dp, bottom = 0.dp)
+                                        .clickable {local()  })
+                            }
+                            Row {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "",
+                                )
+                                Text(
+                                    text = "Eliminar $name en esta aplicación y dejar el interruptor" +
+                                            " desconfigurado (de fábrica)",
+                                    style = TextStyle(fontSize = 14.sp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(start = 5.dp,
+                                        top = 0.dp, end = 0.dp, bottom = 0.dp)
+                                        .clickable {full()}
+                                )
+                            }
+                        }
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                             TextButton(
                                 onClick = {
@@ -1076,7 +1232,7 @@ fun MaintenanceDialog( //9
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Delete,
+                                    Icons.Default.Close,
                                     contentDescription = "",
                                 )
                                 Text(text = "descartar")
@@ -1094,7 +1250,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 2) {
+fun ShowDialog(value: Int = 9) {
     //Column
     when (value) {
 
@@ -1106,6 +1262,6 @@ fun ShowDialog(value: Int = 2) {
         6 -> ColorDialog(true, "cielo", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
         8 -> ModeDialog(true, 4, 10, {  }, {})
-        9 -> MaintenanceDialog(true, "1234", {})
+        9 -> MaintenanceDialog(true, "1234", {},"luz cocina", {},{},{})
     }
 }

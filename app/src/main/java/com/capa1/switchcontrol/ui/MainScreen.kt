@@ -78,8 +78,7 @@ fun MainScreen(
     NewIdDialog(
         show = viewModel.showNewId,
         setId = {id -> viewModel.addSwId(id)},
-        onExit = {viewModel.onShowNewId(false)
-                    viewModel.onShowAdd(false)}
+        onExit = {viewModel.onShowNewId(false)}
     )
     NewAllDialog(
         show = viewModel.showAll,
@@ -115,6 +114,10 @@ fun MainScreen(
     MaintenanceDialog(
         show = viewModel.showMaintenance,
         id = viewModel.id,
+        upgrade = {pair -> viewModel.upgrade(pair.first, pair.second)},
+        name = viewModel.configurableData.name,
+        local = {viewModel.localErase()},
+        full = {viewModel.fullErase()},
         onExit = {viewModel.onShowMaintenance(false)}
     )
     Box(Modifier.fillMaxSize()) {

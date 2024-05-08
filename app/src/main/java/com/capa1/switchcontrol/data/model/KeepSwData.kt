@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global
+import com.capa1.switchcontrol.data.Global.FLASH_VERSION
 import com.capa1.switchcontrol.data.Global.SEND_GET
 import com.capa1.switchcontrol.data.Global.SEND_OFF
 import com.capa1.switchcontrol.data.Global.SEND_ON
@@ -323,7 +324,7 @@ class KeepSwData @Inject constructor (
 
     private fun saveData() {
         val gson = Gson()
-        val flashData = gson.toJson(FlashData("version 0", swList))
+        val flashData = gson.toJson(FlashData(FLASH_VERSION, swList))
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.saveFlashData(flashData)
         }
@@ -343,5 +344,15 @@ class KeepSwData @Inject constructor (
 
     private fun initSw(id: String) {
         mqttManager.publish(id, SEND_GET)
+    }
+
+    fun upgrade(server: String, port: String) {
+        Log.i(TAG,"server: $server, port: $port")
+    }
+    fun localErase(id: String){
+
+    }
+    fun fullErase(id:String){
+
     }
 }
