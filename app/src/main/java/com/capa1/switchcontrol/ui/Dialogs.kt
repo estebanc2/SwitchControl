@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.Upgrade
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -282,7 +283,7 @@ fun NewDialog( //2
                                 color = Color.Red,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                .padding(horizontal = 10.dp),
+                                    .padding(horizontal = 10.dp),
                             )
                         } else if (state == TouchState.READY) { onExit() }
                         Spacer(modifier = Modifier.height(10.dp))
@@ -965,10 +966,11 @@ fun ModeDialog( //8
                                     Text(label,
                                         style = TextStyle(fontSize = 14.sp),
                                         color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.padding(
-                                            horizontal = 8.dp,
-                                            vertical = 10.dp
-                                        )
+                                        modifier = Modifier
+                                            .padding(
+                                                horizontal = 8.dp,
+                                                vertical = 10.dp
+                                            )
                                             .clickable { mode = index }
                                     )
                                     if ((index == 2) || (index == 3)) {
@@ -1073,7 +1075,7 @@ fun MaintenanceDialog( //9
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = "ID DE INTERRUPTOR PARA CONFIGURAR EN OTRA APP",
+                            text = "ID PARA CONFIGURAR EN OTRA APP",
                             style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(start = 0.dp,
@@ -1107,7 +1109,7 @@ fun MaintenanceDialog( //9
                             style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(start = 0.dp,
-                                top = 20.dp, end = 0.dp, bottom = 0.dp),
+                                top = 15.dp, end = 0.dp, bottom = 0.dp),
                         )
                         var server by remember { mutableStateOf("") }
                         var port by remember { mutableStateOf("") }
@@ -1119,12 +1121,6 @@ fun MaintenanceDialog( //9
                                 .padding(horizontal = 10.dp, vertical = 10.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp))
                         {
-                            Text(
-                                text = "Ingresá dirección IP y puerto del servidor http",
-                                style = TextStyle(fontSize = 14.sp),
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
-                            )
                             Row (Modifier, verticalAlignment = Alignment.CenterVertically){
                                 Text(
                                     text = "servidor: ",
@@ -1159,7 +1155,7 @@ fun MaintenanceDialog( //9
                                     onValueChange = { port = it }
                                 )
                             }
-                            Button(
+                            ElevatedButton(
                                 onClick = { upgrade(Pair(server, port)) },
                                 Modifier.padding(start = 0.dp,
                                     top = 10.dp, end = 0.dp, bottom = 0.dp)
@@ -1177,7 +1173,7 @@ fun MaintenanceDialog( //9
                             style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(start = 0.dp,
-                                top = 20.dp, end = 0.dp, bottom = 0.dp),
+                                top = 15.dp, end = 0.dp, bottom = 0.dp),
                         )
                         Column(
                             modifier = Modifier
@@ -1187,7 +1183,8 @@ fun MaintenanceDialog( //9
                                 .padding(horizontal = 10.dp, vertical = 10.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp))
                         {
-                            Row {
+                            var erasing by remember { mutableStateOf(false)}
+                            ElevatedButton(onClick = { erasing = true}) {
                                 Icon(
                                       Icons.Default.PhonelinkErase,
                                             contentDescription = "",
@@ -1196,11 +1193,34 @@ fun MaintenanceDialog( //9
                                     text = "Eliminar $name en esta aplicación",
                                     style = TextStyle(fontSize = 14.sp),
                                     color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(start = 5.dp,
-                                        top = 0.dp, end = 0.dp, bottom = 0.dp)
-                                        .clickable {local()  })
+                                    modifier = Modifier
+                                        .padding(
+                                            start = 5.dp,
+                                            top = 0.dp, end = 0.dp, bottom = 0.dp
+                                        )
+                                )
                             }
-                            Row {
+                            if (erasing){
+                                Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
+                                    Text(
+                                        text = "Seguro?",
+                                        style = TextStyle(fontSize = 14.sp),
+                                        color = MaterialTheme.colorScheme.primary,
+                                    )
+                                    Button(
+                                        onClick = { local()},
+                                    ) {
+                                        Text(text = "si")
+                                    }
+                                    Button(
+                                        onClick = { erasing = false },
+                                    ) {
+                                        Text(text = "no")
+                                    }
+                                }
+                            }
+                            var fullErasing by remember { mutableStateOf(false)}
+                            ElevatedButton(onClick = { fullErasing = true}){
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = "",
@@ -1210,11 +1230,33 @@ fun MaintenanceDialog( //9
                                             " desconfigurado (de fábrica)",
                                     style = TextStyle(fontSize = 14.sp),
                                     color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(start = 5.dp,
-                                        top = 0.dp, end = 0.dp, bottom = 0.dp)
-                                        .clickable {full()}
+                                    modifier = Modifier
+                                        .padding(
+                                            start = 5.dp,
+                                            top = 0.dp, end = 0.dp, bottom = 0.dp
+                                        )
                                 )
                             }
+                            if (fullErasing){
+                                Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
+                                    Text(
+                                        text = "Seguro?",
+                                        style = TextStyle(fontSize = 14.sp),
+                                        color = MaterialTheme.colorScheme.primary,
+                                    )
+                                    Button(
+                                        onClick = { full()},
+                                    ) {
+                                        Text(text = "si")
+                                    }
+                                    Button(
+                                        onClick = { fullErasing = false },
+                                    ) {
+                                        Text(text = "no")
+                                    }
+                                }
+                            }
+
                         }
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                             TextButton(
@@ -1222,11 +1264,7 @@ fun MaintenanceDialog( //9
 
                                 },
                             ) {
-                                Icon(
-                                    Icons.Default.CheckCircle,
-                                    contentDescription = "",
-                                )
-                                Text(text = "aceptar")
+
                             }
                             TextButton(
                                 onClick = { onExit() },

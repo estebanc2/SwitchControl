@@ -2,6 +2,7 @@ package com.capa1.switchcontrol.ui
 
 import android.app.Activity
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.MyColors
+import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.ui.permissions.PermissionUtils
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -52,7 +54,7 @@ fun MainScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(key1 = lifecycleOwner){
         permissionState.launchMultiplePermissionRequest()
-        onDispose {  }
+        onDispose { Log.i(TAG,"SE CIERRA LA APP??") }
     }
     LaunchedEffect(key1 = permissionState.allPermissionsGranted) {
         viewModel.start()

@@ -99,10 +99,12 @@ class KeepSwData @Inject constructor (
     }
 
     fun setSwWithId(id: String) {
-        newSwId = id
-        if (mqttUp) {
-            mqttManager.subscribe(id)
-            mqttManager.publish(id, SEND_GET)
+        if (swList.indexOfFirst { it.id == id } == -1) { // it is a new id
+            newSwId = id
+            if (mqttUp) {
+                mqttManager.subscribe(id)
+                mqttManager.publish(id, SEND_GET)
+            }
         }
     }
 

@@ -39,6 +39,8 @@ class SwViewModel  @Inject constructor(
         private set
     var showAll by mutableStateOf (false)
         private set
+    var showUpgrading by mutableStateOf (false)
+        private set
     val allSwId = keepSwData.allSwId
     var myAp by mutableStateOf (ApData(""," ",false))
         private set
@@ -172,11 +174,17 @@ class SwViewModel  @Inject constructor(
 
     fun upgrade(server: String, port: String) {
         keepSwData.upgrade(server, port)
+        showMaintenance = false
+        showUpgrading = true
     }
     fun localErase(){
         keepSwData.localErase(id)
+        showMaintenance = false
+        exitConfig()
     }
     fun fullErase(){
         keepSwData.fullErase(id)
+        showMaintenance = false
+        exitConfig()
     }
 }
