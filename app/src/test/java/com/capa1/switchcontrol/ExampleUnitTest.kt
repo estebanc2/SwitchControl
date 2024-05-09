@@ -51,4 +51,26 @@ class ExampleUnitTest {
         }
         assert(myList[newRow - 1] == element)
     }
+    @Test
+    fun listItemRemove() {
+        val element1 = Element ("carlos", "Castro")
+        val element2 = Element("pilar", "samanes")
+        val element3 = Element("oti", "castro")
+        var testList = mutableListOf(element1, element2, element3)
+        val initSize = testList.size
+        testList.removeIf{it.b == "samanes"}
+        println(String.format("%d",testList.size))
+        assert(initSize > testList.size)
+    }
+    @Test
+    fun listItemSet() {
+        val element1 = Element ("carlos", "Castro")
+        val element2 = Element("pilar", "samanes")
+        val element3 = Element("oti", "castro")
+        var testList = mutableListOf(element1, element2, element3)
+        testList[testList.indexOfFirst {it.b == "samanes"}] = Element("Angelina","Holly")
+        println(String.format("%s", testList[1].b))
+        assert(testList[1].b == "Holly")
+    }
+
 }

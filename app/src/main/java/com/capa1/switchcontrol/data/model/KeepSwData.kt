@@ -55,7 +55,7 @@ class KeepSwData @Inject constructor (
             allSwId -> {
                 val newFlashData = gson.fromJson(msg, FlashData::class.java)
                 swList = newFlashData.swList.toMutableList()
-                saveData()
+                saveData(swList)
                 initializeSwList()
             }
             newSwId -> {
@@ -63,19 +63,14 @@ class KeepSwData @Inject constructor (
                 val newEspData = gson.fromJson(msg, EspData::class.java)
                 swMap[id] = newEspData
                 swList += SwData(newEspData.name, id, (swList.size + 1), "nada", SwStatus.CONNECTED)
-                saveData()
+                saveData(swList)
             }
             else -> {
-                for (data in swList) {
-                    if (data.id == id) {
-                        val newEspData = gson.fromJson(msg, EspData::class.java)
-                        swMap[id] = newEspData
-                        data.status = SwStatus.CONNECTED
-                    }
-                }
+                swMap[id] =gson.fromJson(msg, EspData::class.java)
+                swList [swList.indexOfFirst { it.id == id }].status = SwStatus.CONNECTED
             }
         }
-        Log.i(TAG, "mqtt received data : $msg")
+        Log.i(TAG, "Rx msg: $msg")
         refreshScreenInfo()
     }
 
@@ -100,8 +95,7 @@ class KeepSwData @Inject constructor (
     fun initOperation() {
         wifiCredentials.get()
         mqttManager.connect()
-        getStoredData()//something.sortedBy { it.row }.toMutableList() //
-        refreshScreenInfo()
+        getStoredData()
     }
 
     fun setSwWithId(id: String) {
@@ -113,57 +107,47 @@ class KeepSwData @Inject constructor (
     }
 
     fun imageClick(id: String) {
-        for (data in swList) {
-            if (data.id == id) {
-                if (data.status == SwStatus.CONNECTED) {
-                    data.status = SwStatus.CONNECTING
-                    when ( swMap[id]?.state ?: SwState.GET_DATA.ordinal) {
-                        SwState.OFF.ordinal -> {
-                            mqttManager.publish(id, SEND_ON)
-                        }
-                        SwState.ON.ordinal -> {
-                            mqttManager.publish(id, SEND_OFF)
-                        }
-                    }
+        if (swList [swList.indexOfFirst { it.id == id }].status == SwStatus.CONNECTED) {
+            swList [swList.indexOfFirst { it.id == id }].status = SwStatus.CONNECTING
+            when ( swMap[id]?.state ?: SwState.GET_DATA.ordinal) {
+                SwState.OFF.ordinal -> {
+                    mqttManager.publish(id, SEND_ON)
+                }
+                SwState.ON.ordinal -> {
+                    mqttManager.publish(id, SEND_OFF)
                 }
             }
         }
     }
 
-    fun configUpgrade(data: ConfigurableData, id:String){
-        if (data.name != swMap[id]!!.name ||
-            data.prgs != swMap[id]!!.prgs ||
-            data.mode != swMap[id]!!.mode ||
-            data.secs != swMap[id]!!.secs){
+    fun configUpgrade(newData: ConfigurableData, id:String){
+        if (newData.name != swMap[id]!!.name ||
+            newData.prgs != swMap[id]!!.prgs ||
+            newData.mode != swMap[id]!!.mode ||
+            newData.secs != swMap[id]!!.secs){
             val setData = Global.gson.toJson( EspData(
-                data.name,
+                newData.name,
                 SwState.SET_DATA.ordinal,
-                data.mode,
-                data.secs,
-                data.prgs,
+                newData.mode,
+                newData.secs,
+                newData.prgs,
                 0))
             mqttManager.publish(id,setData)
         }
-        var newSwData = SwData("","", 1, "nada", SwStatus.DISCONNECTED)
-        var newIndex = 0
+        val index = swList.indexOfFirst { it.id == id }
+        val data = swList[index]
         var aChange = false
-        swList.forEachIndexed { index, swData ->
-            if (swData.id == id) {
-                newSwData = swData
-                newIndex = index
-            }
-        }
-        if(data.name != newSwData.name){
-            swList[newIndex].name = data.name
+        if(newData.name != data.name){
+            data.name = newData.name
             aChange = true
         }
-        if(data.bkColor != newSwData.bkColor){
-            swList[newIndex].bkColor = data.bkColor
+        if(newData.bkColor != data.bkColor){
+            data.bkColor = newData.bkColor
             aChange = true
         }
-        if(data.row != newSwData.row){
-            swList.remove(newSwData)
-            swList.add(data.row - 1, newSwData)
+        if(newData.row != data.row){
+            swList.remove(data)
+            swList.add(newData.row - 1, data)
             swList.forEachIndexed { index, _  ->
                 swList[index].row = index + 1
             }
@@ -171,8 +155,7 @@ class KeepSwData @Inject constructor (
         }
         if(aChange){
             refreshScreenInfo()
-            saveData()
-            Log.i(TAG, "cambio algo en el swList de ${swList.size} elementos")
+            saveData(swList)
         }
     }
 
@@ -188,11 +171,11 @@ class KeepSwData @Inject constructor (
     private fun refreshScreenInfo() {
         if (swList.size > 0){
             val refreshList: MutableList<SwScreenData> = mutableListOf()
-            swList.forEachIndexed { index, swData ->
+            for (swData in swList){
                 refreshList += SwScreenData(
                     name = swData.name,
                     id = swData.id,
-                    row = index + 1,
+                    row = swData.row,
                     bkColor = swData.bkColor,
                     swImageId = getSwImageId(swData.id),
                     timerInfo = getLegend(swData.id)
@@ -302,8 +285,10 @@ class KeepSwData @Inject constructor (
     }
 
     private fun initializeSwList() {
+        Log.i(TAG,"swList size: ${swList.size}")
         for (sw in swList) {
             mqttManager.subscribe(sw.id)
+            Log.i(TAG, "Tx msg id: $sw.id")
             initSw(sw.id)
         }
         checkSwitches()
@@ -319,13 +304,18 @@ class KeepSwData @Inject constructor (
                     swList = mutableListOf()
                     coroutineScope.launch {starter.emit(true) }
                }
+                for (a in swList){
+                    Log.i(TAG,"NAME: ${a.name}, ID:  ${a.id}")
+                }
+                refreshScreenInfo()
             }
         }
     }
 
-    private fun saveData() {
+    private fun saveData(list: MutableList<SwData>) {
+        for(swData in list){swData.status = SwStatus.DISCONNECTED}
         val gson = Gson()
-        val flashData = gson.toJson(FlashData(FLASH_VERSION, swList))
+        val flashData = gson.toJson(FlashData(FLASH_VERSION, list))
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.saveFlashData(flashData)
         }
@@ -351,12 +341,11 @@ class KeepSwData @Inject constructor (
         Log.i(TAG,"server: $server, port: $port")
     }
     fun localErase(id: String){
-        for (data in swList){
-            if (data.id == id) {
-                swList.remove(data)
-            }
+        swList.removeIf{it.id == id}
+        swList.forEachIndexed { index, _  ->
+            swList[index].row = index + 1
         }
-        saveData()
+        saveData(swList)
         refreshScreenInfo()
     }
     fun fullErase(id:String){

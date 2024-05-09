@@ -17,7 +17,7 @@ object Global {
 
     const val TAG = "switchcontrol"
     const val FLASH_VERSION = "1.8"
-    const val ESPTOUCH_WAIT_IN_SECS = 5L
+    const val ESPTOUCH_WAIT_IN_SECS = 15L
     data class MyColor(
         val backColor: Color,
         val textColor: Color
@@ -80,9 +80,18 @@ object Global {
     )
 }
 /*
-SwData("velador", "483fda877368", 2, "limon", SwStatus.DISCONNECTED),
-SwData("luz cocina", "98f4abb33d5a", 1, "lila", SwStatus.DISCONNECTED),
-SwData("riego", "483fda878e46", 3, "pasto", SwStatus.DISCONNECTED),
-SwData("alargue", "bcddc247dbc9", 5, "palta", SwStatus.DISCONNECTED),
-SwData("TV", "483fda879484", 4, "madera", SwStatus.DISCONNECTED)
+velador
+483fda877368
+
+luz cocina
+98f4abb33d5a
+
+riego
+483fda878e46
+
+alargue
+bcddc247dbc9
+
+TV
+483fda879484
 */
