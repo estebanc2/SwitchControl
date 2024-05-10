@@ -5,6 +5,8 @@ import android.util.Log
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.TAG
 import com.espressif.iot.esptouch.EsptouchTask
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -29,6 +31,19 @@ class EspTouch @Inject constructor(
             Log.i(TAG, "newId: [$newId]")
             timeOut.isTerminated    //remove()  .cancel()//}
             listener.NotifyTouch(newId,TouchState.READY)
+        }
+        val workerPool: ExecutorService = Executors.newSingleThreadExecutor()
+        workerPool.submit {
+            val expectResultCount = 1
+            val results = task.executeForResults(expectResultCount)
+            val first = results[0]
+            if (first.isCancelled) {
+                Log.i(TAG, "User cancel the task")
+                return@submit
+            }
+            if (first.isSuc) {
+                Log.i(TAG, "EspTouch successfully")
+            }
         }
     }
 }
