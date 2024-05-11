@@ -72,5 +72,12 @@ class ExampleUnitTest {
         println(String.format("%s", testList[1].b))
         assert(testList[1].b == "Holly")
     }
-
+    @Test
+    fun removeItems(){
+        var mylist = mutableListOf ("uno", "dos")
+        mylist -= "uno"
+        mylist -= "dos"
+        mylist -= "uno"
+        assert(mylist.size == 0)
+    }
 }

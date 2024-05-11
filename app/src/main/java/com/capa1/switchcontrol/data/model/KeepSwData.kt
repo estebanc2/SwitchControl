@@ -36,6 +36,7 @@ class KeepSwData @Inject constructor (
     private val wifiCredentials = WifiCredentials(context, this)
     private val espTouch = EspTouch(context, this)
     private var swList = mutableListOf<SwData>()
+    private var newSw = mutableListOf<String>()
     private var newSwId = ""
     private val swDataStore = SwDataStore(context)
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
@@ -60,10 +61,12 @@ class KeepSwData @Inject constructor (
             }
             newSwId -> {
                 newSwId = ""
+                newSw -= id
                 val newEspData = gson.fromJson(msg, EspData::class.java)
                 swMap[id] = newEspData
                 swList += SwData(newEspData.name, id, (swList.size + 1), "nada", SwStatus.CONNECTED)
                 saveData(swList)
+                //initializeSwList()
             }
             else -> {
                 swMap[id] =gson.fromJson(msg, EspData::class.java)
@@ -81,6 +84,10 @@ class KeepSwData @Inject constructor (
         }
     }
 
+    override fun notifySubscribed(id: String) {
+        Log.i(TAG,"Subscribe success, id: $id")
+        initSw(id)
+    }
     override fun NotifyApData(myAp: ApData) {
         coroutineScope.launch { myApData.emit(myAp) }
         currentSsid = myAp.ssid
@@ -101,9 +108,9 @@ class KeepSwData @Inject constructor (
     fun setSwWithId(id: String) {
         if (swList.indexOfFirst { it.id == id } == -1) { // it is a new id
             newSwId = id
+            newSw += id
             if (mqttUp) {
                 mqttManager.subscribe(id)
-                mqttManager.publish(id, SEND_GET)
             }
         }
     }
@@ -171,7 +178,7 @@ class KeepSwData @Inject constructor (
     }
 
     private fun refreshScreenInfo() {
-        if (swList.size > 0){
+        //if (swList.size > 0){
             val refreshList: MutableList<SwScreenData> = mutableListOf()
             for (swData in swList){
                 refreshList += SwScreenData(
@@ -184,7 +191,7 @@ class KeepSwData @Inject constructor (
                 )
             }
             coroutineScope.launch { swScreenList.emit(refreshList) }
-        }
+        //}
     }
 
     private fun isSet( days: Int, position: Int): Boolean {
@@ -287,11 +294,8 @@ class KeepSwData @Inject constructor (
     }
 
     private fun initializeSwList() {
-        Log.i(TAG,"swList size: ${swList.size}")
         for (sw in swList) {
             mqttManager.subscribe(sw.id)
-            Log.i(TAG, "Tx msg id: $sw.id")
-            initSw(sw.id)
         }
         checkSwitches()
     }
@@ -299,15 +303,10 @@ class KeepSwData @Inject constructor (
     private fun getStoredData() {
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.getFlashData.collect { flashData ->
-                if (flashData != "") {
-                    val gson = Gson()
-                    swList = gson.fromJson(flashData, FlashData::class.java).swList
-                } else {
-                    swList = mutableListOf()
+                val gson = Gson()
+                swList = gson.fromJson(flashData, FlashData::class.java).swList
+                if (swList.size == 0) {
                     coroutineScope.launch {starter.emit(true) }
-               }
-                for (a in swList){
-                    Log.i(TAG,"NAME: ${a.name}, ID:  ${a.id}")
                 }
                 refreshScreenInfo()
             }
@@ -325,12 +324,16 @@ class KeepSwData @Inject constructor (
 
     private fun checkSwitches() {
         val timerInSec = 10L
-        fixedRateTimer("timer", false, 0L, timerInSec * 1000) {
+        val initTimerInSec = 5L
+        fixedRateTimer("timer", false, initTimerInSec * 1000, timerInSec * 1000) {
             for (sw in swList) {
                 if (sw.status == SwStatus.DISCONNECTED) {
                     initSw(sw.id)
                     Log.i(TAG, "------- ${sw.id} esta DESCONECTADO")
                 }
+            }
+            for (id in newSw){
+                initSw(id)
             }
         }
     }

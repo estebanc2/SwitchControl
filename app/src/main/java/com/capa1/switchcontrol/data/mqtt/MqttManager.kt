@@ -1,7 +1,9 @@
 package com.capa1.switchcontrol.data.mqtt
 
+import android.util.Log
 import com.capa1.switchcontrol.data.Global.FROM_SW
 import com.capa1.switchcontrol.data.Global.MQTT_HOST_AND_PORT
+import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.Global.TO_SW
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
@@ -58,8 +60,8 @@ class MqttManager @Inject constructor(
         try {
             mqttClient.subscribe(FROM_SW + id, qos, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
+                    listener.notifySubscribed(id)
                 }
-
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
                 }
             })

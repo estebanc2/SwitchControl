@@ -2,6 +2,7 @@
 
 package com.capa1.switchcontrol.ui
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Mode
 import androidx.compose.material.icons.filled.MoodBad
 import androidx.compose.material.icons.filled.PhonelinkErase
 import androidx.compose.material.icons.filled.Upgrade
@@ -62,10 +64,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.MyColors
+import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -147,6 +152,29 @@ fun AddSwDialog( //1
                                 modifier = Modifier.padding(
                                     horizontal = 10.dp,
                                     vertical = 0.dp))
+                        }
+                        var showHow by remember { mutableStateOf(false) }
+                        TextButton(
+                            onClick = { showHow = true },
+                        ) {
+                            Icon(
+                                Icons.Default.Mode,
+                                contentDescription = "",
+                            )
+                            Text(text = "configurar interruptor",
+                                modifier = Modifier.padding(
+                                    horizontal = 10.dp,
+                                    vertical = 0.dp))
+                        }
+                        if(showHow){
+                            Text(
+                                text = "toca el nombre del interruptor a configurar",
+                                style = TextStyle(fontSize = 18.sp),
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                            )
+                            ElevatedButton(onClick = {showHow = false}){
+                                Text(text = "entendido")}
                         }
                         TextButton(
                             onClick = { onExit() },
@@ -245,24 +273,18 @@ fun NewDialog( //2
                                 maxLines = 1,
                                 onValueChange = { pass = it }
                             )
-                            Text(
-                                text = "",
-                                style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp),
-                            )
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                         var showProgress by remember { mutableStateOf(false) }
                         var currentProgress by remember { mutableStateOf(0f) }
                         val scope = rememberCoroutineScope() // Create a coroutine scope
-
+                        var job: Job? by remember { mutableStateOf(null) }
                         if (showProgress){
-                            scope.launch {
+                            job = scope.launch {
                                 loadProgress { progress ->
                                     currentProgress = progress
                                 }
-                                //loading = false // Reset loading when the coroutine finishes
+                                Log.i(TAG,"1")
                             }
                             LinearProgressIndicator(
                                 modifier = Modifier
@@ -274,6 +296,7 @@ fun NewDialog( //2
                             )
                         }
                         if(state == TouchState.TIMEOUT){
+                            job?.cancel()
                             showProgress = false
                             currentProgress = 0f
                             Text(
@@ -290,6 +313,7 @@ fun NewDialog( //2
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                             TextButton(
                                 onClick = {
+                                    currentProgress = 0f
                                     setPass(pass)
                                     showProgress = true
                                 },
@@ -1288,7 +1312,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 9) {
+fun ShowDialog(value: Int = 1) {
     //Column
     when (value) {
 

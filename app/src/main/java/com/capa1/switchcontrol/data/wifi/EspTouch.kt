@@ -17,19 +17,22 @@ class EspTouch @Inject constructor(
     private val listener: WifiListener
 ) {
     fun discover(ssid: String, bssid:String, pass: String) {
+        var success = false
         val task = EsptouchTask(ssid, bssid, pass, context)
         val timeOut = ScheduledThreadPoolExecutor(1)
         listener.NotifyTouch("", TouchState.IN_PROGRESS)
         timeOut.schedule({
             Log.i(TAG, "timeout.................")
-            listener.NotifyTouch("", TouchState.TIMEOUT)
-            task.interrupt()
+            if (!success){
+                listener.NotifyTouch("", TouchState.TIMEOUT)
+                task.interrupt()
+            }
         }, ESPTOUCH_WAIT_IN_SECS, TimeUnit.SECONDS)
         task.setPackageBroadcast(false) // if true send broadcast packets, else send multicast packets
         task.setEsptouchListener { result ->
             val newId: String = result.bssid
+            success = true
             Log.i(TAG, "newId: [$newId]")
-            timeOut.isTerminated    //remove()  .cancel()//}
             listener.NotifyTouch(newId,TouchState.READY)
         }
         val workerPool: ExecutorService = Executors.newSingleThreadExecutor()

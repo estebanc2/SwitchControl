@@ -21,12 +21,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +42,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.Global.TAG
@@ -44,18 +52,55 @@ import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.ui.permissions.PermissionUtils
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-@OptIn(ExperimentalPermissionsApi::class)
+import kotlinx.coroutines.CoroutineScope
+
+@Composable
+fun ComposableLifecycle(
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    onEvent: (LifecycleOwner, Lifecycle.Event) -> Unit
+) {
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { source, event ->
+            onEvent(source, event)
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     viewModel: SwViewModel = hiltViewModel()
 ) {
+    ComposableLifecycle { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_CREATE -> {
+                Log.d(TAG, "onCreate")
+            }
+            Lifecycle.Event.ON_START -> {
+                Log.d(TAG, "On Start")
+            }
+            Lifecycle.Event.ON_RESUME -> {
+                Log.d(TAG, "On Resume")
+            }
+            Lifecycle.Event.ON_PAUSE -> {
+                Log.d(TAG, "On Pause")
+            }
+            Lifecycle.Event.ON_STOP -> {
+                Log.d(TAG, "On Stop")
+            }
+            Lifecycle.Event.ON_DESTROY -> {
+                Log.d(TAG, "On Destroy")
+            }
+            else -> {}
+        }
+    }
     val permissionState =
         rememberMultiplePermissionsState(permissions = PermissionUtils.permissions)
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(key1 = lifecycleOwner){
-        permissionState.launchMultiplePermissionRequest()
-        onDispose { Log.i(TAG,"SE CIERRA LA APP??") }
-    }
     LaunchedEffect(key1 = permissionState.allPermissionsGranted) {
         viewModel.start()
     }
@@ -122,7 +167,9 @@ fun MainScreen(
         full = {viewModel.fullErase()},
         onExit = {viewModel.onShowMaintenance(false)}
     )
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        Modifier.fillMaxSize()
+    ) {
         if (!viewModel.goConfig){
             ShowSwitches(
                 switches = viewModel.swScreenList,

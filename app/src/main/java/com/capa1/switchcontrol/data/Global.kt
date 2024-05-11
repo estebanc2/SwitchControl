@@ -17,7 +17,7 @@ object Global {
 
     const val TAG = "switchcontrol"
     const val FLASH_VERSION = "1.8"
-    const val ESPTOUCH_WAIT_IN_SECS = 25L
+    const val ESPTOUCH_WAIT_IN_SECS = 18L
     data class MyColor(
         val backColor: Color,
         val textColor: Color

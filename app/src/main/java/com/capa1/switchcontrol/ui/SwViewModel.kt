@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capa1.switchcontrol.R
@@ -77,6 +79,10 @@ class SwViewModel  @Inject constructor(
         viewModelScope.launch {
             keepSwData.touchState.collect { result ->
                 touchProgress = result
+                if (result == TouchState.READY){
+                    showAdd = false
+                    showNew = false
+                }
             }
         }
         viewModelScope.launch {
@@ -171,7 +177,6 @@ class SwViewModel  @Inject constructor(
     fun onShowMaintenance(show: Boolean) {
         showMaintenance = show
     }
-
     fun upgrade(server: String, port: String) {
         keepSwData.upgrade(server, port)
         showMaintenance = false
