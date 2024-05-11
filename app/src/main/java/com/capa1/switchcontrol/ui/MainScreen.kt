@@ -34,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -54,51 +55,11 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.CoroutineScope
 
-@Composable
-fun ComposableLifecycle(
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    onEvent: (LifecycleOwner, Lifecycle.Event) -> Unit
-) {
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { source, event ->
-            onEvent(source, event)
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-}
-
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     viewModel: SwViewModel = hiltViewModel()
 ) {
-    ComposableLifecycle { _, event ->
-        when (event) {
-            Lifecycle.Event.ON_CREATE -> {
-                Log.d(TAG, "onCreate")
-            }
-            Lifecycle.Event.ON_START -> {
-                Log.d(TAG, "On Start")
-            }
-            Lifecycle.Event.ON_RESUME -> {
-                Log.d(TAG, "On Resume")
-            }
-            Lifecycle.Event.ON_PAUSE -> {
-                Log.d(TAG, "On Pause")
-            }
-            Lifecycle.Event.ON_STOP -> {
-                Log.d(TAG, "On Stop")
-            }
-            Lifecycle.Event.ON_DESTROY -> {
-                Log.d(TAG, "On Destroy")
-            }
-            else -> {}
-        }
-    }
     val permissionState =
         rememberMultiplePermissionsState(permissions = PermissionUtils.permissions)
     LaunchedEffect(key1 = permissionState.allPermissionsGranted) {
@@ -238,19 +199,21 @@ fun SwRow(
     click: () -> Unit,
     onConfig: (SwScreenData) -> Unit
 ){
+    val configuration = LocalConfiguration.current
+    val imageSize = (configuration.screenWidthDp.dp - 60.dp) / 4
     var image = item.swImageId
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape = MaterialTheme.shapes.small)
             .background(MyColors[item.bkColor]!!.backColor)
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .padding(horizontal = 10.dp, vertical = 10.dp)
     ){
         Row(
             Modifier.fillMaxWidth(),
             Arrangement.SpaceBetween,
             ){
-            Column {
+            Column(modifier = Modifier.size(width = imageSize*3,height = imageSize)) {
                 Text(
                     text = item.name,
                     color = MyColors[item.bkColor]!!.textColor,
@@ -273,7 +236,7 @@ fun SwRow(
                         R.drawable.open -> image = R.drawable.closing
                     }
                 }
-                .size(70.dp, 70.dp)
+                .size(imageSize, imageSize)
             )
         }
     }
@@ -292,7 +255,8 @@ fun ScreenPreview(value: Int = 2) {
         )
         2 -> ShowSwitches(
                 switches = listOf(
-                    SwScreenData("velador", "483fda877368", 2, "limon", R.drawable.close, "sin informacion"),
+                    SwScreenData("velador", "483fda877368", 2, "limon", R.drawable.close,
+                        "sin informacion o con muchisima informacion que taparia el dubujito del interruptor"),
                     SwScreenData("luz cocina", "98f4abb33d5a", 1, "lila", R.drawable.close, "sin informacion"),
                     SwScreenData("riego", "483fda878e46", 3, "pasto", R.drawable.close, "sin informacion"),
                     SwScreenData("alargue", "bcddc247dbc9", 5, "palta", R.drawable.close, "sin informacion"),

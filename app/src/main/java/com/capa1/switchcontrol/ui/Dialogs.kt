@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Check
@@ -1120,12 +1122,14 @@ fun MaintenanceDialog( //9
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                                 )
-                                Text(
-                                    text = id,
-                                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp),
-                                )
+                                SelectionContainer {
+                                    Text(
+                                        text = id,
+                                        style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp)
+                                    )
+                                }
                             }
                         }
                         Text(
@@ -1312,7 +1316,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 1) {
+fun ShowDialog(value: Int = 9) {
     //Column
     when (value) {
 
