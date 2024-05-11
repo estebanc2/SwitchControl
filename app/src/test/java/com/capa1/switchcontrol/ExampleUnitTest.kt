@@ -80,4 +80,12 @@ class ExampleUnitTest {
         mylist -= "uno"
         assert(mylist.size == 0)
     }
+    @Test
+    fun convertByte(){
+        val string = "feac3455ff"
+        val ss = string.substring(0,2).toInt(16)//.toUByte()//.toByte()
+        println(String.format("%d",ss))
+        val rr = ss.toString(16) + string.substring(2,string.length)
+        println(String.format("%s",rr))
+    }
 }

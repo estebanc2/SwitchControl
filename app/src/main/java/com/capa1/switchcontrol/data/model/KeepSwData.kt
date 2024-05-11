@@ -70,6 +70,13 @@ class KeepSwData @Inject constructor (
             }
             else -> {
                 swMap[id] =gson.fromJson(msg, EspData::class.java)
+                if(swMap[id]?.mode == SwMode.TIMERS_TEMP.ordinal){
+                    val tempId = (if(id.substring(0,2).toInt(16) == 255)
+                        254 else id.substring(0,2).toInt(16) + 1).toString(16) + id.substring(2,id.length)
+                    if (swList.indexOfFirst { it.id == tempId } == -1) {
+                        setSwWithId(tempId)
+                    }
+                }
                 swList [swList.indexOfFirst { it.id == id }].status = SwStatus.CONNECTED
             }
         }
@@ -85,7 +92,6 @@ class KeepSwData @Inject constructor (
     }
 
     override fun notifySubscribed(id: String) {
-        Log.i(TAG,"Subscribe success, id: $id")
         initSw(id)
     }
     override fun NotifyApData(myAp: ApData) {
@@ -157,8 +163,8 @@ class KeepSwData @Inject constructor (
         if(newData.row != data.row){
             swList.remove(data)
             swList.add(newData.row - 1, data)
-            swList.forEachIndexed { index, _  ->
-                swList[index].row = index + 1
+            swList.forEachIndexed { i, _  ->
+                swList[i].row = i + 1
             }
             aChange = true
         }
@@ -174,24 +180,21 @@ class KeepSwData @Inject constructor (
     }
     fun discoverSwitches(pass: String){
         espTouch.discover(currentSsid, currentBssid, pass)
-        Log.i(TAG,"la clave wifi es: $pass")
     }
 
     private fun refreshScreenInfo() {
-        //if (swList.size > 0){
-            val refreshList: MutableList<SwScreenData> = mutableListOf()
-            for (swData in swList){
-                refreshList += SwScreenData(
-                    name = swData.name,
-                    id = swData.id,
-                    row = swData.row,
-                    bkColor = swData.bkColor,
-                    swImageId = getSwImageId(swData.id),
-                    timerInfo = getLegend(swData.id)
-                )
-            }
-            coroutineScope.launch { swScreenList.emit(refreshList) }
-        //}
+        val refreshList: MutableList<SwScreenData> = mutableListOf()
+        for (swData in swList){
+            refreshList += SwScreenData(
+                name = swData.name,
+                id = swData.id,
+                row = swData.row,
+                bkColor = swData.bkColor,
+                swImageId = getSwImageId(swData.id),
+                timerInfo = getLegend(swData.id)
+            )
+        }
+        coroutineScope.launch { swScreenList.emit(refreshList) }
     }
 
     private fun isSet( days: Int, position: Int): Boolean {
@@ -205,7 +208,7 @@ class KeepSwData @Inject constructor (
         when (swMap[id]!!.mode) {
             SwMode.PULSE_NA.ordinal -> return "Pulso de ${swMap[id]!!.secs} segundos"
             SwMode.PULSE_NC.ordinal -> return "Pulso de ${swMap[id]!!.secs} segundos"
-            SwMode.TEMP.ordinal -> return "Enciende si temp < $${swMap[id]!!.tempX10 / 10}°"
+            SwMode.TEMP.ordinal -> return "Enciende si temp < ${swMap[id]!!.secs / 10}°"
             else -> {
                 if (swMap[id]!!.state != SwState.OFF.ordinal &&
                     swMap[id]!!.state != SwState.ON.ordinal
@@ -329,7 +332,6 @@ class KeepSwData @Inject constructor (
             for (sw in swList) {
                 if (sw.status == SwStatus.DISCONNECTED) {
                     initSw(sw.id)
-                    Log.i(TAG, "------- ${sw.id} esta DESCONECTADO")
                 }
             }
             for (id in newSw){

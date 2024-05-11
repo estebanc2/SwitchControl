@@ -1001,7 +1001,7 @@ fun ModeDialog( //8
                                     )
                                     if ((index == 2) || (index == 3)) {
                                         Text(
-                                            text = "seg.: ${secs}",
+                                            text = "seg.: $secs",
                                             style = TextStyle(fontSize = 14.sp),
                                             color = visible,
                                             modifier = Modifier.padding(
@@ -1014,7 +1014,7 @@ fun ModeDialog( //8
                                                 Icons.Default.KeyboardArrowUp,
                                                 contentDescription = "",
                                                 tint = visible,
-                                                modifier = Modifier.clickable { if (secs < 120) secs += 1 }
+                                                modifier = Modifier.clickable { if (secs < 250) secs += 1 }
                                             )
                                             Icon(
                                                 Icons.Default.KeyboardArrowDown,
@@ -1025,7 +1025,7 @@ fun ModeDialog( //8
                                         }
                                     } else if ((index == 4) || (index == 5)) {
                                         Text(
-                                            text = "grad.: ${secs}",
+                                            text = "grad.: ${secs/10}",
                                             style = TextStyle(fontSize = 14.sp),
                                             color = visible,
                                             modifier = Modifier.padding(
@@ -1038,13 +1038,13 @@ fun ModeDialog( //8
                                                 Icons.Default.KeyboardArrowUp,
                                                 contentDescription = "",
                                                 tint = visible,
-                                                modifier = Modifier.clickable { if (secs < 120) secs += 1 }
+                                                modifier = Modifier.clickable { if (secs < 120) secs += 10 }
                                             )
                                             Icon(
                                                 Icons.Default.KeyboardArrowDown,
                                                 contentDescription = "",
                                                 tint = visible,
-                                                modifier = Modifier.clickable { if (secs > 0) secs -= 1 }
+                                                modifier = Modifier.clickable { if (secs > 0) secs -= 10 }
                                             )
                                         }
                                     }
@@ -1316,7 +1316,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 9) {
+fun ShowDialog(value: Int = 8) {
     //Column
     when (value) {
 
