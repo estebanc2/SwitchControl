@@ -49,16 +49,17 @@ fun MainScreen(
     viewModel: SwViewModel = hiltViewModel()
 ) {
     val permissionState =
-        rememberMultiplePermissionsState(permissions = PermissionUtils.permissions)
-    LaunchedEffect(key1 = permissionState.allPermissionsGranted) {
+        rememberMultiplePermissionsState(permissions = PermissionUtils.permissions).allPermissionsGranted
+    LaunchedEffect(key1 = permissionState) {
         viewModel.start()
     }
     val activity = (LocalContext.current as? Activity)
-    NoPermissionDialog(show = !permissionState.allPermissionsGranted,
+    NoPermissionDialog(
+        show = !permissionState,
         onConfirm = { activity?.finish() }
     )
     AddSwDialog(
-        show = viewModel.showAdd,
+        show = viewModel.showAdd && permissionState,
         addSw = {viewModel.onShowNew(true)},
         addId = {viewModel.onShowNewId(true)},
         addAll = {viewModel.onShowAll(true)},

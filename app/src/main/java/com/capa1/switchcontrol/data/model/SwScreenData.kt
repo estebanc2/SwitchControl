@@ -1,7 +1,5 @@
 package com.capa1.switchcontrol.data.model
 
-import android.media.Image
-
 data class SwScreenData(
     val name: String,
     val id: String,

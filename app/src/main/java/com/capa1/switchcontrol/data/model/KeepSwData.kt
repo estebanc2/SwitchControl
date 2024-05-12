@@ -55,7 +55,6 @@ class KeepSwData @Inject constructor (
         val gson = Gson()
         when (id) {
             allSwId -> {
-                Log.i(TAG,"recibiendo: $msg")
                 val newFlashData = gson.fromJson(msg, FlashData::class.java)
                 swList = newFlashData.swList
                 saveData(swList)
@@ -83,7 +82,7 @@ class KeepSwData @Inject constructor (
                 swList [swList.indexOfFirst { it.id == id }].status = SwStatus.CONNECTED
             }
         }
-        Log.i(TAG, "Rx msg: $msg")
+        //Log.i(TAG, "Rx msg: $msg")
         refreshScreenInfo()
     }
 
@@ -182,7 +181,6 @@ class KeepSwData @Inject constructor (
     fun sendConfig(id: String) {
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.getFlashData.collect { flashData ->
-                Log.i(TAG,"enviando: $flashData")
                 mqttManager.publish(id, flashData)
             }
         }

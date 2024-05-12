@@ -24,10 +24,10 @@ object Global {
     )
     val MyColors: Map<String, MyColor> = mapOf(
         "nada"    to  MyColor(Color(0xFFFFFFFF), Color(0xFF000000)),
-        "limon"   to  MyColor(Color(0xFFFDD835), Color(0xFF000000)),
-        "pomelo"  to  MyColor(Color(0xFFFFAA00), Color(0xFF000000)),
+        "limon"   to  MyColor(Color(0xFFEBF37E), Color(0xFF000000)),
+        "pomelo"  to  MyColor(Color(0xFFF7CA61), Color(0xFF000000)),
         "naranja" to  MyColor(Color(0xFFFB8C00), Color(0xFF000000)),
-        "rosa"    to  MyColor(Color(0xFFFCA0C2), Color(0xFF000000)),
+        "rosa"    to  MyColor(Color(0xFFFAACC9), Color(0xFF000000)),
         "lila"    to  MyColor(Color(0xFFCA57E9), Color(0xFFFFFFFF)),
         "cielo"   to  MyColor(Color(0xFF85D0F5), Color(0xFF000000)),
         "mar"     to  MyColor(Color(0xFF4F66F5), Color(0xFFFFFFFF)),

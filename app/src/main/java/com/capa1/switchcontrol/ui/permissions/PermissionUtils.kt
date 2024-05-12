@@ -1,7 +1,6 @@
 package com.capa1.switchcontrol.ui.permissions
 
 import android.Manifest
-import android.os.Build
 
 object PermissionUtils {
     val permissions =
