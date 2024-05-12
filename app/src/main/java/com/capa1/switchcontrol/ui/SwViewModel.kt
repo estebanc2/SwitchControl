@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capa1.switchcontrol.R
@@ -92,6 +90,14 @@ class SwViewModel  @Inject constructor(
         }
     }
     fun imageClick(id: String){
+        /* // con esto se pone el dibujito de la transiscion pero no funciona. revisar si hay recomposicion
+        if (swScreenList [swScreenList.indexOfFirst { it.id == id }].swImageId == R.drawable.close) {
+            swScreenList [swScreenList.indexOfFirst { it.id == id }].swImageId = R.drawable.opening
+        }
+        if (swScreenList [swScreenList.indexOfFirst { it.id == id }].swImageId == R.drawable.open) {
+            swScreenList [swScreenList.indexOfFirst { it.id == id }].swImageId = R.drawable.closing
+        }
+        */
         keepSwData.imageClick(id)
     }
     fun saveConfig(){
@@ -172,6 +178,9 @@ class SwViewModel  @Inject constructor(
     fun addAllSw(id: String) {
         if(id != "0"){
             keepSwData.sendConfig(id)
+        }
+        else{
+            keepSwData.receiveConfig()
         }
         showAdd = false
         showAll = false

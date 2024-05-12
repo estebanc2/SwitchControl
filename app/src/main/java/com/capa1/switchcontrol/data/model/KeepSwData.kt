@@ -28,6 +28,7 @@ import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
+import kotlin.random.Random
 
 class KeepSwData @Inject constructor (
     context: Context
@@ -44,7 +45,7 @@ class KeepSwData @Inject constructor (
     private var currentSsid = ""
     private var currentBssid = ""
     var swMap = mutableMapOf<String, EspData>()
-    val allSwId = "abc12345678f"
+    val allSwId = Random.nextInt(9).toString() + "0123456789"+ Random.nextInt(9).toString()
     val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
     val myApData: MutableStateFlow<ApData> = MutableStateFlow(ApData("no conectado","", false))
     val touchState: MutableStateFlow<TouchState> = MutableStateFlow(TouchState.IN_PROGRESS)
@@ -54,9 +55,11 @@ class KeepSwData @Inject constructor (
         val gson = Gson()
         when (id) {
             allSwId -> {
+                Log.i(TAG,"recibiendo: $msg")
                 val newFlashData = gson.fromJson(msg, FlashData::class.java)
-                swList = newFlashData.swList.toMutableList()
+                swList = newFlashData.swList
                 saveData(swList)
+                mqttManager.unsubscribe(id)
                 initializeSwList()
             }
             newSwId -> {
@@ -92,7 +95,9 @@ class KeepSwData @Inject constructor (
     }
 
     override fun notifySubscribed(id: String) {
-        initSw(id)
+        if( id != allSwId){
+            initSw(id)
+        }
     }
     override fun NotifyApData(myAp: ApData) {
         coroutineScope.launch { myApData.emit(myAp) }
@@ -175,8 +180,12 @@ class KeepSwData @Inject constructor (
     }
 
     fun sendConfig(id: String) {
-        val allData = Global.gson.toJson( getStoredData())
-        mqttManager.publish(id,allData)
+        CoroutineScope(Dispatchers.IO).launch {
+            swDataStore.getFlashData.collect { flashData ->
+                Log.i(TAG,"enviando: $flashData")
+                mqttManager.publish(id, flashData)
+            }
+        }
     }
     fun discoverSwitches(pass: String){
         espTouch.discover(currentSsid, currentBssid, pass)
@@ -362,5 +371,11 @@ class KeepSwData @Inject constructor (
         localErase(id)
         mqttManager.publish(id, SEND_ERASE)
         mqttManager.unsubscribe(id)
+    }
+
+    fun receiveConfig() {
+        if (mqttUp) {
+            mqttManager.subscribeFromPhone(allSwId)
+        }
     }
 }

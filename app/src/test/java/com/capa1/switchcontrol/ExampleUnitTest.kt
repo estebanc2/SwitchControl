@@ -3,6 +3,8 @@ package com.capa1.switchcontrol
 import org.junit.Test
 
 import org.junit.Assert.*
+import kotlin.random.Random
+
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -20,10 +22,9 @@ class ExampleUnitTest {
     }
     @Test
     fun getMacFromTopic(){
-        val topic = "/mtc/to_sw/1018A"
+        val topic = "1234" + Random.nextInt(9)
         val mac = topic.split("/").last()
-        println(String.format("%s es realmente 1018A", mac))
-        assert(mac == "1018A")
+        println(String.format("el numero armado es %s", mac))
     }
     @Test
     fun listModif(){

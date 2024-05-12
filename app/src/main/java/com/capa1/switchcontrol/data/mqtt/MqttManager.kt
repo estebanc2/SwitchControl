@@ -69,7 +69,19 @@ class MqttManager @Inject constructor(
             e.printStackTrace()
         }
     }
-
+    fun subscribeFromPhone(id: String, qos: Int = 1) {
+        try {
+            mqttClient.subscribe(TO_SW + id, qos, null, object : IMqttActionListener {
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                    listener.notifySubscribed(id)
+                }
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                }
+            })
+        } catch (e: MqttException) {
+            e.printStackTrace()
+        }
+    }
     fun unsubscribe(id: String) {
         try {
             mqttClient.unsubscribe(FROM_SW + id, null, object : IMqttActionListener {

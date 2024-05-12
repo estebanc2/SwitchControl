@@ -2,7 +2,6 @@ package com.capa1.switchcontrol.ui
 
 import android.app.Activity
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,36 +23,25 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.MyColors
-import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.ui.permissions.PermissionUtils
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -199,9 +187,7 @@ fun SwRow(
     click: () -> Unit,
     onConfig: (SwScreenData) -> Unit
 ){
-    val configuration = LocalConfiguration.current
-    val imageSize = (configuration.screenWidthDp.dp - 60.dp) / 4
-    var image = item.swImageId
+    val imageSize = (LocalConfiguration.current.screenWidthDp.dp - 60.dp) / 4
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -226,16 +212,10 @@ fun SwRow(
                 )
             }
         Image(
-            painterResource(id = image),
+            painterResource(id = item.swImageId),
             contentDescription = "",
             Modifier
-                .clickable {
-                    click()
-                    when (image) {
-                        R.drawable.close -> image = R.drawable.opening
-                        R.drawable.open -> image = R.drawable.closing
-                    }
-                }
+                .clickable { click() }
                 .size(imageSize, imageSize)
             )
         }
@@ -247,17 +227,19 @@ fun SwRow(
     showBackground = true
 )
 @Composable
-fun ScreenPreview(value: Int = 2) {
+fun ScreenPreview(value: Int = 1) {
     when (value) {
         1 -> SwRow(
-                item = SwScreenData("luz cocina", "100AA56F", 1,"limon",  R.drawable.close_lock, "Cambia en mas de 24h"),
+                item = SwScreenData("luz cocina", "100AA56F", 1,"limon",
+                    R.drawable.close, "Cambia en mas de 24h"),
                 click = {}, {}
         )
         2 -> ShowSwitches(
                 switches = listOf(
                     SwScreenData("velador", "483fda877368", 2, "limon", R.drawable.close,
                         "sin informacion o con muchisima informacion que taparia el dubujito del interruptor"),
-                    SwScreenData("luz cocina", "98f4abb33d5a", 1, "lila", R.drawable.close, "sin informacion"),
+                    SwScreenData("luz cocina", "98f4abb33d5a", 1,
+                        "lila", R.drawable.close, "sin informacion"),
                     SwScreenData("riego", "483fda878e46", 3, "pasto", R.drawable.close, "sin informacion"),
                     SwScreenData("alargue", "bcddc247dbc9", 5, "palta", R.drawable.close, "sin informacion"),
                     SwScreenData("TV", "483fda879484", 4, "madera", R.drawable.close, "sin informacion")
