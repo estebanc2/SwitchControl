@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -28,6 +27,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Mode
 import androidx.compose.material.icons.filled.MoodBad
 import androidx.compose.material.icons.filled.PhonelinkErase
 import androidx.compose.material.icons.filled.Upgrade
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -59,7 +60,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,7 +72,6 @@ import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -356,10 +355,7 @@ fun NewIdDialog( //3: Boolean,
     setId: (String) -> Unit,
     onExit: () -> Unit
 ) {
-    val tokenValue = remember {
-        mutableStateOf(TextFieldValue())
-    }
-    if (show) {
+     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
                 shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
@@ -378,27 +374,26 @@ fun NewIdDialog( //3: Boolean,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
                         Spacer(modifier = Modifier.height(20.dp))
+                        var id by remember { mutableStateOf("") }
+
                         TextField(
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                             placeholder = { Text(text = "12 caracteres: 0..9 / a..f") },
-                            value = tokenValue.value,
+                            value = id,
                             singleLine = true,
                             maxLines = 1,
-                            onValueChange = {
-                                tokenValue.value = it
-                            }
+                            onValueChange = {id = it}
                         )
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
 
                             TextButton(
                                 onClick = {
-                                    val input = tokenValue.value.text
-                                    if (input.length != 12) {
+                                    if (id.length != 12) {
                                         return@TextButton
                                     }
-                                    setId(input)
+                                    setId(id)
                                 },
                             ) {
                                 Icon(
@@ -431,9 +426,6 @@ fun NewAllDialog( //4
     setId: (String) -> Unit,
     onExit: () -> Unit
 ) {
-    val tokenValue = remember {
-        mutableStateOf(TextFieldValue())
-    }
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
@@ -443,14 +435,14 @@ fun NewAllDialog( //4
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                        modifier = Modifier.padding(10.dp),
+                        //verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
                             text = "COPIAR TODO DE/A OTRO MOVIL",
                             style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                         )
                         Text(
                             text = "Para recibir la configuración completa de otro movil, pasale este código: $allSwId",
@@ -458,40 +450,46 @@ fun NewAllDialog( //4
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
-                        Spacer(modifier = Modifier.height(20.dp))
                         Text(
                             text = "Para enviar la configuración completa a otro movil, anota su código",
                             style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                         )
+                        var id by remember { mutableStateOf("") }
                         TextField (
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                             placeholder = { Text(text = "12 caracteres: 0..9 / a..f") },
-                            value = tokenValue.value,
+                            value = id,
                             singleLine = true,
                             maxLines = 1,
-                            onValueChange = {
-                                tokenValue.value = it
-                            }
+                            onValueChange = { id = it }
                         )
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                             TextButton(
                                 onClick = {
-                                    val input = tokenValue.value.text
-                                    if (input.length != 12) {
+                                    if (id.length != 12) {
                                         return@TextButton
                                     }
-                                    setId(input)
+                                    setId(id)
                                 },
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Default.Upload,
                                     contentDescription = "",
                                 )
-                                Text(text = "aceptar")
+                                Text(text = "enviar")
+                            }
+                            TextButton(
+                                onClick = {setId("0")},
+                            ) {
+                                Icon(
+                                    Icons.Default.Download,
+                                    contentDescription = "",
+                                )
+                                Text(text = "recibir")
                             }
                             TextButton(
                                 onClick = { onExit() },
@@ -516,9 +514,6 @@ fun NameDialog( //5
     setName: (String) -> Unit,
     onExit: () -> Unit
 ) {
-    val tokenValue = remember {
-        mutableStateOf(TextFieldValue())
-    }
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
@@ -528,7 +523,7 @@ fun NameDialog( //5
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
@@ -537,29 +532,21 @@ fun NameDialog( //5
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
-                        Spacer(modifier = Modifier.height(20.dp))
+                        var name by remember { mutableStateOf(currentName) }
                         TextField (
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                            placeholder = {
-                                Text(
-                                    text = " $currentName ",
-                                    style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                                )
-                            },
-                            value = tokenValue.value,
+                            value = name,
                             singleLine = true,
                             maxLines = 1,
-                            onValueChange = {
-                                tokenValue.value = it
-                            }
+                            onValueChange = { name = it }
                         )
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                             TextButton(
                                 onClick = {
-                                    val input = tokenValue.value.text
-                                    setName(input)
+
+                                    setName(name)
                                 },
                             ) {
                                 Icon(
@@ -963,12 +950,12 @@ fun ModeDialog( //8
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
                             text = "MODO DE FUNCIONAMIENTO",
-                            style = TextStyle(fontSize = 18.sp),
+                            style = TextStyle(fontSize = 20.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
@@ -990,22 +977,22 @@ fun ModeDialog( //8
                                         tint = visible
                                     )
                                     Text(label,
-                                        style = TextStyle(fontSize = 14.sp),
+                                        style = TextStyle(fontSize = 18.sp),
                                         color = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier
                                             .padding(
                                                 horizontal = 8.dp,
-                                                vertical = 10.dp
+                                                vertical = 8.dp
                                             )
                                             .clickable { mode = index }
                                     )
                                     if ((index == 2) || (index == 3)) {
                                         Text(
                                             text = "seg.: $secs",
-                                            style = TextStyle(fontSize = 14.sp),
+                                            style = TextStyle(fontSize = 18.sp),
                                             color = visible,
                                             modifier = Modifier.padding(
-                                                horizontal = 16.dp,
+                                                horizontal = 8.dp,
                                                 vertical = 0.dp
                                             ),
                                         )
@@ -1026,7 +1013,7 @@ fun ModeDialog( //8
                                     } else if ((index == 4) || (index == 5)) {
                                         Text(
                                             text = "grad.: ${secs/10}",
-                                            style = TextStyle(fontSize = 14.sp),
+                                            style = TextStyle(fontSize = 18.sp),
                                             color = visible,
                                             modifier = Modifier.padding(
                                                 horizontal = 16.dp,
@@ -1316,7 +1303,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 8) {
+fun ShowDialog(value: Int = 9) {
     //Column
     when (value) {
 

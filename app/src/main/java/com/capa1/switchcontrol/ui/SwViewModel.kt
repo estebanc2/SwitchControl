@@ -170,7 +170,9 @@ class SwViewModel  @Inject constructor(
         showAll = show
     }
     fun addAllSw(id: String) {
-        keepSwData.sendConfig(id)
+        if(id != "0"){
+            keepSwData.sendConfig(id)
+        }
         showAdd = false
         showAll = false
     }

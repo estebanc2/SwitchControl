@@ -307,7 +307,10 @@ class KeepSwData @Inject constructor (
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.getFlashData.collect { flashData ->
                 val gson = Gson()
-                swList = gson.fromJson(flashData, FlashData::class.java).swList
+                val stored = gson.fromJson(flashData, FlashData::class.java)
+                if (stored != null){
+                    swList = stored.swList
+                }
                 if (swList.size == 0) {
                     coroutineScope.launch {starter.emit(true) }
                 }
