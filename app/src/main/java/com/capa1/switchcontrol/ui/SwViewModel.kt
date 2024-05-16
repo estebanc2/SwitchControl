@@ -12,6 +12,7 @@ import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.ConfigurableData
 import com.capa1.switchcontrol.data.model.KeepSwData
 import com.capa1.switchcontrol.data.model.SwScreenData
+import com.capa1.switchcontrol.data.model.SwState
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
@@ -39,7 +40,7 @@ class SwViewModel  @Inject constructor(
         private set
     var showAll by mutableStateOf (false)
         private set
-    var showUpgrading by mutableStateOf (false)
+    var upgrading by mutableStateOf (0)
         private set
     val allSwId = keepSwData.allSwId
     var myAp by mutableStateOf (ApData(""," ",false))
@@ -65,11 +66,20 @@ class SwViewModel  @Inject constructor(
     }
     private fun subscribeToChanges() {
         viewModelScope.launch {
+            keepSwData.upgradeState.collect { result ->
+                when (result){
+                    SwState.UPGRADED.ordinal -> showMaintenance = false
+                    SwState.SERVER_FAIL.ordinal,
+                    SwState.UPGRADE_FAIL.ordinal->upgrading = result
+                }
+            }
+        }
+        viewModelScope.launch {
             keepSwData.swScreenList.collect { result ->
                 swScreenList = result
             }
         }
-         viewModelScope.launch {
+        viewModelScope.launch {
             keepSwData.myApData.collect { result ->
                 myAp = result
             }
@@ -189,9 +199,7 @@ class SwViewModel  @Inject constructor(
         showMaintenance = show
     }
     fun upgrade(server: String, port: String) {
-        keepSwData.upgrade(server, port)
-        showMaintenance = false
-        showUpgrading = true
+        keepSwData.upgrade(id, server, port)
     }
     fun localErase(){
         keepSwData.localErase(id)

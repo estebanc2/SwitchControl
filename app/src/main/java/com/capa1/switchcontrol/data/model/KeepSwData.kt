@@ -5,6 +5,7 @@ import android.util.Log
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.Global.FLASH_VERSION
+import com.capa1.switchcontrol.data.Global.NO_TIMERS
 import com.capa1.switchcontrol.data.Global.SEND_ERASE
 import com.capa1.switchcontrol.data.Global.SEND_GET
 import com.capa1.switchcontrol.data.Global.SEND_OFF
@@ -39,6 +40,7 @@ class KeepSwData @Inject constructor (
     private var swList = mutableListOf<SwData>()
     private var newSw = mutableListOf<String>()
     private var newSwId = ""
+    private var upgradingId = ""
     private val swDataStore = SwDataStore(context)
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private var mqttUp = false
@@ -50,6 +52,7 @@ class KeepSwData @Inject constructor (
     val myApData: MutableStateFlow<ApData> = MutableStateFlow(ApData("no conectado","", false))
     val touchState: MutableStateFlow<TouchState> = MutableStateFlow(TouchState.IN_PROGRESS)
     val starter: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val upgradeState: MutableStateFlow<Int>  = MutableStateFlow(SwState.UPGRADE.ordinal)
 
     override fun notifyNewMessage(id: String, msg: String) {
         val gson = Gson()
@@ -70,6 +73,11 @@ class KeepSwData @Inject constructor (
                 saveData(swList)
                 //initializeSwList()
             }
+            upgradingId ->{
+                upgradingId = ""
+                val result = gson.fromJson(msg, EspData::class.java).state
+                coroutineScope.launch {upgradeState.emit(result) }
+            }
             else -> {
                 swMap[id] =gson.fromJson(msg, EspData::class.java)
                 if(swMap[id]?.mode == SwMode.TIMERS_TEMP.ordinal){
@@ -82,7 +90,7 @@ class KeepSwData @Inject constructor (
                 swList [swList.indexOfFirst { it.id == id }].status = SwStatus.CONNECTED
             }
         }
-        //Log.i(TAG, "Rx msg: $msg")
+        Log.i(TAG, "Rx msg: $msg")
         refreshScreenInfo()
     }
 
@@ -354,8 +362,17 @@ class KeepSwData @Inject constructor (
         mqttManager.publish(id, SEND_GET)
     }
 
-    fun upgrade(server: String, port: String) {
-        Log.i(TAG,"server: $server, port: $port")
+    fun upgrade(id: String, server: String, port: String) {
+        upgradingId = id
+        val setData = Global.gson.toJson( EspData(
+            name = server,
+            state = SwState.UPGRADE.ordinal,
+            mode = 0,
+            secs = port.toInt(),
+            prgs = NO_TIMERS,
+            tempX10 = 0
+        ))
+        mqttManager.publish(id,setData)
     }
     fun localErase(id: String){
         swList.removeIf{it.id == id}

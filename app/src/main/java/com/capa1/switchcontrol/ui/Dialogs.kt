@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
@@ -60,6 +61,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,6 +70,7 @@ import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.SwMode
+import com.capa1.switchcontrol.data.model.SwState
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
@@ -1025,7 +1028,7 @@ fun ModeDialog( //8
                                                 Icons.Default.KeyboardArrowUp,
                                                 contentDescription = "",
                                                 tint = visible,
-                                                modifier = Modifier.clickable { if (secs < 120) secs += 10 }
+                                                modifier = Modifier.clickable { if (secs < 220) secs += 10 }
                                             )
                                             Icon(
                                                 Icons.Default.KeyboardArrowDown,
@@ -1068,13 +1071,14 @@ fun ModeDialog( //8
 fun MaintenanceDialog( //9
     show: Boolean,
     id: String,
+    upgrading: Int,
     upgrade: (Pair<String, String>) -> Unit,
     name:String,
     local: ()->Unit,
     full: ()->Unit,
     onExit: () -> Unit
 ) {
-
+    var showProgress by remember { mutableStateOf(false) }
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
@@ -1167,11 +1171,49 @@ fun MaintenanceDialog( //9
                                     value = port,
                                     singleLine = true,
                                     maxLines = 1,
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     onValueChange = { port = it }
                                 )
                             }
+                            when(upgrading){
+                                SwState.SERVER_FAIL.ordinal->{
+                                    Text(
+                                        text = "Revisa server/port y reintenta",
+                                        style = TextStyle(fontSize = 16.sp),
+                                        color = Color.Red,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 10.dp),
+                                    )
+                                    showProgress = false
+                                }
+                                SwState.UPGRADE_FAIL.ordinal->{
+                                    Text(
+                                        text = "falla al hacer el upgrade",
+                                        style = TextStyle(fontSize = 16.sp),
+                                        color = Color.Red,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 10.dp),
+                                    )
+                                    showProgress = false
+                                }
+                                else->{}
+                            }
+                            if(showProgress) {
+                                LinearProgressIndicator(
+                                    //progress = 0.7f,
+                                    modifier = Modifier
+                                        .padding(horizontal = 10.dp)
+                                        .fillMaxWidth()
+                                        .height(8.dp)
+                                        .clip(RoundedCornerShape(16.dp))
+                                )
+                            }
                             ElevatedButton(
-                                onClick = { upgrade(Pair(server, port)) },
+                                onClick = {
+                                    upgrade(Pair(server, port))
+                                          showProgress = true},
                                 Modifier.padding(start = 0.dp,
                                     top = 10.dp, end = 0.dp, bottom = 0.dp)
                             ) {
@@ -1282,7 +1324,9 @@ fun MaintenanceDialog( //9
 
                             }
                             TextButton(
-                                onClick = { onExit() },
+                                onClick = {
+                                    showProgress = false
+                                    onExit() },
                             ) {
                                 Icon(
                                     Icons.Default.Close,
@@ -1315,6 +1359,6 @@ fun ShowDialog(value: Int = 9) {
         6 -> ColorDialog(true, "cielo", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
         8 -> ModeDialog(true, 4, 10, {  }, {})
-        9 -> MaintenanceDialog(true, "1234", {},"luz cocina", {},{},{})
+        9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, {},"luz cocina", {},{},{})
     }
 }

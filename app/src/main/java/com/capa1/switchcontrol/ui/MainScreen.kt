@@ -111,6 +111,7 @@ fun MainScreen(
     MaintenanceDialog(
         show = viewModel.showMaintenance,
         id = viewModel.id,
+        upgrading = viewModel.upgrading,
         upgrade = {pair -> viewModel.upgrade(pair.first, pair.second)},
         name = viewModel.configurableData.name,
         local = {viewModel.localErase()},
