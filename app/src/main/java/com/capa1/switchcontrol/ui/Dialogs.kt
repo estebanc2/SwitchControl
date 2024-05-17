@@ -1072,6 +1072,8 @@ fun MaintenanceDialog( //9
     show: Boolean,
     id: String,
     upgrading: Int,
+    lastServer: String,
+    lastPort: String,
     upgrade: (Pair<String, String>) -> Unit,
     name:String,
     local: ()->Unit,
@@ -1079,6 +1081,8 @@ fun MaintenanceDialog( //9
     onExit: () -> Unit
 ) {
     var showProgress by remember { mutableStateOf(false) }
+    var server by remember { mutableStateOf(lastServer) }
+    var port by remember { mutableStateOf(lastPort) }
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
@@ -1130,8 +1134,6 @@ fun MaintenanceDialog( //9
                             modifier = Modifier.padding(start = 0.dp,
                                 top = 15.dp, end = 0.dp, bottom = 0.dp),
                         )
-                        var server by remember { mutableStateOf("") }
-                        var port by remember { mutableStateOf("") }
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -1176,6 +1178,9 @@ fun MaintenanceDialog( //9
                                 )
                             }
                             when(upgrading){
+                                SwState.UPGRADE.ordinal->{
+                                    showProgress = true
+                                }
                                 SwState.SERVER_FAIL.ordinal->{
                                     Text(
                                         text = "Revisa server/port y reintenta",
@@ -1198,6 +1203,16 @@ fun MaintenanceDialog( //9
                                     )
                                     showProgress = false
                                 }
+                                SwState.UPGRADED.ordinal->{
+                                    Text(
+                                        text = "firmware actualizado!",
+                                        style = TextStyle(fontSize = 16.sp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 10.dp),
+                                    )
+                                    showProgress = false
+                                }
                                 else->{}
                             }
                             if(showProgress) {
@@ -1211,11 +1226,7 @@ fun MaintenanceDialog( //9
                                 )
                             }
                             ElevatedButton(
-                                onClick = {
-                                    upgrade(Pair(server, port))
-                                          showProgress = true},
-                                Modifier.padding(start = 0.dp,
-                                    top = 10.dp, end = 0.dp, bottom = 0.dp)
+                                onClick = { upgrade(Pair(server, port)) },
                             ) {
                                 Icon(
                                     Icons.Default.Upgrade,
@@ -1359,6 +1370,6 @@ fun ShowDialog(value: Int = 9) {
         6 -> ColorDialog(true, "cielo", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
         8 -> ModeDialog(true, 4, 10, {  }, {})
-        9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, {},"luz cocina", {},{},{})
+        9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, "", "", {},"luz cocina", {},{},{})
     }
 }

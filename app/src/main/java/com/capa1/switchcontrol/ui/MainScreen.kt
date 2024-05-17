@@ -112,6 +112,8 @@ fun MainScreen(
         show = viewModel.showMaintenance,
         id = viewModel.id,
         upgrading = viewModel.upgrading,
+        lastServer = viewModel.server,
+        lastPort = viewModel.port,
         upgrade = {pair -> viewModel.upgrade(pair.first, pair.second)},
         name = viewModel.configurableData.name,
         local = {viewModel.localErase()},

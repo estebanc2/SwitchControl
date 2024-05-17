@@ -25,6 +25,8 @@ class SwViewModel  @Inject constructor(
     private val keepSwData: KeepSwData
 ) : ViewModel() {
     var id = ""
+    var server = ""
+    var port = ""
     var swState = false
     var showName by mutableStateOf (false)
         private set
@@ -67,11 +69,7 @@ class SwViewModel  @Inject constructor(
     private fun subscribeToChanges() {
         viewModelScope.launch {
             keepSwData.upgradeState.collect { result ->
-                when (result){
-                    SwState.UPGRADED.ordinal -> showMaintenance = false
-                    SwState.SERVER_FAIL.ordinal,
-                    SwState.UPGRADE_FAIL.ordinal->upgrading = result
-                }
+                upgrading = result
             }
         }
         viewModelScope.launch {
@@ -199,6 +197,8 @@ class SwViewModel  @Inject constructor(
         showMaintenance = show
     }
     fun upgrade(server: String, port: String) {
+        this.server = server
+        this.port = port
         keepSwData.upgrade(id, server, port)
     }
     fun localErase(){

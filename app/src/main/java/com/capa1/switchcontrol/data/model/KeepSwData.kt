@@ -52,7 +52,7 @@ class KeepSwData @Inject constructor (
     val myApData: MutableStateFlow<ApData> = MutableStateFlow(ApData("no conectado","", false))
     val touchState: MutableStateFlow<TouchState> = MutableStateFlow(TouchState.IN_PROGRESS)
     val starter: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val upgradeState: MutableStateFlow<Int>  = MutableStateFlow(SwState.UPGRADE.ordinal)
+    val upgradeState: MutableStateFlow<Int>  = MutableStateFlow(0)
 
     override fun notifyNewMessage(id: String, msg: String) {
         val gson = Gson()
@@ -74,9 +74,12 @@ class KeepSwData @Inject constructor (
                 //initializeSwList()
             }
             upgradingId ->{
-                upgradingId = ""
                 val result = gson.fromJson(msg, EspData::class.java).state
+                Log.i(TAG,"during upgrade receive a state: $result")
                 coroutineScope.launch {upgradeState.emit(result) }
+                if (result == SwState.UPGRADED.ordinal){
+                    upgradingId = ""
+                }
             }
             else -> {
                 swMap[id] =gson.fromJson(msg, EspData::class.java)
@@ -363,6 +366,7 @@ class KeepSwData @Inject constructor (
     }
 
     fun upgrade(id: String, server: String, port: String) {
+        coroutineScope.launch {upgradeState.emit(SwState.UPGRADE.ordinal) }
         upgradingId = id
         val setData = Global.gson.toJson( EspData(
             name = server,
