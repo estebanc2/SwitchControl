@@ -38,14 +38,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.data.Global
-import com.capa1.switchcontrol.data.model.ConfigurableData
+import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.data.model.SwMode
+import com.capa1.switchcontrol.data.model.SwState
+import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 
 @Composable
 fun ConfigScreen(
     qty: Int,
     swState: Boolean,
-    data: ConfigurableData,
+    data: SwData,
     changeName: () -> Unit,
     changeColor: ()-> Unit,
     changeRow: (Int) -> Unit,
@@ -332,7 +335,8 @@ fun ShowConfigPreview()
     ConfigScreen(
         qty = 5,
         swState = true,
-        data = ConfigurableData("luz cocina", 0, 0, Global.NO_TIMERS, "nada", 2),
+        data = SwData("luz cocina", SwState.OFF, SwMode.TIMERS, 0, Global.NO_TIMERS,
+            "nada", 2, SwStatus.CONNECTED, 10),
         changeName = {},
         changeColor = {},
         changeRow = {},

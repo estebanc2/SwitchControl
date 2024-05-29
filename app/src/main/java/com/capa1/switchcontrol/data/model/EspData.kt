@@ -8,3 +8,16 @@ data class EspData(
     val prgs: MutableList<WeeklyProgram>,
     val tempX10:Int
 )
+data class WeeklyProgram(
+    val start: Int,
+    val stop: Int,
+    val days: Int
+)
+enum class SwMode {
+    TIMERS,
+    TIMERS_CONTACT,
+    PULSE_NA,
+    PULSE_NC,
+    TIMERS_TEMP,
+    TEMP
+}

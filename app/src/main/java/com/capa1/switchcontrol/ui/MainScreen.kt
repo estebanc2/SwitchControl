@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -43,7 +42,7 @@ import com.capa1.switchcontrol.ui.permissions.PermissionUtils
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainScreen(
     viewModel: SwViewModel = hiltViewModel()
@@ -85,26 +84,26 @@ fun MainScreen(
     )
     NameDialog(
         show = viewModel.showName,
-        currentName = viewModel.configurableData.name ,
+        currentName = viewModel.swData.name ,
         setName = {name -> viewModel.newName(name)},
         onExit = {viewModel.onShowName(false)}
     )
     ColorDialog(
         show = viewModel.showColor,
-        currentColor = viewModel.configurableData.bkColor,
+        currentColor = viewModel.swData.bkColor,
         setColor = {color -> viewModel.newColor(color)},
         exit = {viewModel.onShowColor(false)}
     )
     TimerDialog(
         show = viewModel.showTimer,
-        currentWP = viewModel.configurableData.prgs[viewModel.currentTimer],
+        currentWP = viewModel.swData.prgs[viewModel.currentTimer],
         setTimer = {timer -> viewModel.newTimer(timer)},
         onExit = {viewModel.onShowTimer(0,false)}
     )
     ModeDialog(
         show = viewModel.showMode,
-        currentMode = viewModel.configurableData.mode,
-        currentSecs = viewModel.configurableData.secs,
+        currentMode = viewModel.swData.mode,
+        currentSecs = viewModel.swData.secs,
         setMode = {pair -> viewModel.setMode(pair.first, pair.second)},
         onExit = {viewModel.onShowMode(false)}
     )
@@ -115,7 +114,7 @@ fun MainScreen(
         lastServer = viewModel.server,
         lastPort = viewModel.port,
         upgrade = {pair -> viewModel.upgrade(pair.first, pair.second)},
-        name = viewModel.configurableData.name,
+        name = viewModel.swData.name,
         local = {viewModel.localErase()},
         full = {viewModel.fullErase()},
         onExit = {viewModel.onShowMaintenance(false)}
@@ -134,7 +133,7 @@ fun MainScreen(
             ConfigScreen (
                 qty = viewModel.swScreenList.size,
                 swState = viewModel.swState,
-                data = viewModel.configurableData,
+                data = viewModel.swData,
                 changeName = {viewModel.onShowName(true)},
                 changeColor = {viewModel.onShowColor(true)},
                 changeRow = { pos -> viewModel.changeRow(pos)},

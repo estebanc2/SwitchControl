@@ -41,7 +41,6 @@ import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -934,13 +933,12 @@ fun TimerDialog( //7
         }
     }
 }
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModeDialog( //8
     show: Boolean,
-    currentMode:Int,
+    currentMode:SwMode,
     currentSecs: Int,
-    setMode: (Pair<Int,Int>) -> Unit,
+    setMode: (Pair<SwMode,Int>) -> Unit,
     onExit: () -> Unit
 ) {
 
@@ -970,7 +968,7 @@ fun ModeDialog( //8
                             options += eachMode.name
                         }
                         options.forEachIndexed { index, label ->
-                            val visible = if (index != mode) Color(0xFFEEEEEA)
+                            val visible = if (index != mode.ordinal) Color(0xFFEEEEEA)
                                         else MaterialTheme.colorScheme.primary
                             Column {
                                 Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
@@ -987,7 +985,7 @@ fun ModeDialog( //8
                                                 horizontal = 8.dp,
                                                 vertical = 8.dp
                                             )
-                                            .clickable { mode = index }
+                                            .clickable { mode = SwMode.entries.toTypedArray()[index] }
                                     )
                                     if ((index == 2) || (index == 3)) {
                                         Text(
@@ -1358,7 +1356,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 9) {
+fun ShowDialog(value: Int = 7) {
     //Column
     when (value) {
 
@@ -1369,7 +1367,7 @@ fun ShowDialog(value: Int = 9) {
         5 -> NameDialog(true, "luz cocina", {""}, {})
         6 -> ColorDialog(true, "cielo", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
-        8 -> ModeDialog(true, 4, 10, {  }, {})
+        8 -> ModeDialog(true, SwMode.TEMP, 10, {  }, {})
         9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, "", "", {},"luz cocina", {},{},{})
     }
 }

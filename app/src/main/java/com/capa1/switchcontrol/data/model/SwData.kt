@@ -2,13 +2,28 @@ package com.capa1.switchcontrol.data.model
 
 data class SwData(
     var name: String,
-    val id: String,
+    var state: SwState,
+    var mode: SwMode,
+    var secs: Int,
+    var prgs: MutableList<WeeklyProgram>,
+    var bkColor: String,
     var row: Int,
-    var bkColor: String = "nada",
-    var status: SwStatus
+    var status: SwStatus,
+    var tempX10: Int
 )
 enum class SwStatus {
     CONNECTED,
     DISCONNECTED,
     CONNECTING
+}
+enum class SwState {
+    OFF,
+    ON,
+    GET_DATA,
+    SET_DATA,
+    ERASE,
+    UPGRADE,
+    SERVER_FAIL,
+    UPGRADE_FAIL,
+    UPGRADED
 }

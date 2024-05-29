@@ -9,10 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.NO_TIMERS
 import com.capa1.switchcontrol.data.Global.TAG
-import com.capa1.switchcontrol.data.model.ConfigurableData
 import com.capa1.switchcontrol.data.model.KeepSwData
+import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.SwState
+import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
@@ -59,7 +61,8 @@ class SwViewModel  @Inject constructor(
         private set
     var touchProgress by mutableStateOf (TouchState.IN_PROGRESS)
         private set
-    var configurableData by mutableStateOf (ConfigurableData("", 0, 0, NO_TIMERS, "nada", 2))
+    var swData by mutableStateOf (SwData("", SwState.OFF, SwMode.TIMERS, 0, 
+        NO_TIMERS, "nada", 2, SwStatus.DISCONNECTED, 0))
         private set
 
     fun start(){
@@ -109,7 +112,7 @@ class SwViewModel  @Inject constructor(
         keepSwData.imageClick(id)
     }
     fun saveConfig(){
-        keepSwData.configUpgrade(configurableData, id)
+        keepSwData.configUpgrade(swData, id)
         goConfig = false
     }
     fun exitConfig(){
@@ -118,34 +121,27 @@ class SwViewModel  @Inject constructor(
     fun onConfig(show: Boolean, item: SwScreenData) {
         id = item.id
         swState = item.swImageId != R.drawable.no_info
-        configurableData = ConfigurableData(
-            item.name,
-            keepSwData.swMap[item.id]?.mode ?: 0,
-            keepSwData.swMap[item.id]?.secs ?: 0,
-            (keepSwData.swMap[item.id]?.prgs ?: NO_TIMERS).toMutableList(),
-            item.bkColor,
-            item.row
-        )
+        swData = keepSwData.swMap[id]!!
         goConfig = show
     }
     fun newName(name: String){
-        configurableData.name = name
+        swData.name = name
         showName = false
     }
     fun newColor(color: String){
-        configurableData.bkColor = color
+        swData.bkColor = color
     }
     fun changeRow(pos: Int) {
-        configurableData.row += pos
-        Log.i(TAG,"row: [${configurableData.row}]")
+        swData.row += pos
+        Log.i(TAG,"row: [${swData.row}]")
     }
     fun newTimer(newPrg: WeeklyProgram){
-        configurableData.prgs[currentTimer] = newPrg
+        swData.prgs[currentTimer] = newPrg
         showTimer = false
     }
-    fun setMode(mode: Int, secs: Int) {
-        configurableData.mode = mode
-        configurableData.secs = secs
+    fun setMode(mode: SwMode, secs: Int) {
+        swData.mode = mode
+        swData.secs = secs
         showMode = false
     }
     fun setPass(pass: String) {

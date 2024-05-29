@@ -20,11 +20,11 @@ class EspTouch @Inject constructor(
         var success = false
         val task = EsptouchTask(ssid, bssid, pass, context)
         val timeOut = ScheduledThreadPoolExecutor(1)
-        listener.NotifyTouch("", TouchState.IN_PROGRESS)
+        listener.notifyTouch("", TouchState.IN_PROGRESS)
         timeOut.schedule({
             Log.i(TAG, "timeout.................")
             if (!success){
-                listener.NotifyTouch("", TouchState.TIMEOUT)
+                listener.notifyTouch("", TouchState.TIMEOUT)
                 task.interrupt()
             }
         }, ESPTOUCH_WAIT_IN_SECS, TimeUnit.SECONDS)
@@ -33,7 +33,7 @@ class EspTouch @Inject constructor(
             val newId: String = result.bssid
             success = true
             Log.i(TAG, "newId: [$newId]")
-            listener.NotifyTouch(newId,TouchState.READY)
+            listener.notifyTouch(newId,TouchState.READY)
         }
         val workerPool: ExecutorService = Executors.newSingleThreadExecutor()
         workerPool.submit {
@@ -49,4 +49,10 @@ class EspTouch @Inject constructor(
             }
         }
     }
+}
+
+enum class TouchState {
+    READY,
+    TIMEOUT,
+    IN_PROGRESS
 }
