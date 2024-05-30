@@ -37,7 +37,7 @@ class KeepSwData @Inject constructor (
     private val mqttManager = MqttManager(this)
     private val wifiCredentials = WifiCredentials(context, this)
     private val espTouch = EspTouch(context, this)
-    private var newSw = mutableListOf<String>()
+    private val newSw = mutableListOf<String>()
     private var newSwId = ""
     private var upgradingId = ""
     private val swDataStore = SwDataStore(context)
@@ -90,20 +90,22 @@ class KeepSwData @Inject constructor (
             }
             else -> {
                 val esp = gson.fromJson(msg, EspData::class.java)
-                swMap[id] = SwData( esp.name,
-                                    SwState.entries[esp.state],
-                                    SwMode.entries[esp.mode],
-                                    esp.secs,
-                                    esp.prgs,
-                                    swMap[id]!!.bkColor,
-                                    swMap[id]!!.row,
-                                    SwStatus.CONNECTED,
-                                    esp.tempX10)
-                if(swMap[id]!!.mode == SwMode.TIMERS_TEMP) {
-                    val tempId = (if(id.substring(0,2).toInt(16) == 255)
-                        254 else id.substring(0,2).toInt(16) + 1).toString(16) + id.substring(2,id.length)
-                    if (!swMap.contains(tempId)) {
-                        setSwWithId(tempId)
+                if(swMap[id] != null){
+                    swMap[id] = SwData( esp.name,
+                        SwState.entries[esp.state],
+                        SwMode.entries[esp.mode],
+                        esp.secs,
+                        esp.prgs,
+                        swMap[id]!!.bkColor,
+                        swMap[id]!!.row,
+                        SwStatus.CONNECTED,
+                        esp.tempX10)
+                    if(swMap[id]!!.mode == SwMode.TIMERS_TEMP) {
+                        val tempId = (if(id.substring(0,2).toInt(16) == 255)
+                            254 else id.substring(0,2).toInt(16) + 1).toString(16) + id.substring(2,id.length)
+                        if (!swMap.contains(tempId)) {
+                            setSwWithId(tempId)
+                        }
                     }
                 }
             }
@@ -166,55 +168,47 @@ class KeepSwData @Inject constructor (
     }
     fun configUpgrade(newData: SwData, id: String){
         Log.i(TAG,"llega ${newData.name} al keepSwData con bkcolor ${newData.bkColor}")
-        Log.i(TAG,"y se comparara con el bkcolor ${swMap[id]!!.bkColor} que ya estaba en el map")
-        if (newData.name != swMap[id]!!.name ||
-            newData.prgs != swMap[id]!!.prgs ||
-            newData.mode != swMap[id]!!.mode ||
-            newData.secs != swMap[id]!!.secs){
-            val setData = Global.gson.toJson( EspData(
-                newData.name,
-                SwState.SET_DATA.ordinal,
-                newData.mode.ordinal,
-                newData.secs,
-                newData.prgs,
-                swMap[id]!!.tempX10))
-            mqttManager.publish(id,setData)
-            Log.i(TAG,"CAMBIO!! id: $id, values: $setData")
-        }
-        var aChange = false
-        if(newData.name != swMap[id]!!.name){
-            swMap[id]!!.name = newData.name
-            aChange = true
-        }
-        if(newData.bkColor != swMap[id]!!.bkColor){
-            swMap[id]!!.bkColor = newData.bkColor
-            aChange = true
-        }
-        val oldRow = swMap[id]!!.row
-        if(oldRow > newData.row) {
-            swMap.forEach { (id, swData) ->
-                if (swData.row < oldRow && swData.row >= newData.row) {
-                    swMap[id]!!.row += 1
+        Log.i(TAG,"y se comparara con el bkcolor ${swMap[id]?.bkColor} que ya estaba en el map")
+        val currentSwData = swMap[id]
+        if (currentSwData != null) {
+            if (newData.name != currentSwData.name ||
+                newData.prgs != currentSwData.prgs ||
+                newData.mode != currentSwData.mode ||
+                newData.secs != currentSwData.secs){
+                val setData = Global.gson.toJson( EspData(
+                    newData.name,
+                    SwState.SET_DATA.ordinal,
+                    newData.mode.ordinal,
+                    newData.secs,
+                    newData.prgs,
+                    currentSwData.tempX10 ))
+                mqttManager.publish(id,setData)
+                Log.i(TAG,"CAMBIO!! id: $id, values: $setData")
+            }
+            if (currentSwData.row > newData.row) {
+                swMap.forEach { (id, swData) ->
+                    if (swData.row < currentSwData.row && swData.row >= newData.row) {
+                        swMap[id]?.row  =  swData.row + 1
+                    }
                 }
             }
-            swMap[id]!!.row = newData.row
-            aChange = true
-        }
-        if(oldRow < newData.row) {
-            swMap.forEach { (id, swData) ->
-                if (swData.row > oldRow && swData.row <= newData.row) {
-                    swMap[id]!!.row -= 1
+            if(currentSwData.row < newData.row) {
+                swMap.forEach { (id, swData) ->
+                    if (swData.row > currentSwData.row && swData.row <= newData.row) {
+                        swMap[id]?.row = swData.row - 1
+                    }
                 }
             }
-            swMap[id]!!.row = newData.row
-            aChange = true
-        }
-        if(aChange){
-            Log.i(TAG,"CAMBIO!! id: $id")
-            refreshScreenInfo()
-            saveData()
+            if (newData.name != currentSwData.name ||
+                newData.bkColor != currentSwData.bkColor ||
+                newData.row != currentSwData.row ){
+                swMap[id] = newData
+                refreshScreenInfo()
+                saveData()
+            }
         }
     }
+
     fun getCurrentSwData( id: String): SwData {
         return swMap[id]!!
     }
@@ -262,17 +256,17 @@ class KeepSwData @Inject constructor (
             }
         }
     }
-
     private fun refreshScreenInfo() {
+        Log.i(TAG," ---------Refrescando!!")
         val refreshList: MutableList<SwScreenData> = mutableListOf()
         swMap.forEach { (id, swData) ->
-            refreshList += SwScreenData(name = swData.name,
+            refreshList.add(SwScreenData(name = swData.name,
                                         id = id,
                                         row = swData.row,
                                         bkColor = swData.bkColor,
                                         swImageId = getSwImageId(id),
                                         timerInfo = getLegend(id)
-                                    )
+                                    ))
         }
         coroutineScope.launch { swScreenList.emit(refreshList) }
     }
@@ -381,6 +375,7 @@ class KeepSwData @Inject constructor (
     private fun getStoredData() {
         CoroutineScope(Dispatchers.IO).launch {
             swDataStore.getFlashData.collect { flashData ->
+                Log.i(TAG,"saco: $flashData")
                 val gson = Gson()
                 val stored = gson.fromJson(flashData, ToStore::class.java)
                 if (stored != null) {
@@ -407,7 +402,7 @@ class KeepSwData @Inject constructor (
         }
     }
     private fun saveData() {
-        val list = mutableListOf<StoredData>()
+        val list: MutableList<StoredData> = mutableListOf()
         swMap.forEach { (id, swData) ->
             list.add(StoredData(swData.name, id, swData.bkColor))
         }

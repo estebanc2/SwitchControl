@@ -61,10 +61,15 @@ class SwViewModel  @Inject constructor(
         private set
     var touchProgress by mutableStateOf (TouchState.IN_PROGRESS)
         private set
-    var localSwData2 by mutableStateOf (SwData("", SwState.OFF, SwMode.TIMERS, 0,
-        NO_TIMERS, "nada", 2, SwStatus.DISCONNECTED, 0))
-        private set
-    var localSwData = SwData("", SwState.OFF, SwMode.TIMERS, 0,
+    private var name = ""
+    private var bkColor = "nada"
+    private var row = 1
+    private var prg = NO_TIMERS
+    private var mode = SwMode.PULSE_NA
+    private var secs = 0
+
+
+    var localSwData:SwData = SwData("", SwState.OFF, SwMode.TIMERS, 0,
         NO_TIMERS, "nada", 2, SwStatus.DISCONNECTED, 0)
 
 
@@ -115,8 +120,8 @@ class SwViewModel  @Inject constructor(
         keepSwData.imageClick(id)
     }
     fun saveConfig(){
-        keepSwData.configUpgrade(localSwData, id)
-        Log.i(TAG,"llega ${localSwData.name} al viewmodel con bkcolor ${localSwData.bkColor}")
+        //keepSwData.configUpgrade(localSwData, id)
+        Log.i(TAG,"3 (saveConfig) vm: ${localSwData.bkColor} ks: ${keepSwData.getCurrentSwData(id).bkColor}")
         goConfig = false
     }
     fun exitConfig(){
@@ -127,6 +132,7 @@ class SwViewModel  @Inject constructor(
         showName = false
     }
     fun newColor(color: String){
+        Log.i(TAG,"2 (newColor) vm: de ${localSwData.bkColor} a $color, ks: ${keepSwData.getCurrentSwData(id).bkColor}")
         localSwData.bkColor = color
     }
     fun changeRow(pos: Int) {
@@ -154,7 +160,7 @@ class SwViewModel  @Inject constructor(
         id = item.id
         swState = item.swImageId != R.drawable.no_info
         localSwData = keepSwData.getCurrentSwData(id)
-        Log.i(TAG,"cuando se llama al configurar, color: ${localSwData.bkColor}")
+        Log.i(TAG,"1 (onConfig) vm: ${localSwData.bkColor}, ks: ${keepSwData.getCurrentSwData(id).bkColor}")
         goConfig = show
     }
     fun onShowAdd(show: Boolean) {
