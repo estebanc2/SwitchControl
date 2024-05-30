@@ -84,26 +84,26 @@ fun MainScreen(
     )
     NameDialog(
         show = viewModel.showName,
-        currentName = viewModel.swData.name ,
+        currentName = viewModel.localSwData.name ,
         setName = {name -> viewModel.newName(name)},
         onExit = {viewModel.onShowName(false)}
     )
     ColorDialog(
         show = viewModel.showColor,
-        currentColor = viewModel.swData.bkColor,
+        currentColor = viewModel.localSwData.bkColor,
         setColor = {color -> viewModel.newColor(color)},
         exit = {viewModel.onShowColor(false)}
     )
     TimerDialog(
         show = viewModel.showTimer,
-        currentWP = viewModel.swData.prgs[viewModel.currentTimer],
+        currentWP = viewModel.localSwData.prgs[viewModel.currentTimer],
         setTimer = {timer -> viewModel.newTimer(timer)},
         onExit = {viewModel.onShowTimer(0,false)}
     )
     ModeDialog(
         show = viewModel.showMode,
-        currentMode = viewModel.swData.mode,
-        currentSecs = viewModel.swData.secs,
+        currentMode = viewModel.localSwData.mode,
+        currentSecs = viewModel.localSwData.secs,
         setMode = {pair -> viewModel.setMode(pair.first, pair.second)},
         onExit = {viewModel.onShowMode(false)}
     )
@@ -114,7 +114,7 @@ fun MainScreen(
         lastServer = viewModel.server,
         lastPort = viewModel.port,
         upgrade = {pair -> viewModel.upgrade(pair.first, pair.second)},
-        name = viewModel.swData.name,
+        name = viewModel.localSwData.name,
         local = {viewModel.localErase()},
         full = {viewModel.fullErase()},
         onExit = {viewModel.onShowMaintenance(false)}
@@ -133,7 +133,7 @@ fun MainScreen(
             ConfigScreen (
                 qty = viewModel.swScreenList.size,
                 swState = viewModel.swState,
-                data = viewModel.swData,
+                data = viewModel.localSwData,
                 changeName = {viewModel.onShowName(true)},
                 changeColor = {viewModel.onShowColor(true)},
                 changeRow = { pos -> viewModel.changeRow(pos)},

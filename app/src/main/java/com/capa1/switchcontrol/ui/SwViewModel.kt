@@ -61,9 +61,12 @@ class SwViewModel  @Inject constructor(
         private set
     var touchProgress by mutableStateOf (TouchState.IN_PROGRESS)
         private set
-    var swData by mutableStateOf (SwData("", SwState.OFF, SwMode.TIMERS, 0, 
+    var localSwData2 by mutableStateOf (SwData("", SwState.OFF, SwMode.TIMERS, 0,
         NO_TIMERS, "nada", 2, SwStatus.DISCONNECTED, 0))
         private set
+    var localSwData = SwData("", SwState.OFF, SwMode.TIMERS, 0,
+        NO_TIMERS, "nada", 2, SwStatus.DISCONNECTED, 0)
+
 
     fun start(){
         keepSwData.initOperation()
@@ -112,36 +115,31 @@ class SwViewModel  @Inject constructor(
         keepSwData.imageClick(id)
     }
     fun saveConfig(){
-        keepSwData.configUpgrade(swData, id)
+        keepSwData.configUpgrade(localSwData, id)
+        Log.i(TAG,"llega ${localSwData.name} al viewmodel con bkcolor ${localSwData.bkColor}")
         goConfig = false
     }
     fun exitConfig(){
         goConfig = false
     }
-    fun onConfig(show: Boolean, item: SwScreenData) {
-        id = item.id
-        swState = item.swImageId != R.drawable.no_info
-        swData = keepSwData.swMap[id]!!
-        goConfig = show
-    }
     fun newName(name: String){
-        swData.name = name
+        localSwData.name = name
         showName = false
     }
     fun newColor(color: String){
-        swData.bkColor = color
+        localSwData.bkColor = color
     }
     fun changeRow(pos: Int) {
-        swData.row += pos
-        Log.i(TAG,"row: [${swData.row}]")
+        localSwData.row += pos
+        Log.i(TAG,"row: [${localSwData.row}]")
     }
     fun newTimer(newPrg: WeeklyProgram){
-        swData.prgs[currentTimer] = newPrg
+        localSwData.prgs[currentTimer] = newPrg
         showTimer = false
     }
     fun setMode(mode: SwMode, secs: Int) {
-        swData.mode = mode
-        swData.secs = secs
+        localSwData.mode = mode
+        localSwData.secs = secs
         showMode = false
     }
     fun setPass(pass: String) {
@@ -151,6 +149,13 @@ class SwViewModel  @Inject constructor(
         keepSwData.setSwWithId(id)
         showNewId = false
         showAdd = false
+    }
+    fun onConfig(show: Boolean, item: SwScreenData) {
+        id = item.id
+        swState = item.swImageId != R.drawable.no_info
+        localSwData = keepSwData.getCurrentSwData(id)
+        Log.i(TAG,"cuando se llama al configurar, color: ${localSwData.bkColor}")
+        goConfig = show
     }
     fun onShowAdd(show: Boolean) {
         showAdd = show
@@ -181,10 +186,10 @@ class SwViewModel  @Inject constructor(
     }
     fun addAllSw(id: String) {
         if(id != "0"){
-            keepSwData.sendConfig(id)
+            keepSwData.sendConfigToOtherPhone(id)
         }
         else{
-            keepSwData.receiveConfig()
+            keepSwData.receiveConfigFromOtherPhone()
         }
         showAdd = false
         showAll = false
@@ -195,7 +200,7 @@ class SwViewModel  @Inject constructor(
     fun upgrade(server: String, port: String) {
         this.server = server
         this.port = port
-        keepSwData.upgrade(id, server, port)
+        keepSwData.firmwareUpgrade(id, server, port)
     }
     fun localErase(){
         keepSwData.localErase(id)

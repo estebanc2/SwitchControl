@@ -45,7 +45,7 @@ class KeepSwData @Inject constructor (
     private var mqttUp = false
     private var currentSsid = ""
     private var currentBssid = ""
-    var swMap = mutableMapOf<String, SwData>()
+    private val swMap = mutableMapOf<String, SwData>()
     val allSwId = Random.nextInt(9).toString() + "0123456789"+ Random.nextInt(9).toString()
     val swScreenList: MutableStateFlow<List<SwScreenData>> = MutableStateFlow(listOf())
     val myApData: MutableStateFlow<ApData> = MutableStateFlow(ApData("no conectado","", false))
@@ -108,7 +108,7 @@ class KeepSwData @Inject constructor (
                 }
             }
         }
-        //Log.i(TAG, "Rx msg: $msg")
+        Log.i(TAG, "Rx msg: $msg")
         refreshScreenInfo()
     }
     override fun notifyMqttState(mqttState: MqttState) {
@@ -165,6 +165,8 @@ class KeepSwData @Inject constructor (
         }
     }
     fun configUpgrade(newData: SwData, id: String){
+        Log.i(TAG,"llega ${newData.name} al keepSwData con bkcolor ${newData.bkColor}")
+        Log.i(TAG,"y se comparara con el bkcolor ${swMap[id]!!.bkColor} que ya estaba en el map")
         if (newData.name != swMap[id]!!.name ||
             newData.prgs != swMap[id]!!.prgs ||
             newData.mode != swMap[id]!!.mode ||
@@ -177,15 +179,15 @@ class KeepSwData @Inject constructor (
                 newData.prgs,
                 swMap[id]!!.tempX10))
             mqttManager.publish(id,setData)
+            Log.i(TAG,"CAMBIO!! id: $id, values: $setData")
         }
-        val data = swMap[id]!!
         var aChange = false
-        if(newData.name != data.name){
-            data.name = newData.name
+        if(newData.name != swMap[id]!!.name){
+            swMap[id]!!.name = newData.name
             aChange = true
         }
-        if(newData.bkColor != data.bkColor){
-            data.bkColor = newData.bkColor
+        if(newData.bkColor != swMap[id]!!.bkColor){
+            swMap[id]!!.bkColor = newData.bkColor
             aChange = true
         }
         val oldRow = swMap[id]!!.row
@@ -208,21 +210,18 @@ class KeepSwData @Inject constructor (
             aChange = true
         }
         if(aChange){
+            Log.i(TAG,"CAMBIO!! id: $id")
             refreshScreenInfo()
             saveData()
         }
     }
-    fun sendConfig(id: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            swDataStore.getFlashData.collect { flashData ->
-                mqttManager.publish(id, flashData)
-            }
-        }
+    fun getCurrentSwData( id: String): SwData {
+        return swMap[id]!!
     }
     fun discoverSwitches(pass: String){
         espTouch.discover(currentSsid, currentBssid, pass)
     }
-    fun upgrade(id: String, server: String, port: String) {
+    fun firmwareUpgrade(id: String, server: String, port: String) {
         coroutineScope.launch {upgradeState.emit(SwState.UPGRADE.ordinal) }
         upgradingId = id
         val setData = Global.gson.toJson( EspData(
@@ -251,9 +250,16 @@ class KeepSwData @Inject constructor (
         mqttManager.publish(id, SEND_ERASE)
         mqttManager.unsubscribe(id)
     }
-    fun receiveConfig() {
+    fun receiveConfigFromOtherPhone() {
         if (mqttUp) {
             mqttManager.subscribeFromPhone(allSwId)
+        }
+    }
+    fun sendConfigToOtherPhone(id: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            swDataStore.getFlashData.collect { flashData ->
+                mqttManager.publish(id, flashData)
+            }
         }
     }
 
