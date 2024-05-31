@@ -56,19 +56,7 @@ class SwViewModel  @Inject constructor(
     var server = ""
     var port = ""
     var swState = false
-    var showName by mutableStateOf (false)
-        private set
-    var showColor by mutableStateOf (false)
-        private set
-    var showTimer by mutableStateOf (false)
-        private set
-    var showAdd by mutableStateOf (false)
-        private set
-    var showNewId by mutableStateOf (false)
-        private set
-    var showNew by mutableStateOf (false)
-        private set
-    var showAll by mutableStateOf (false)
+    var show by mutableStateOf (Show())
         private set
     var upgrading by mutableStateOf (0)
         private set
@@ -77,12 +65,6 @@ class SwViewModel  @Inject constructor(
     var swScreenList by mutableStateOf<MutableList<SwScreenData>>(mutableListOf())
         private set
     var currentTimer by mutableStateOf(0)
-        private set
-    var showMode by mutableStateOf (false)
-        private set
-    var showMaintenance by mutableStateOf (false)
-        private set
-    var goConfig by mutableStateOf (false)
         private set
     var touchProgress by mutableStateOf (TouchState.IN_PROGRESS)
         private set
@@ -208,7 +190,7 @@ class SwViewModel  @Inject constructor(
                 val stored = gson.fromJson(flashData, ToStore::class.java)
                 if (stored != null) {
                     if (stored.list.size == 0) {
-                        showAdd = true
+                        show.add = true
                     } else {
                         stored.list.forEachIndexed { i, data ->
                             swMap[data.id] = SwData(
@@ -386,22 +368,22 @@ class SwViewModel  @Inject constructor(
                 mqttManager.subscribe(id)
             }
         }
-        showNewId = false
-        showAdd = false
+        show.newId = false
+        show.add = false
     }
     fun imageClick(id: String){
 
     }
     fun saveConfig(){
         //keepSwData.configUpgrade(localSwData, id)
-        goConfig = false
+        show.config = false
     }
     fun exitConfig(){
-        goConfig = false
+        show.config = false
     }
     fun newName(name: String){
         localSwData.name = name
-        showName = false
+        show.name = false
     }
     fun newColor(color: String){
          localSwData.bkColor = color
@@ -412,12 +394,12 @@ class SwViewModel  @Inject constructor(
     }
     fun newTimer(newPrg: WeeklyProgram){
         localSwData.prgs[currentTimer] = newPrg
-        showTimer = false
+        show.timer = false
     }
     fun setMode(mode: SwMode, secs: Int) {
         localSwData.mode = mode
         localSwData.secs = secs
-        showMode = false
+        show.mode = false
     }
     fun discoverSwitches(pass: String) {
         espTouch.discover(myAp.ssid, myAp.bssid, pass)
@@ -426,37 +408,37 @@ class SwViewModel  @Inject constructor(
         id = item.id
         swState = item.swImageId != R.drawable.no_info
         localSwData = swMap[id]!!
-        goConfig = show
+        this.show.config = show
     }
     fun onShowAdd(show: Boolean) {
-        showAdd = show
+        this.show.add = show
     }
     fun onShowName(show: Boolean) {
-        showName = show
+        this.show.name = show
     }
     fun onShowColor(show: Boolean) {
-        showColor = show
+        this.show.color = show
     }
     fun onShowTimer(timer: Int, show: Boolean) {
         if (show){
             currentTimer = timer
         }
-        showTimer = show
+        this.show.timer = show
     }
     fun onShowMode(show: Boolean) {
-        showMode = show
+        this.show.mode = show
     }
     fun onShowNewId(show: Boolean) {
-        showNewId = show
+        this.show.newId = show
     }
     fun onShowNew(show: Boolean) {
-        showNew = show
+        this.show.new = show
     }
     fun onShowAll(show: Boolean) {
-        showAll = show
+        this.show.all = show
     }
     fun onShowMaintenance(show: Boolean) {
-        showMaintenance = show
+        this.show.maintenance = show
     }
 
     fun firmwareUpgrade(server: String, port: String) {
@@ -487,8 +469,8 @@ class SwViewModel  @Inject constructor(
                 mqttManager.subscribeFromPhone(allSwId)
             }
         }
-        showAdd = false
-        showAll = false
+        show.add = false
+        show.all = false
     }
 
     fun localErase(){
@@ -501,14 +483,12 @@ class SwViewModel  @Inject constructor(
         }
         saveData()
         refreshScreenInfo()
-        showMaintenance = false
+        show.maintenance = false
         exitConfig()
     }
     fun fullErase(){
         localErase()
         mqttManager.publish(id, Global.SEND_ERASE)
         mqttManager.unsubscribe(id)
-        showMaintenance = false
-        exitConfig()
     }
 }

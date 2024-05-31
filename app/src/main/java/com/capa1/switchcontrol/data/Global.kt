@@ -14,7 +14,6 @@ object Global {
     const val FROM_SW = "/mtc/from_sw/"
     const val MQTT_HOST_AND_PORT =
         "tcp://linode.1.poplarlabs.net:1883" //"tcp://test.mosquitto.org:1883"; //
-
     const val TAG = "switchcontrol"
     const val ESPTOUCH_WAIT_IN_SECS = 18L
     data class MyColor(
@@ -35,11 +34,11 @@ object Global {
         "metal"   to  MyColor(Color(0xFF8F8C8F), Color(0xFFFFFFFF)),
         "madera"  to  MyColor(Color(0xFF793E2B), Color(0xFFFFFFFF)),
     )
-    val NO_TIMERS: MutableList<WeeklyProgram> = mutableListOf( WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0),
-                WeeklyProgram(0,0,0)
-    )
+    val NO_TIMERS: MutableList<WeeklyProgram> = mutableListOf ( WeeklyProgram(0,0,0),
+                                                                WeeklyProgram(0,0,0),
+                                                                WeeklyProgram(0,0,0),
+                                                                WeeklyProgram(0,0,0)
+                                                            )
 
     val SEND_ON: String = gson.toJson(
                     EspData(
