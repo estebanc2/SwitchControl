@@ -113,7 +113,7 @@ fun MainScreen(
         upgrading = viewModel.upgrading,
         lastServer = viewModel.server,
         lastPort = viewModel.port,
-        upgrade = {pair -> viewModel.upgrade(pair.first, pair.second)},
+        upgrade = {pair -> viewModel.firmwareUpgrade(pair.first, pair.second)},
         name = viewModel.localSwData.name,
         local = {viewModel.localErase()},
         full = {viewModel.fullErase()},

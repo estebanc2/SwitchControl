@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.Global.NO_TIMERS
@@ -19,14 +20,12 @@ import com.capa1.switchcontrol.data.model.SwState
 import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.data.model.ToStore
 import com.capa1.switchcontrol.data.model.WeeklyProgram
-import com.capa1.switchcontrol.data.mqtt.MqttListener
 import com.capa1.switchcontrol.data.mqtt.MqttManager
 import com.capa1.switchcontrol.data.mqtt.MqttState
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.EspTouch
 import com.capa1.switchcontrol.data.wifi.TouchState
 import com.capa1.switchcontrol.data.wifi.WifiCredentials
-import com.capa1.switchcontrol.data.wifi.WifiListener
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -44,19 +43,14 @@ class SwViewModel  @Inject constructor(
     private val wifiCredentials: WifiCredentials,
     private val swDataStore: SwDataStore,
     private val espTouch: EspTouch
-) : ViewModel(), MqttListener, WifiListener {
+) : ViewModel() {
 
     private val swMap = mutableMapOf<String, SwData>()
     val allSwId = Random.nextInt(9).toString() + "0123456789"+ Random.nextInt(9).toString()
-    private var starter = false
     private val newSw = mutableListOf<String>()
     private var newSwId = ""
     private var mqttUp = false
-    private var currentSsid = ""
-    private var currentBssid = ""
     private var upgradingId = ""
-
-
 
     var id = ""
     var server = ""
@@ -94,26 +88,117 @@ class SwViewModel  @Inject constructor(
         private set
 
 
-    var localSwData:SwData = SwData("", SwState.OFF, SwMode.TIMERS, 0,
-        NO_TIMERS, "nada", 2, SwStatus.DISCONNECTED, 0)
+    var localSwData:SwData = SwData(
+        "", SwState.OFF, SwMode.TIMERS, 0,
+        NO_TIMERS, 0, "nada", 2, SwStatus.DISCONNECTED
+    )
 
 
     fun start(){
         wifiCredentials.get()
         mqttManager.connect()
         getStoredData()
+        subscribeToChanges()
     }
-
-    private fun setSwWithId(id: String) {
-        if (!swMap.contains(id)) {
-            newSwId = id
-            newSw += id
-            if (mqttUp) {
-                mqttManager.subscribe(id)
+    private fun subscribeToChanges() {
+        viewModelScope.launch {
+            mqttManager.mqttState.collect { result ->
+                if (result == MqttState.UP) {
+                    mqttUp = true
+                    initializeSw()
+                }
             }
         }
-        showNewId = false
-        showAdd = false
+        viewModelScope.launch {
+            mqttManager.arrival.collect { result ->
+                val id = result.first
+                val msg = result.second
+                val gson = Gson()
+                when (id) {
+                    allSwId -> {
+                        val toStore = gson.toJson(msg)
+                        CoroutineScope(Dispatchers.IO).launch {
+                            swDataStore.saveFlashData(toStore)
+                        }
+                        mqttManager.unsubscribe(id)
+                        getStoredData()
+                        initializeSw()
+                    }
+                    newSwId -> {
+                        newSwId = ""
+                        newSw -= id
+                        val esp = gson.fromJson(msg, EspData::class.java)
+                        if(swMap[id] != null) {
+                            swMap[id] = SwData(
+                                esp.name,
+                                SwState.entries[esp.state],
+                                SwMode.entries[esp.mode],
+                                esp.secs,
+                                esp.prgs,
+                                esp.tempX10,
+                                "nada",
+                                swMap.size + 1,
+                                SwStatus.CONNECTED
+                            )
+                            saveData()
+                        }
+                    }
+                    upgradingId ->{
+                        val result = gson.fromJson(msg, EspData::class.java).state
+                        Log.i(TAG,"during upgrade receive a state: $result")
+                        //coroutineScope.launch {upgradeState.emit(result) }
+                        if (result == SwState.UPGRADED.ordinal){
+                            upgradingId = ""
+                        }
+                    }
+                    else -> {
+                        val esp = gson.fromJson(msg, EspData::class.java)
+                        if(swMap[id] != null){
+                            swMap[id] = SwData(
+                                esp.name,
+                                SwState.entries[esp.state],
+                                SwMode.entries[esp.mode],
+                                esp.secs,
+                                esp.prgs,
+                                esp.tempX10,
+                                swMap[id]!!.bkColor,
+                                swMap[id]!!.row,
+                                SwStatus.CONNECTED
+                            )
+                            if(swMap[id]!!.mode == SwMode.TIMERS_TEMP) {
+                                val tempId = (if(id.substring(0,2).toInt(16) == 255)
+                                    254 else id.substring(0,2).toInt(16) + 1).toString(16) + id.substring(2,id.length)
+                                if (!swMap.contains(tempId)) {
+                                    setSwWithId(tempId)
+                                }
+                            }
+                        }
+                    }
+                }
+                Log.i(TAG, "Rx msg: $msg")
+                refreshScreenInfo()
+            }
+        }
+        viewModelScope.launch {
+            mqttManager.subscribedId.collect { result ->
+                if (result != allSwId){
+                    initSw(id)
+                }
+            }
+        }
+        viewModelScope.launch {
+            espTouch.touched.collect { result ->
+                touchProgress = result.second
+                if(touchProgress == TouchState.READY){
+                    setSwWithId(result.first)
+                }
+            }
+        }
+        viewModelScope.launch {
+            wifiCredentials.apData.collect { result ->
+                myAp = result
+            }
+        }
     }
     private fun getStoredData() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -123,18 +208,20 @@ class SwViewModel  @Inject constructor(
                 val stored = gson.fromJson(flashData, ToStore::class.java)
                 if (stored != null) {
                     if (stored.list.size == 0) {
-                        starter = true
+                        showAdd = true
                     } else {
                         stored.list.forEachIndexed { i, data ->
-                            swMap[data.id] = SwData(name = data.name,
+                            swMap[data.id] = SwData(
+                                name = data.name,
                                 state = SwState.OFF,
                                 mode = SwMode.TIMERS,
                                 secs = 0,
                                 prgs = NO_TIMERS,
+                                tempX10 = 0,
                                 bkColor = data.bkColor,
                                 row = i + 1,
-                                status = SwStatus.DISCONNECTED,
-                                tempX10 = 0)
+                                status = SwStatus.DISCONNECTED
+                            )
                         }
                         refreshScreenInfo()
                     }
@@ -155,6 +242,7 @@ class SwViewModel  @Inject constructor(
             swDataStore.saveFlashData(toStore)
         }
     }
+
     private fun refreshScreenInfo() {
         Log.i(TAG," ---------Refrescando!!")
         swScreenList = mutableListOf()
@@ -175,13 +263,13 @@ class SwViewModel  @Inject constructor(
         if (!swMap.containsKey(id)) {
             return "Sin Información"
         }
-        when (swMap[id]!!.mode) {
+        when (swMap[id]?.mode) {
             SwMode.PULSE_NA -> return "Pulso de ${swMap[id]!!.secs} segundos"
             SwMode.PULSE_NC -> return "Pulso de ${swMap[id]!!.secs} segundos"
             SwMode.TEMP -> return "Enciende si temp < ${swMap[id]!!.secs / 10}°"
             else -> {
-                if (swMap[id]!!.state != SwState.OFF &&
-                    swMap[id]!!.state != SwState.ON
+                if (swMap[id]?.state != SwState.OFF &&
+                    swMap[id]?.state != SwState.ON
                 ) {
                     return "Sin información"
                 }
@@ -193,7 +281,7 @@ class SwViewModel  @Inject constructor(
                 val rightNow = (hour * 60) + min
                 var delta = 24 * 60
                 if (swMap[id]!!.state == SwState.OFF) {
-                    for (prg in swMap[id]!!.prgs) {
+                    for (prg in swMap[id]?.prgs ?: NO_TIMERS) {
                         if (isSet(prg.days, today)) {
                             val deltaTrans = prg.start - rightNow
                             if (deltaTrans in 1..<delta) {
@@ -208,7 +296,7 @@ class SwViewModel  @Inject constructor(
                         }
                     }
                 } else {
-                    for (prg in swMap[id]!!.prgs) {
+                    for (prg in swMap[id]?.prgs ?: NO_TIMERS) {
                         if (isSet(prg.days, today)) {
                             val deltaTrans = prg.stop - rightNow
                             if (deltaTrans in 1..<delta) {
@@ -290,6 +378,17 @@ class SwViewModel  @Inject constructor(
         mqttManager.publish(id, Global.SEND_GET)
     }
 
+    fun setSwWithId(id: String) {
+        if (!swMap.contains(id)) {
+            newSwId = id
+            newSw += id
+            if (mqttUp) {
+                mqttManager.subscribe(id)
+            }
+        }
+        showNewId = false
+        showAdd = false
+    }
     fun imageClick(id: String){
 
     }
@@ -321,7 +420,7 @@ class SwViewModel  @Inject constructor(
         showMode = false
     }
     fun discoverSwitches(pass: String) {
-        espTouch.discover(currentSsid, currentBssid, pass)
+        espTouch.discover(myAp.ssid, myAp.bssid, pass)
     }
     fun onConfig(show: Boolean, item: SwScreenData) {
         id = item.id
@@ -360,7 +459,9 @@ class SwViewModel  @Inject constructor(
         showMaintenance = show
     }
 
-    fun upgrade(server: String, port: String) {
+    fun firmwareUpgrade(server: String, port: String) {
+        this.server = server
+        this.port = port
         //coroutineScope.launch {upgradeState.emit(SwState.UPGRADE.ordinal) }
         upgradingId = id
         val setData = Global.gson.toJson( EspData(
@@ -409,86 +510,5 @@ class SwViewModel  @Inject constructor(
         mqttManager.unsubscribe(id)
         showMaintenance = false
         exitConfig()
-    }
-
-    override fun notifyNewMessage(id: String, msg: String) {
-        val gson = Gson()
-        when (id) {
-            allSwId -> {
-                val toStore = gson.toJson(msg)
-                CoroutineScope(Dispatchers.IO).launch {
-                    swDataStore.saveFlashData(toStore)
-                }
-                mqttManager.unsubscribe(id)
-                getStoredData()
-                initializeSw()
-            }
-            newSwId -> {
-                newSwId = ""
-                newSw -= id
-                val esp = gson.fromJson(msg, EspData::class.java)
-                swMap[id] = SwData( esp.name,
-                    SwState.entries[esp.state],
-                    SwMode.entries[esp.mode],
-                    esp.secs,
-                    esp.prgs,
-                    "nada",
-                    swMap.size + 1,
-                    SwStatus.CONNECTED,
-                    esp.tempX10)
-                saveData()
-            }
-            upgradingId ->{
-                val result = gson.fromJson(msg, EspData::class.java).state
-                Log.i(TAG,"during upgrade receive a state: $result")
-                //coroutineScope.launch {upgradeState.emit(result) }
-                if (result == SwState.UPGRADED.ordinal){
-                    upgradingId = ""
-                }
-            }
-            else -> {
-                val esp = gson.fromJson(msg, EspData::class.java)
-                if(swMap[id] != null){
-                    swMap[id] = SwData( esp.name,
-                        SwState.entries[esp.state],
-                        SwMode.entries[esp.mode],
-                        esp.secs,
-                        esp.prgs,
-                        swMap[id]!!.bkColor,
-                        swMap[id]!!.row,
-                        SwStatus.CONNECTED,
-                        esp.tempX10)
-                    if(swMap[id]!!.mode == SwMode.TIMERS_TEMP) {
-                        val tempId = (if(id.substring(0,2).toInt(16) == 255)
-                            254 else id.substring(0,2).toInt(16) + 1).toString(16) + id.substring(2,id.length)
-                        if (!swMap.contains(tempId)) {
-                            this.setSwWithId(tempId)
-                        }
-                    }
-                }
-            }
-        }
-        Log.i(TAG, "Rx msg: $msg")
-        refreshScreenInfo()
-    }
-    override fun notifyMqttState(mqttState: MqttState) {
-        if (mqttState == MqttState.UP) {
-            mqttUp = true
-            initializeSw()
-        }
-    }
-    override fun notifySubscribed(id: String) {
-        if( id != allSwId){
-            initSw(id)
-        }
-    }
-    override fun notifyApData(myAp: ApData) {
-        currentSsid = myAp.ssid
-        currentBssid = myAp.bssid
-    }
-    override fun notifyTouch(id: String, state: TouchState) {
-        if(state == TouchState.READY){
-            this.setSwWithId(id)
-        }
     }
 }

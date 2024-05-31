@@ -8,8 +8,11 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class SwDataStore(private val context: Context) {
+class SwDataStore @Inject constructor (
+    private val context: Context
+) {
     companion object {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("SW_DATA")
         private val KEY = stringPreferencesKey("SWITCHES")

@@ -6,10 +6,10 @@ data class SwData(
     var mode: SwMode,
     var secs: Int,
     var prgs: MutableList<WeeklyProgram>,
+    var tempX10: Int,
     var bkColor: String,
     var row: Int,
-    var status: SwStatus,
-    var tempX10: Int
+    var status: SwStatus
 )
 enum class SwStatus {
     CONNECTED,

@@ -4,7 +4,12 @@ import android.content.Context
 import android.util.Log
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.TAG
+import com.capa1.switchcontrol.data.mqtt.MqttState
 import com.espressif.iot.esptouch.EsptouchTask
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledThreadPoolExecutor
@@ -14,17 +19,19 @@ import javax.inject.Inject
 
 class EspTouch @Inject constructor(
     private val context: Context,
-    private val listener: WifiListener
 ) {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    val touched: MutableStateFlow<Pair<String, TouchState>> = MutableStateFlow(Pair("", TouchState.IN_PROGRESS))
+
     fun discover(ssid: String, bssid:String, pass: String) {
         var success = false
         val task = EsptouchTask(ssid, bssid, pass, context)
         val timeOut = ScheduledThreadPoolExecutor(1)
-        listener.notifyTouch("", TouchState.IN_PROGRESS)
+        coroutineScope.launch { touched.emit(Pair("", TouchState.IN_PROGRESS))}
         timeOut.schedule({
             Log.i(TAG, "timeout.................")
             if (!success){
-                listener.notifyTouch("", TouchState.TIMEOUT)
+                coroutineScope.launch { touched.emit(Pair("", TouchState.TIMEOUT))}
                 task.interrupt()
             }
         }, ESPTOUCH_WAIT_IN_SECS, TimeUnit.SECONDS)
@@ -33,7 +40,7 @@ class EspTouch @Inject constructor(
             val newId: String = result.bssid
             success = true
             Log.i(TAG, "newId: [$newId]")
-            listener.notifyTouch(newId,TouchState.READY)
+            coroutineScope.launch { touched.emit(Pair(newId, TouchState.READY))}
         }
         val workerPool: ExecutorService = Executors.newSingleThreadExecutor()
         workerPool.submit {

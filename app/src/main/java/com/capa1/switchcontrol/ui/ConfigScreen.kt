@@ -335,8 +335,10 @@ fun ShowConfigPreview()
     ConfigScreen(
         qty = 5,
         swState = true,
-        data = SwData("luz cocina", SwState.OFF, SwMode.TIMERS, 0, Global.NO_TIMERS,
-            "nada", 2, SwStatus.CONNECTED, 10),
+        data = SwData(
+            "luz cocina", SwState.OFF, SwMode.TIMERS, 0, Global.NO_TIMERS,
+            10, "nada", 2, SwStatus.CONNECTED
+        ),
         changeName = {},
         changeColor = {},
         changeRow = {},
