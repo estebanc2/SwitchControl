@@ -1,7 +1,6 @@
 package com.capa1.switchcontrol.di
 
 import android.content.Context
-import com.capa1.switchcontrol.data.model.KeepSwData
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

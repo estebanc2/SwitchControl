@@ -68,12 +68,12 @@ fun MainScreen(
         show = viewModel.showNew,
         apData = viewModel.myAp,
         state = viewModel.touchProgress,
-        setPass = {pass -> viewModel.setPass(pass)},
+        setPass = {pass -> viewModel.discoverSwitches(pass)},
         onExit = {viewModel.onShowNew(false)}
     )
     NewIdDialog(
         show = viewModel.showNewId,
-        setId = {id -> viewModel.addSwId(id)},
+        setId = {id -> viewModel.setSwWithId(id)},
         onExit = {viewModel.onShowNewId(false)}
     )
     NewAllDialog(
