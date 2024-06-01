@@ -89,4 +89,11 @@ class ExampleUnitTest {
         val rr = ss.toString(16) + string.substring(2,string.length)
         println(String.format("%s",rr))
     }
+    @Test
+    fun sorter() {
+        data class Class(val name:String, val age:Int)
+        val myMap1 = mutableMapOf (2 to Class("hijo1", 27), 3 to Class("hijo2", 24), 1 to Class("mujer", 62))
+        val myMap2 = myMap1.toList().sortedBy { it.second.age }.toMap()
+        println("antes: $myMap1, then $myMap2")
+    }
 }

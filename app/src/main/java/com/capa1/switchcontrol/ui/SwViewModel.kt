@@ -45,7 +45,7 @@ class SwViewModel  @Inject constructor(
     private val espTouch: EspTouch
 ) : ViewModel() {
 
-    private val swMap = LinkedHashMap<String, SwData>()
+    private var swMap = LinkedHashMap<String, SwData>()
     val allSwId = Random.nextInt(9).toString() + "0123456789"+ Random.nextInt(9).toString()
     private val newSw = mutableListOf<String>()
     private var newSwId = ""
@@ -84,7 +84,7 @@ class SwViewModel  @Inject constructor(
         private set
     var touchProgress by mutableStateOf (TouchState.IN_PROGRESS)
         private set
-    var localSwData by mutableStateOf (SwData("", SwState.OFF, SwMode.TIMERS, 0,
+    var currentSwData by mutableStateOf (SwData("", SwState.OFF, SwMode.TIMERS, 0,
         NO_TIMERS, 0, "nada", 2, SwStatus.DISCONNECTED))
         private set
 
@@ -239,6 +239,7 @@ class SwViewModel  @Inject constructor(
         Log.i(TAG," ---------Refrescando!!")
         swScreenList = mutableListOf()
         swMap.forEach { (id, swData) ->
+            //Log.i(TAG, "rows en orden de cargada: ${swData.row} ")
             swScreenList.add(SwScreenData(  name = swData.name,
                                             id = id,
                                             row = swData.row,
@@ -401,48 +402,76 @@ class SwViewModel  @Inject constructor(
             }
         }
     }
-
     fun saveConfig(){
-        Log.i(TAG,"en save, de swData $localSwData")
-        Log.i(TAG,"en save, del mapa ${swMap.getValue(currentId)}")
+        if (swMap.getValue(currentId).name != currentSwData.name ||
+            swMap.getValue(currentId).prgs != currentSwData.prgs ||
+            swMap.getValue(currentId).mode != currentSwData.mode ||
+            swMap.getValue(currentId).secs != currentSwData.secs){
+            val setData = Global.gson.toJson(EspData (  currentSwData.name,
+                                                        SwState.SET_DATA.ordinal,
+                                                        currentSwData.mode.ordinal,
+                                                        currentSwData.secs,
+                                                        currentSwData.prgs,
+                                                        currentSwData.tempX10 ))
+            mqttManager.publish(currentId,setData)
+        }
+        if (swMap.getValue(currentId).row > currentSwData.row) {
+            swMap.forEach { (id, swData) ->
+                if (swData.row < swMap.getValue(currentId).row && swData.row >= currentSwData.row) {
+                    swMap[id]?.row  =  swData.row + 1
+                }
+            }
+        }
+        if(swMap.getValue(currentId).row < currentSwData.row) {
+            swMap.forEach { (id, swData) ->
+                if (swData.row > swMap.getValue(currentId).row && swData.row <= currentSwData.row) {
+                    swMap[id]?.row = swData.row - 1
+                }
+            }
+        }
+        Log.i(TAG, "antes: ${swMap.values}")
+        swMap = (swMap.toList().sortedBy { it.second.row }.toMap().toMutableMap() as LinkedHashMap<String, SwData>)
+        Log.i(TAG, "despues: ${swMap.values}")
+        if (swMap.getValue(currentId).name != currentSwData.name ||
+            swMap.getValue(currentId).bkColor != currentSwData.bkColor ||
+            swMap.getValue(currentId).row != currentSwData.row ){
+            swMap[currentId] = currentSwData.copy()
+            refreshScreenInfo()
+            saveData()
+        }
         showConfig = false
     }
     fun exitConfig(){
-        Log.i(TAG,"en exit, de swData $localSwData")
-        Log.i(TAG,"en exit, del mapa ${swMap.getValue(currentId)}")
         showConfig = false
     }
     fun goConfig(item: SwScreenData) {
         currentId = item.id
-        localSwData = swMap.getValue(currentId)
+        currentSwData = swMap.getValue(currentId).copy()
         showConfig = true
     }
-
     fun newName(name: String){
-        localSwData.name = name
+        currentSwData.name = name
         showName = false
     }
     fun newColor(color: String){
-         localSwData.bkColor = color
+         currentSwData.bkColor = color
     }
     fun changeRow(pos: Int) {
-        localSwData.row += pos
-        Log.i(TAG,"row: [${localSwData.row}]")
+        currentSwData.row += pos
+        Log.i(TAG,"row: [${currentSwData.row}]")
     }
     fun newTimer(newPrg: WeeklyProgram){
-        localSwData.prgs[currentTimer] = newPrg
+        currentSwData.prgs[currentTimer] = newPrg
         showTimer = false
     }
     fun setMode(mode: SwMode, secs: Int) {
-        localSwData.mode = mode
-        localSwData.secs = secs
+        currentSwData.mode = mode
+        currentSwData.secs = secs
         showMode = false
     }
-
     fun discoverSwitches(pass: String) {
         espTouch.discover(myAp.ssid, myAp.bssid, pass)
     }
-
     fun onShowAdd(show: Boolean) {
         showAdd = show
     }
@@ -473,7 +502,6 @@ class SwViewModel  @Inject constructor(
     fun onShowMaintenance(show: Boolean) {
         showMaintenance = show
     }
-
     fun firmwareUpgrade(server: String, port: String) {
         this.server = server
         this.port = port
@@ -504,7 +532,6 @@ class SwViewModel  @Inject constructor(
         showAdd = false
         showAll = false
     }
-
     fun localErase(){
         val erasedRow = swMap.getValue(currentId).row
         swMap.remove(currentId)

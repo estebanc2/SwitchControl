@@ -84,26 +84,26 @@ fun MainScreen(
     )
     NameDialog(
         show = viewModel.showName,
-        currentName = viewModel.localSwData.name ,
+        currentName = viewModel.currentSwData.name ,
         setName = {name -> viewModel.newName(name)},
         onExit = {viewModel.onShowName(false)}
     )
     ColorDialog(
         show = viewModel.showColor,
-        currentColor = viewModel.localSwData.bkColor,
+        currentColor = viewModel.currentSwData.bkColor,
         setColor = {color -> viewModel.newColor(color)},
         exit = {viewModel.onShowColor(false)}
     )
     TimerDialog(
         show = viewModel.showTimer,
-        currentWP = viewModel.localSwData.prgs[viewModel.currentTimer],
+        currentWP = viewModel.currentSwData.prgs[viewModel.currentTimer],
         setTimer = {timer -> viewModel.newTimer(timer)},
         onExit = {viewModel.onShowTimer(0,false)}
     )
     ModeDialog(
         show = viewModel.showMode,
-        currentMode = viewModel.localSwData.mode,
-        currentSecs = viewModel.localSwData.secs,
+        currentMode = viewModel.currentSwData.mode,
+        currentSecs = viewModel.currentSwData.secs,
         setMode = {pair -> viewModel.setMode(pair.first, pair.second)},
         onExit = {viewModel.onShowMode(false)}
     )
@@ -114,7 +114,7 @@ fun MainScreen(
         lastServer = viewModel.server,
         lastPort = viewModel.port,
         upgrade = {pair -> viewModel.firmwareUpgrade(pair.first, pair.second)},
-        name = viewModel.localSwData.name,
+        name = viewModel.currentSwData.name,
         local = {viewModel.localErase()},
         full = {viewModel.fullErase()},
         onExit = {viewModel.onShowMaintenance(false)}
@@ -132,8 +132,8 @@ fun MainScreen(
         }else{
             ConfigScreen (
                 qty = viewModel.swScreenList.size,
-                status = viewModel.localSwData.status,
-                data = viewModel.localSwData,
+                status = viewModel.currentSwData.status,
+                data = viewModel.currentSwData,
                 changeName = {viewModel.onShowName(true)},
                 changeColor = {viewModel.onShowColor(true)},
                 changeRow = { pos -> viewModel.changeRow(pos)},
