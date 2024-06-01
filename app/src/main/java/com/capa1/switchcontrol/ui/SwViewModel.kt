@@ -45,18 +45,28 @@ class SwViewModel  @Inject constructor(
     private val espTouch: EspTouch
 ) : ViewModel() {
 
-    private val swMap = mutableMapOf<String, SwData>()
+    private val swMap = LinkedHashMap<String, SwData>()
     val allSwId = Random.nextInt(9).toString() + "0123456789"+ Random.nextInt(9).toString()
     private val newSw = mutableListOf<String>()
     private var newSwId = ""
     private var mqttUp = false
     private var upgradingId = ""
-
-    var id = ""
+    var currentId = ""
     var server = ""
     var port = ""
-    var swState = false
-    var show by mutableStateOf (Show())
+    var showName by mutableStateOf (false)
+        private set
+    var showColor by mutableStateOf (false)
+        private set
+    var showTimer by mutableStateOf (false)
+        private set
+    var showAdd by mutableStateOf (false)
+        private set
+    var showNewId by mutableStateOf (false)
+        private set
+    var showNew by mutableStateOf (false)
+        private set
+    var showAll by mutableStateOf (false)
         private set
     var upgrading by mutableStateOf (0)
         private set
@@ -66,15 +76,17 @@ class SwViewModel  @Inject constructor(
         private set
     var currentTimer by mutableStateOf(0)
         private set
+    var showMode by mutableStateOf (false)
+        private set
+    var showMaintenance by mutableStateOf (false)
+        private set
+    var showConfig by mutableStateOf (false)
+        private set
     var touchProgress by mutableStateOf (TouchState.IN_PROGRESS)
         private set
-
-
-    var localSwData:SwData = SwData(
-        "", SwState.OFF, SwMode.TIMERS, 0,
-        NO_TIMERS, 0, "nada", 2, SwStatus.DISCONNECTED
-    )
-
+    var localSwData by mutableStateOf (SwData("", SwState.OFF, SwMode.TIMERS, 0,
+        NO_TIMERS, 0, "nada", 2, SwStatus.DISCONNECTED))
+        private set
 
     fun start(){
         wifiCredentials.get()
@@ -110,26 +122,24 @@ class SwViewModel  @Inject constructor(
                         newSwId = ""
                         newSw -= id
                         val esp = gson.fromJson(msg, EspData::class.java)
-                        if(swMap[id] != null) {
-                            swMap[id] = SwData(
-                                esp.name,
-                                SwState.entries[esp.state],
-                                SwMode.entries[esp.mode],
-                                esp.secs,
-                                esp.prgs,
-                                esp.tempX10,
-                                "nada",
-                                swMap.size + 1,
-                                SwStatus.CONNECTED
+                        Log.i(TAG," recibo msg $msg")
+                        if (esp != null){
+                            swMap[id] = SwData( name = esp.name,
+                                state = SwState.entries[esp.state],
+                                mode =SwMode.entries[esp.mode],
+                                secs = esp.secs,
+                                prgs = esp.prgs,
+                                tempX10 = esp.tempX10,
+                                bkColor = "nada",
+                                row = swMap.size + 1,
+                                status = SwStatus.CONNECTED
                             )
                             saveData()
                         }
                     }
                     upgradingId ->{
-                        val result = gson.fromJson(msg, EspData::class.java).state
-                        Log.i(TAG,"during upgrade receive a state: $result")
-                        //coroutineScope.launch {upgradeState.emit(result) }
-                        if (result == SwState.UPGRADED.ordinal){
+                        val upgradeState = gson.fromJson(msg, EspData::class.java).state
+                        if (upgradeState == SwState.UPGRADED.ordinal){
                             upgradingId = ""
                         }
                     }
@@ -143,11 +153,11 @@ class SwViewModel  @Inject constructor(
                                 esp.secs,
                                 esp.prgs,
                                 esp.tempX10,
-                                swMap[id]!!.bkColor,
-                                swMap[id]!!.row,
+                                swMap[id]?.bkColor ?: "nada",
+                                swMap[id]?.row ?: 1,
                                 SwStatus.CONNECTED
                             )
-                            if(swMap[id]!!.mode == SwMode.TIMERS_TEMP) {
+                            if(swMap[id]?.mode == SwMode.TIMERS_TEMP) {
                                 val tempId = (if(id.substring(0,2).toInt(16) == 255)
                                     254 else id.substring(0,2).toInt(16) + 1).toString(16) + id.substring(2,id.length)
                                 if (!swMap.contains(tempId)) {
@@ -163,8 +173,9 @@ class SwViewModel  @Inject constructor(
         }
         viewModelScope.launch {
             mqttManager.subscribedId.collect { result ->
+                Log.i(TAG,"se subscribio el $result")
                 if (result != allSwId){
-                    initSw(id)
+                    initSw(result)
                 }
             }
         }
@@ -190,7 +201,7 @@ class SwViewModel  @Inject constructor(
                 val stored = gson.fromJson(flashData, ToStore::class.java)
                 if (stored != null) {
                     if (stored.list.size == 0) {
-                        show.add = true
+                        showAdd = true
                     } else {
                         stored.list.forEachIndexed { i, data ->
                             swMap[data.id] = SwData(
@@ -224,7 +235,6 @@ class SwViewModel  @Inject constructor(
             swDataStore.saveFlashData(toStore)
         }
     }
-
     private fun refreshScreenInfo() {
         Log.i(TAG," ---------Refrescando!!")
         swScreenList = mutableListOf()
@@ -246,9 +256,9 @@ class SwViewModel  @Inject constructor(
             return "Sin Información"
         }
         when (swMap[id]?.mode) {
-            SwMode.PULSE_NA -> return "Pulso de ${swMap[id]!!.secs} segundos"
-            SwMode.PULSE_NC -> return "Pulso de ${swMap[id]!!.secs} segundos"
-            SwMode.TEMP -> return "Enciende si temp < ${swMap[id]!!.secs / 10}°"
+            SwMode.PULSE_NA -> return "Pulso de ${swMap[id]?.secs} segundos"
+            SwMode.PULSE_NC -> return "Pulso de ${swMap[id]?.secs} segundos"
+            SwMode.TEMP -> return "Enciende si temp < ${(swMap[id]?.secs ?: 1) / 10}°"
             else -> {
                 if (swMap[id]?.state != SwState.OFF &&
                     swMap[id]?.state != SwState.ON
@@ -262,7 +272,7 @@ class SwViewModel  @Inject constructor(
                 val tomorrow = (today + 1) % 7
                 val rightNow = (hour * 60) + min
                 var delta = 24 * 60
-                if (swMap[id]!!.state == SwState.OFF) {
+                if (swMap[id]?.state == SwState.OFF) {
                     for (prg in swMap[id]?.prgs ?: NO_TIMERS) {
                         if (isSet(prg.days, today)) {
                             val deltaTrans = prg.start - rightNow
@@ -312,7 +322,11 @@ class SwViewModel  @Inject constructor(
         if (!swMap.containsKey(id)) {
             return R.drawable.no_info
         }
-        when (swMap[id]!!.mode to swMap[id]!!.state) {
+        if (swMap[id]?.status == SwStatus.CONNECTING){
+            return R.drawable.opening
+        }
+
+        when (swMap[id]?.mode to swMap[id]?.state) {
             (SwMode.TIMERS to SwState.ON),
             (SwMode.TIMERS_TEMP to SwState.ON),
             (SwMode.TIMERS_CONTACT to SwState.ON) -> {
@@ -359,31 +373,54 @@ class SwViewModel  @Inject constructor(
     private fun initSw(id: String) {
         mqttManager.publish(id, Global.SEND_GET)
     }
-
     fun setSwWithId(id: String) {
         if (!swMap.contains(id)) {
             newSwId = id
             newSw += id
             if (mqttUp) {
+                Log.i(TAG, "llegue hasta subscribirme id $id" )
                 mqttManager.subscribe(id)
             }
         }
-        show.newId = false
-        show.add = false
+        showNewId = false
+        showAdd = false
     }
     fun imageClick(id: String){
-
+        if (swMap[id]?.status == SwStatus.CONNECTED) {
+            swMap [id]?.status = SwStatus.CONNECTING
+            when ( swMap[id]?.state ) {
+                SwState.OFF -> {
+                    mqttManager.publish(id, Global.SEND_ON)
+                }
+                SwState.ON -> {
+                    mqttManager.publish(id, Global.SEND_OFF)
+                }
+                else -> {
+                    swMap [id]?.status = SwStatus.CONNECTED
+                }
+            }
+        }
     }
+
     fun saveConfig(){
-        //keepSwData.configUpgrade(localSwData, id)
-        show.config = false
+        Log.i(TAG,"en save, de swData $localSwData")
+        Log.i(TAG,"en save, del mapa ${swMap.getValue(currentId)}")
+        showConfig = false
     }
     fun exitConfig(){
-        show.config = false
+        Log.i(TAG,"en exit, de swData $localSwData")
+        Log.i(TAG,"en exit, del mapa ${swMap.getValue(currentId)}")
+        showConfig = false
     }
+    fun goConfig(item: SwScreenData) {
+        currentId = item.id
+        localSwData = swMap.getValue(currentId)
+        showConfig = true
+    }
+
     fun newName(name: String){
         localSwData.name = name
-        show.name = false
+        showName = false
     }
     fun newColor(color: String){
          localSwData.bkColor = color
@@ -394,58 +431,53 @@ class SwViewModel  @Inject constructor(
     }
     fun newTimer(newPrg: WeeklyProgram){
         localSwData.prgs[currentTimer] = newPrg
-        show.timer = false
+        showTimer = false
     }
     fun setMode(mode: SwMode, secs: Int) {
         localSwData.mode = mode
         localSwData.secs = secs
-        show.mode = false
+        showMode = false
     }
+
     fun discoverSwitches(pass: String) {
         espTouch.discover(myAp.ssid, myAp.bssid, pass)
     }
-    fun onConfig(show: Boolean, item: SwScreenData) {
-        id = item.id
-        swState = item.swImageId != R.drawable.no_info
-        localSwData = swMap[id]!!
-        this.show.config = show
-    }
+
     fun onShowAdd(show: Boolean) {
-        this.show.add = show
+        showAdd = show
     }
     fun onShowName(show: Boolean) {
-        this.show.name = show
+        showName = show
     }
     fun onShowColor(show: Boolean) {
-        this.show.color = show
+        showColor = show
     }
     fun onShowTimer(timer: Int, show: Boolean) {
         if (show){
             currentTimer = timer
         }
-        this.show.timer = show
+        showTimer = show
     }
     fun onShowMode(show: Boolean) {
-        this.show.mode = show
+        showMode = show
     }
     fun onShowNewId(show: Boolean) {
-        this.show.newId = show
+        showNewId = show
     }
     fun onShowNew(show: Boolean) {
-        this.show.new = show
+        showNew = show
     }
     fun onShowAll(show: Boolean) {
-        this.show.all = show
+        showAll = show
     }
     fun onShowMaintenance(show: Boolean) {
-        this.show.maintenance = show
+        showMaintenance = show
     }
 
     fun firmwareUpgrade(server: String, port: String) {
         this.server = server
         this.port = port
-        //coroutineScope.launch {upgradeState.emit(SwState.UPGRADE.ordinal) }
-        upgradingId = id
+        upgradingId = currentId
         val setData = Global.gson.toJson( EspData(
             name = server,
             state = SwState.UPGRADE.ordinal,
@@ -454,7 +486,7 @@ class SwViewModel  @Inject constructor(
             prgs = NO_TIMERS,
             tempX10 = 0
         ))
-        mqttManager.publish(id,setData)
+        mqttManager.publish(currentId,setData)
     }
     fun addAllSw(id: String) {
         if(id != "0"){
@@ -469,26 +501,26 @@ class SwViewModel  @Inject constructor(
                 mqttManager.subscribeFromPhone(allSwId)
             }
         }
-        show.add = false
-        show.all = false
+        showAdd = false
+        showAll = false
     }
 
     fun localErase(){
-        val erasedRow = swMap[id]?.row
-        swMap.remove(id)
+        val erasedRow = swMap.getValue(currentId).row
+        swMap.remove(currentId)
         swMap.forEach { (key, value) ->
-            if (value.row > erasedRow!!) {
-                swMap[key]?.row = value.row - 1
+            if (value.row > erasedRow) {
+                swMap.getValue(key).row = value.row - 1
             }
         }
         saveData()
         refreshScreenInfo()
-        show.maintenance = false
+        showMaintenance = false
         exitConfig()
     }
     fun fullErase(){
         localErase()
-        mqttManager.publish(id, Global.SEND_ERASE)
-        mqttManager.unsubscribe(id)
+        mqttManager.publish(currentId, Global.SEND_ERASE)
+        mqttManager.unsubscribe(currentId)
     }
 }

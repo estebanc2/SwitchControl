@@ -11,11 +11,13 @@ data class SwData(
     var row: Int,
     var status: SwStatus
 )
+
 enum class SwStatus {
     CONNECTED,
     DISCONNECTED,
     CONNECTING
 }
+
 enum class SwState {
     OFF,
     ON,

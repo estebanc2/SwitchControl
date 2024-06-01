@@ -5,6 +5,6 @@ data class SwScreenData(
     val id: String,
     val row: Int,
     val bkColor: String,
-    var swImageId: Int,
+    val swImageId: Int,
     val timerInfo: String
 )

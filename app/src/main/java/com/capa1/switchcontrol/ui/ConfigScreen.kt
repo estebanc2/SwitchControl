@@ -47,7 +47,7 @@ import com.capa1.switchcontrol.data.model.WeeklyProgram
 @Composable
 fun ConfigScreen(
     qty: Int,
-    swState: Boolean,
+    status: SwStatus,
     data: SwData,
     changeName: () -> Unit,
     changeColor: ()-> Unit,
@@ -125,7 +125,7 @@ fun ConfigScreen(
             Icon(
                 Icons.Default.ChangeCircle,
                 contentDescription = "",
-                modifier = Modifier.clickable { if(swState) changeName() }
+                modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeName() }
             )
         }
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
@@ -211,56 +211,56 @@ fun ConfigScreen(
                 Icon(
                     Icons.Default.Restore,
                     contentDescription = "",
-                    modifier = Modifier.clickable { if(swState) changeTimer(0)}
+                    modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeTimer(0)}
                 )
                 Text(
                     text = getTimersInfo(prgs[0]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable {  if(swState) changeTimer(0) }
+                        .clickable {  if(status == SwStatus.CONNECTED) changeTimer(0) }
                 )
             }
             Row {
                 Icon(
                     Icons.Default.Restore,
                     contentDescription = "",
-                    modifier = Modifier.clickable { if(swState) changeTimer(1)}
+                    modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeTimer(1)}
                 )
                 Text(
                     text = getTimersInfo(prgs[1]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable {  if(swState) changeTimer(1) }
+                        .clickable {  if(status == SwStatus.CONNECTED) changeTimer(1) }
                 )
             }
             Row {
                 Icon(
                     Icons.Default.Restore,
                     contentDescription = "",
-                    modifier = Modifier.clickable { if(swState) changeTimer(2)}
+                    modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeTimer(2)}
                 )
                 Text(
                     text = getTimersInfo(prgs[2]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable {  if(swState) changeTimer(2) }
+                        .clickable {  if(status == SwStatus.CONNECTED) changeTimer(2) }
                 )
             }
             Row {
                 Icon(
                     Icons.Default.Restore,
                     contentDescription = "",
-                    modifier = Modifier.clickable { if(swState) changeTimer(3)}
+                    modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeTimer(3)}
                 )
                 Text(
                     text = getTimersInfo(prgs[3]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable {  if(swState) changeTimer(3) }
+                        .clickable {  if(status == SwStatus.CONNECTED) changeTimer(3) }
                 )
             }
         }
@@ -288,7 +288,7 @@ fun ConfigScreen(
                 style = TextStyle(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = 10.dp)
-                    .clickable {  if(swState) changeMode() }
+                    .clickable {  if(status == SwStatus.CONNECTED) changeMode() }
             )
             Spacer(modifier = Modifier.padding(horizontal = 25.dp))
             Icon(
@@ -334,7 +334,7 @@ fun ShowConfigPreview()
 {
     ConfigScreen(
         qty = 5,
-        swState = true,
+        status = SwStatus.CONNECTED,
         data = SwData(
             "luz cocina", SwState.OFF, SwMode.TIMERS, 0, Global.NO_TIMERS,
             10, "nada", 2, SwStatus.CONNECTED

@@ -58,58 +58,58 @@ fun MainScreen(
         onConfirm = { activity?.finish() }
     )
     AddSwDialog(
-        show = viewModel.show.add && permissionState,
+        show = viewModel.showAdd && permissionState,
         addSw = {viewModel.onShowNew(true)},
         addId = {viewModel.onShowNewId(true)},
         addAll = {viewModel.onShowAll(true)},
         onExit = {viewModel.onShowAdd(false)}
     )
     NewDialog(
-        show = viewModel.show.new,
+        show = viewModel.showNew,
         apData = viewModel.myAp,
         state = viewModel.touchProgress,
         setPass = {pass -> viewModel.discoverSwitches(pass)},
         onExit = {viewModel.onShowNew(false)}
     )
     NewIdDialog(
-        show = viewModel.show.newId,
+        show = viewModel.showNewId,
         setId = {id -> viewModel.setSwWithId(id)},
         onExit = {viewModel.onShowNewId(false)}
     )
     NewAllDialog(
-        show = viewModel.show.all,
+        show = viewModel.showAll,
         allSwId = viewModel.allSwId,
         setId = {id -> viewModel.addAllSw(id)},
         onExit = { viewModel.onShowAll(false)}
     )
     NameDialog(
-        show = viewModel.show.name,
+        show = viewModel.showName,
         currentName = viewModel.localSwData.name ,
         setName = {name -> viewModel.newName(name)},
         onExit = {viewModel.onShowName(false)}
     )
     ColorDialog(
-        show = viewModel.show.color,
+        show = viewModel.showColor,
         currentColor = viewModel.localSwData.bkColor,
         setColor = {color -> viewModel.newColor(color)},
         exit = {viewModel.onShowColor(false)}
     )
     TimerDialog(
-        show = viewModel.show.timer,
+        show = viewModel.showTimer,
         currentWP = viewModel.localSwData.prgs[viewModel.currentTimer],
         setTimer = {timer -> viewModel.newTimer(timer)},
         onExit = {viewModel.onShowTimer(0,false)}
     )
     ModeDialog(
-        show = viewModel.show.mode,
+        show = viewModel.showMode,
         currentMode = viewModel.localSwData.mode,
         currentSecs = viewModel.localSwData.secs,
         setMode = {pair -> viewModel.setMode(pair.first, pair.second)},
         onExit = {viewModel.onShowMode(false)}
     )
     MaintenanceDialog(
-        show = viewModel.show.maintenance,
-        id = viewModel.id,
+        show = viewModel.showMaintenance,
+        id = viewModel.currentId,
         upgrading = viewModel.upgrading,
         lastServer = viewModel.server,
         lastPort = viewModel.port,
@@ -122,17 +122,17 @@ fun MainScreen(
     Box(
         Modifier.fillMaxSize()
     ) {
-        if (!viewModel.show.config){
+        if (!viewModel.showConfig){
             ShowSwitches(
                 switches = viewModel.swScreenList,
                 onShowAdd = {viewModel.onShowAdd(true)},
                 click = {id -> viewModel.imageClick(id)},
-                onConfig = {item -> viewModel.onConfig(true, item)}
+                onConfig = {item -> viewModel.goConfig(item)}
             )
         }else{
             ConfigScreen (
                 qty = viewModel.swScreenList.size,
-                swState = viewModel.swState,
+                status = viewModel.localSwData.status,
                 data = viewModel.localSwData,
                 changeName = {viewModel.onShowName(true)},
                 changeColor = {viewModel.onShowColor(true)},
