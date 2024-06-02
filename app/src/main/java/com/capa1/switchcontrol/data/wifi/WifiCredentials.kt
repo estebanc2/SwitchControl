@@ -15,7 +15,7 @@ class WifiCredentials @Inject constructor(
     private val context: Context,
 ) {
     val apData: MutableStateFlow<ApData> = MutableStateFlow(ApData("unknown", "", false))
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     fun get() {
         try {

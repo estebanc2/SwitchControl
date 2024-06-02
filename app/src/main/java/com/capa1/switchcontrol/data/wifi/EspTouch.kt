@@ -20,7 +20,7 @@ import javax.inject.Inject
 class EspTouch @Inject constructor(
     private val context: Context,
 ) {
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
     val touched: MutableStateFlow<Pair<String, TouchState>> = MutableStateFlow(Pair("", TouchState.IN_PROGRESS))
 
     fun discover(ssid: String, bssid:String, pass: String) {

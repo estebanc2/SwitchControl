@@ -2,6 +2,7 @@ package com.capa1.switchcontrol.ui
 
 import android.app.Activity
 import android.content.res.Configuration
+import android.media.VolumeShaper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -183,14 +184,24 @@ fun ShowSwitches(
         }
     }
 }
-
+@Composable
+fun OrientationDetector() {
+    val orientation = LocalConfiguration.current.orientation
+    val orientationText = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        "Landscape"
+    } else {
+        "Portrait"
+    }
+    Text("Orientation: $orientationText")
+}
 @Composable
 fun SwRow(
     item: SwScreenData,
     click: () -> Unit,
     onConfig: (SwScreenData) -> Unit
 ){
-    val imageSize = (LocalConfiguration.current.screenWidthDp.dp - 60.dp) / 4
+    val isPortTrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    val imageSize = LocalConfiguration.current.screenWidthDp.dp / if (isPortTrait)  6 else 12
     Box(
         modifier = Modifier
             .fillMaxWidth()

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capa1.switchcontrol.R
@@ -210,8 +211,8 @@ class SwViewModel  @Inject constructor(
 
     private fun getStoredData() {
         Log.i(TAG, "entro a getStoredData")
-        CoroutineScope(Dispatchers.Default).launch {
-            swDataStore.getFlashData.collect { flashData ->
+        viewModelScope.launch {
+            swDataStore.getFlashData().collect { flashData ->
                 Log.i(TAG,"saco: $flashData")
                 val gson = Gson()
                 val stored = gson.fromJson(flashData, ToStore::class.java)
@@ -248,7 +249,7 @@ class SwViewModel  @Inject constructor(
         }
         val gson = Gson()
         val toStore = gson.toJson(ToStore(list))
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch{
             swDataStore.saveFlashData(toStore)
         }
     }
@@ -542,8 +543,9 @@ class SwViewModel  @Inject constructor(
     }
     fun addAllSw(id: String) {
         if(id != "0"){
-            CoroutineScope(Dispatchers.IO).launch {
-                swDataStore.getFlashData.collect { flashData ->
+            viewModelScope.launch {
+                swDataStore.getFlashData().collect { flashData ->
+                    Log.i(TAG,"en addallsw saco: $flashData")
                     mqttManager.publish(id, flashData)
                 }
             }

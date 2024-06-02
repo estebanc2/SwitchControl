@@ -25,7 +25,7 @@ enum class MqttState {
 }
 class MqttManager @Inject constructor() {
     private lateinit var mqttClient: MqttAsyncClient
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
     val mqttState: MutableStateFlow<MqttState> = MutableStateFlow(MqttState.DOWN)
     val subscribedId: MutableStateFlow<String> = MutableStateFlow("")
     val arrival: MutableStateFlow<Pair<String, String>> = MutableStateFlow(Pair("", ""))
