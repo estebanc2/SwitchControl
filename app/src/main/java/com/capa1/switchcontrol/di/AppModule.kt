@@ -17,25 +17,21 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 
 object AppModule {
-
     @Provides
     @Singleton
     fun providesMqttManager (): MqttManager {
         return MqttManager()
     }
-
     @Provides
     @Singleton
     fun providesSwdDtaStore (@ApplicationContext context: Context): SwDataStore {
         return SwDataStore(context)
     }
-
     @Provides
     @Singleton
     fun providesEspTouch (@ApplicationContext context: Context): EspTouch {
         return EspTouch(context)
     }
-
     @Provides
     @Singleton
     fun providesWifiCredentials (@ApplicationContext context: Context): WifiCredentials {
