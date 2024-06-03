@@ -89,8 +89,8 @@ class SwViewModel  @Inject constructor(
         private set
 
     fun start(){
+        Log.i(TAG," EN EL START")
         if(!started){
-            Log.i(TAG," EN EL START")
             getStoredData()
             mqttManager.connect()
             subscribeToChanges()
@@ -260,8 +260,8 @@ class SwViewModel  @Inject constructor(
                                             swImageId = getSwImageId(id),
                                             timerInfo = getLegend(id)
                                         ))
-            Log.i(TAG,"refresco ${swData.name}")
         }
+        Log.i(TAG,"refresco la swScreenList")
         swScreenList = list
     }
     private fun isSet( days: Int, position: Int): Boolean {
@@ -376,9 +376,8 @@ class SwViewModel  @Inject constructor(
         checkSwitches()
     }
     private fun checkSwitches() {
-        val timerInSec = 10L
-        val initTimerInSec = 10L
-        fixedRateTimer("timer", false, initTimerInSec * 1000, timerInSec * 1000) {
+        val timerInSec = 1L
+        fixedRateTimer("timer", false, timerInSec * 1000, timerInSec * 1000) {
             swMap.forEach { (id, swData)->
                 if (swData.status == SwStatus.DISCONNECTED) {
                     initSw(id)

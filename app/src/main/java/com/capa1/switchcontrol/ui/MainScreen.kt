@@ -2,6 +2,7 @@ package com.capa1.switchcontrol.ui
 
 import android.app.Activity
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,10 +11,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,12 +31,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.MyColors
+import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.ui.permissions.PermissionUtils
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -48,13 +46,133 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 fun MainScreen(
     viewModel: SwViewModel = hiltViewModel()
 ) {
-     val permissionState =
+    Log.i(TAG, "init MainScreen")
+    val permissionState =
         rememberMultiplePermissionsState(permissions = PermissionUtils.permissions).allPermissionsGranted
     LaunchedEffect(key1 = permissionState) {
         if (permissionState) {
             viewModel.start()
         }
     }
+    Box(
+        Modifier.fillMaxSize()
+    ) {
+        if (!viewModel.showConfig){
+            Column{
+                ShowTitle (
+                    onShowAdd = {viewModel.onShowAdd(true)}
+                )
+                ShowSwitches(
+                    switches = viewModel.swScreenList,
+                    click = {id -> viewModel.imageClick(id)},
+                    onConfig = {item -> viewModel.goConfig(item)}
+                )
+            }
+       }else{
+            ConfigScreen (
+                qty = viewModel.swScreenList.size,
+                status = viewModel.currentSwData.status,
+                data = viewModel.currentSwData,
+                changeName = {viewModel.onShowName(true)},
+                changeColor = {viewModel.onShowColor(true)},
+                changeRow = { pos -> viewModel.changeRow(pos)},
+                changeTimer = {timer -> viewModel.onShowTimer(timer, true)},
+                changeMode ={viewModel.onShowMode(true)},
+                goMaintenance = { viewModel.onShowMaintenance(true)},
+                save = {viewModel.saveConfig()},
+                onExit = {viewModel.exitConfig()}
+            )
+        }
+    }
+    initializeDialogs(viewModel, permissionState)
+}
+
+@Composable
+fun ShowTitle(
+    onShowAdd: () -> Unit
+){
+    Row(Modifier.fillMaxWidth()
+        .padding(horizontal = 20.dp, vertical = 10.dp),
+        Arrangement.SpaceBetween,
+    ) {
+        Log.i(TAG, "printing title")
+        Text(
+            text = "Interruptores WiFi",
+            style = TextStyle(fontSize = 30.sp),
+            color = MaterialTheme.colorScheme.primary
+        )
+        Icon(
+            Icons.Default.Add,
+            contentDescription = "",
+            modifier = Modifier.clickable { onShowAdd() }
+        )
+    }
+}
+@Composable
+fun ShowSwitches(
+    switches:List<SwScreenData>,
+    click: (String) -> Unit,
+    onConfig: (SwScreenData)-> Unit
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(all = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
+        items(switches) { switch ->
+            SwRow(
+                item = switch,
+                click = { click(switch.id) },
+                onConfig = {item -> onConfig(item)}
+            )
+        }
+    }
+}
+
+@Composable
+fun SwRow(
+    item: SwScreenData,
+    click: () -> Unit,
+    onConfig: (SwScreenData) -> Unit
+){
+    val isPortTrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    val imageSize = LocalConfiguration.current.screenWidthDp.dp / if (isPortTrait)  6 else 12
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = MaterialTheme.shapes.small)
+            .background(MyColors[item.bkColor]!!.backColor)
+            .padding(horizontal = 10.dp, vertical = 10.dp)
+    ){
+        Row(
+            Modifier.fillMaxWidth(),
+            Arrangement.SpaceBetween,
+        ){
+            Column(modifier = Modifier.width(width = imageSize * 3.5f)) {//
+                Text(
+                    text = item.name,
+                    color = MyColors[item.bkColor]!!.textColor,
+                    style = TextStyle(fontSize = 24.sp),
+                    modifier = Modifier.clickable{ onConfig(item) }
+                )
+                Text (
+                    text = item.timerInfo,
+                    color = MyColors[item.bkColor]!!.textColor,
+                )
+            }
+            Image(
+                painterResource(id = item.swImageId),
+                contentDescription = "",
+                Modifier
+                    .clickable { click() }
+                    .size(imageSize, imageSize)
+            )
+        }
+    }
+}
+
+
+@Composable
+fun initializeDialogs(viewModel: SwViewModel, permissionState: Boolean) {
     val activity = (LocalContext.current as? Activity)
     NoPermissionDialog(
         show = !permissionState,
@@ -122,135 +240,4 @@ fun MainScreen(
         full = {viewModel.fullErase()},
         onExit = {viewModel.onShowMaintenance(false)}
     )
-    Box(
-        Modifier.fillMaxSize()
-    ) {
-        if (!viewModel.showConfig){
-            ShowSwitches(
-                switches = viewModel.swScreenList,
-                onShowAdd = {viewModel.onShowAdd(true)},
-                click = {id -> viewModel.imageClick(id)},
-                onConfig = {item -> viewModel.goConfig(item)}
-            )
-        }else{
-            ConfigScreen (
-                qty = viewModel.swScreenList.size,
-                status = viewModel.currentSwData.status,
-                data = viewModel.currentSwData,
-                changeName = {viewModel.onShowName(true)},
-                changeColor = {viewModel.onShowColor(true)},
-                changeRow = { pos -> viewModel.changeRow(pos)},
-                changeTimer = {timer -> viewModel.onShowTimer(timer, true)},
-                changeMode ={viewModel.onShowMode(true)},
-                goMaintenance = { viewModel.onShowMaintenance(true)},
-                save = {viewModel.saveConfig()},
-                onExit = {viewModel.exitConfig()}
-            )
-        }
-    }
-}
-
-
-@Composable
-fun ShowSwitches(
-    switches:List<SwScreenData>,
-    onShowAdd: () -> Unit,
-    click: (String) -> Unit,
-    onConfig: (SwScreenData)-> Unit
-) {
-    LazyColumn(
-        contentPadding = PaddingValues(all = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(5.dp)
-    ) {
-        item {
-            Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
-                Text(
-                    text = "Interruptores WiFi",
-                    style = TextStyle(fontSize = 30.sp),
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = "",
-                    modifier = Modifier.clickable { onShowAdd() }
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-        }
-        items(switches) { switch ->
-            SwRow(
-                item = switch,
-                click = { click(switch.id) },
-                onConfig = {item -> onConfig(item)}
-            )
-        }
-    }
-}
-
-@Composable
-fun SwRow(
-    item: SwScreenData,
-    click: () -> Unit,
-    onConfig: (SwScreenData) -> Unit
-){
-    val isPortTrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
-    val imageSize = LocalConfiguration.current.screenWidthDp.dp / if (isPortTrait)  6 else 12
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape = MaterialTheme.shapes.small)
-            .background(MyColors[item.bkColor]!!.backColor)
-            .padding(horizontal = 10.dp, vertical = 10.dp)
-    ){
-        Row(
-            Modifier.fillMaxWidth(),
-            Arrangement.SpaceBetween,
-            ){
-            Column(modifier = Modifier.width(width = imageSize * 3.5f)) {//
-                Text(
-                    text = item.name,
-                    color = MyColors[item.bkColor]!!.textColor,
-                    style = TextStyle(fontSize = 24.sp),
-                    modifier = Modifier.clickable{ onConfig(item) }
-                )
-                Text (
-                    text = item.timerInfo,
-                    color = MyColors[item.bkColor]!!.textColor,
-                )
-            }
-        Image(
-            painterResource(id = item.swImageId),
-            contentDescription = "",
-            Modifier
-                .clickable { click() }
-                .size(imageSize, imageSize)
-            )
-        }
-    }
-}
-
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL,
-    showBackground = true
-)
-@Composable
-fun ScreenPreview(value: Int = 1) {
-    when (value) {
-        1 -> SwRow(
-                item = SwScreenData("luz cocina", "100AA56F", 1,"limon",
-                    R.drawable.close, "Cambia en mas de 24h"),
-                click = {}, {}
-        )
-        2 -> ShowSwitches(
-                switches = listOf(
-                    SwScreenData("velador", "483fda877368", 2, "limon", R.drawable.close,
-                        "sin informacion o con muchisima informacion que taparia el dubujito del interruptor"),
-                    SwScreenData("luz cocina", "98f4abb33d5a", 1,
-                        "lila", R.drawable.close, "sin informacion"),
-                    SwScreenData("riego", "483fda878e46", 3, "pasto", R.drawable.close, "sin informacion"),
-                    SwScreenData("alargue", "bcddc247dbc9", 5, "palta", R.drawable.close, "sin informacion"),
-                    SwScreenData("TV", "483fda879484", 4, "madera", R.drawable.close, "sin informacion")
-                ), {}, {}, {}
-        )
-    }
 }
