@@ -72,7 +72,7 @@ class SwViewModel  @Inject constructor(
         private set
     var myAp by mutableStateOf (ApData(""," ",false))
         private set
-    var swScreenList by mutableStateOf<MutableList<SwScreenData>>(mutableListOf())
+    var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
         private set
     var currentTimer by mutableStateOf(0)
         private set
@@ -91,10 +91,10 @@ class SwViewModel  @Inject constructor(
     fun start(){
         if(!started){
             Log.i(TAG," EN EL START")
-            wifiCredentials.get()
-            mqttManager.connect()
             getStoredData()
+            mqttManager.connect()
             subscribeToChanges()
+            wifiCredentials.get()
         }
     }
     private fun subscribeToChanges() {
@@ -208,6 +208,7 @@ class SwViewModel  @Inject constructor(
     private fun getStoredData() {
         viewModelScope.launch(Dispatchers.IO) {
             swDataStore.getFlashData().collect { flashData ->
+                Log.i(TAG,"saco: $flashData")
                 if (!started) {
                     started = true
                     val gson = Gson()
@@ -250,16 +251,18 @@ class SwViewModel  @Inject constructor(
         }
     }
     private fun refreshScreenInfo() {
-        swScreenList = mutableListOf()
+        val list = mutableListOf<SwScreenData>()
         swMap.toList().sortedBy { it.second.row }.forEach { (id, swData) ->
-            swScreenList.add(SwScreenData(  name = swData.name,
+            list.add(SwScreenData(  name = swData.name,
                                             id = id,
                                             row = swData.row,
                                             bkColor = swData.bkColor,
                                             swImageId = getSwImageId(id),
                                             timerInfo = getLegend(id)
                                         ))
+            Log.i(TAG,"refresco ${swData.name}")
         }
+        swScreenList = list
     }
     private fun isSet( days: Int, position: Int): Boolean {
         return days shr position and 1 == 1
