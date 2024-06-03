@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capa1.switchcontrol.R
@@ -29,7 +28,6 @@ import com.capa1.switchcontrol.data.wifi.TouchState
 import com.capa1.switchcontrol.data.wifi.WifiCredentials
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -52,6 +50,7 @@ class SwViewModel  @Inject constructor(
     private var newSwId = ""
     private var mqttUp = false
     private var upgradingId = ""
+    private var started = false
     var currentId = ""
     var server = ""
     var port = ""
@@ -90,14 +89,16 @@ class SwViewModel  @Inject constructor(
         private set
 
     fun start(){
-        Log.i(TAG," EN EL START")
-        wifiCredentials.get()
-        mqttManager.connect()
-        getStoredData()
-        subscribeToChanges()
+        if(!started){
+            Log.i(TAG," EN EL START")
+            wifiCredentials.get()
+            mqttManager.connect()
+            getStoredData()
+            subscribeToChanges()
+        }
     }
     private fun subscribeToChanges() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             mqttManager.mqttState.collect { result ->
                 if (result == MqttState.UP) {
                     mqttUp = true
@@ -105,20 +106,19 @@ class SwViewModel  @Inject constructor(
                 }
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             mqttManager.arrival.collect { result ->
                 processArrival(result. first, result.second)
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             mqttManager.subscribedId.collect { result ->
-                Log.i(TAG,"se subscribio el $result")
                 if (result != allSwId && result != ""){
                     initSw(result)
                 }
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             espTouch.touched.collect { result ->
                 touchProgress = result.second
                 if(touchProgress == TouchState.READY){
@@ -126,7 +126,7 @@ class SwViewModel  @Inject constructor(
                 }
             }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             wifiCredentials.apData.collect { result ->
                 myAp = result
             }
@@ -140,9 +140,8 @@ class SwViewModel  @Inject constructor(
         val gson = Gson()
         when (id) {
             allSwId -> {
-                Log.i(TAG, "id = allSwId")
                 val toStore = gson.toJson(msg)
-                CoroutineScope(Dispatchers.IO).launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     swDataStore.saveFlashData(toStore)
                 }
                 mqttManager.unsubscribe(id)
@@ -151,11 +150,9 @@ class SwViewModel  @Inject constructor(
             }
 
             newSwId -> {
-                Log.i(TAG, "id = newSwId")
                 newSwId = ""
                 newSw -= id
                 val esp = gson.fromJson(msg, EspData::class.java)
-                Log.i(TAG, " recibo msg $msg")
                 if (esp != null) {
                     swMap[id] = SwData(
                         name = esp.name,
@@ -173,7 +170,6 @@ class SwViewModel  @Inject constructor(
             }
 
             upgradingId -> {
-                Log.i(TAG, "id = upgradingId")
                 val upgradeState = gson.fromJson(msg, EspData::class.java).state
                 if (upgradeState == SwState.UPGRADED.ordinal) {
                     upgradingId = ""
@@ -210,46 +206,46 @@ class SwViewModel  @Inject constructor(
     }
 
     private fun getStoredData() {
-        Log.i(TAG, "entro a getStoredData")
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             swDataStore.getFlashData().collect { flashData ->
-                Log.i(TAG,"saco: $flashData")
-                val gson = Gson()
-                val stored = gson.fromJson(flashData, ToStore::class.java)
-                if (stored != null) {
-                    if (stored.list.size == 0) {
-                        showAdd = true
-                    } else {
-                        stored.list.forEachIndexed { i, data ->
-                            swMap[data.id] = SwData(
-                                name = data.name,
-                                state = SwState.OFF,
-                                mode = SwMode.TIMERS,
-                                secs = 0,
-                                prgs = NO_TIMERS,
-                                tempX10 = 0,
-                                bkColor = data.bkColor,
-                                row = i + 1,
-                                status = SwStatus.DISCONNECTED
-                            )
+                if (!started) {
+                    started = true
+                    val gson = Gson()
+                    val stored = gson.fromJson(flashData, ToStore::class.java)
+                    if (stored != null) {
+                        if (stored.list.size == 0) {
+                            showAdd = true
+                        } else {
+                            stored.list.forEachIndexed { i, data ->
+                                swMap[data.id] = SwData(
+                                    name = data.name,
+                                    state = SwState.OFF,
+                                    mode = SwMode.TIMERS,
+                                    secs = 0,
+                                    prgs = NO_TIMERS,
+                                    tempX10 = 0,
+                                    bkColor = data.bkColor,
+                                    row = i + 1,
+                                    status = SwStatus.DISCONNECTED
+                                )
+                            }
+                            refreshScreenInfo()
                         }
-                        refreshScreenInfo()
+                    } else {
+                        Log.i(TAG, "bad stored data!")
                     }
-                } else {
-                    Log.i(TAG,"bad stored data!")
                 }
             }
         }
     }
     private fun saveData() {
-        Log.i(TAG, "entro a saveData")
         val list = mutableListOf<StoredData>()
         swMap.toList().sortedBy { it.second.row }. forEach { (id, swData) ->
             list.add(StoredData(swData.name, id, swData.bkColor))
         }
         val gson = Gson()
         val toStore = gson.toJson(ToStore(list))
-        viewModelScope.launch{
+        viewModelScope.launch(Dispatchers.IO){
             swDataStore.saveFlashData(toStore)
         }
     }
@@ -388,7 +384,6 @@ class SwViewModel  @Inject constructor(
             }
             for (id in newSw){
                 initSw(id)
-                Log.i(TAG,"id en lista de nuevos: ${id})")
             }
         }
     }
@@ -400,7 +395,6 @@ class SwViewModel  @Inject constructor(
             newSwId = id
             newSw += id
             if (mqttUp) {
-                Log.i(TAG, "llegue hasta subscribirme id $id" )
                 mqttManager.subscribe(id)
             }
         }
@@ -424,8 +418,6 @@ class SwViewModel  @Inject constructor(
         }
     }
     fun saveConfig(){
-        Log.i(TAG, "prgs viejos: ${swMap.getValue(currentId).prgs}")
-        Log.i(TAG, "prgs nuevos: ${currentSwData.prgs}")
         if (swMap.getValue(currentId).row > currentSwData.row) {
             swMap.forEach { (id, swData) ->
                 if (swData.row < swMap.getValue(currentId).row && swData.row >= currentSwData.row) {
@@ -482,10 +474,8 @@ class SwViewModel  @Inject constructor(
     }
     fun changeRow(pos: Int) {
         currentSwData.row += pos
-        Log.i(TAG,"row: [${currentSwData.row}]")
     }
     fun newTimer(newPrg: WeeklyProgram){
-        Log.i(TAG,"traigo $newPrg y ya tengo ${currentSwData.prgs[currentTimer]}")
         currentSwData.prgs[currentTimer] = newPrg.copy()
         showTimer = false
     }
@@ -543,9 +533,8 @@ class SwViewModel  @Inject constructor(
     }
     fun addAllSw(id: String) {
         if(id != "0"){
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 swDataStore.getFlashData().collect { flashData ->
-                    Log.i(TAG,"en addallsw saco: $flashData")
                     mqttManager.publish(id, flashData)
                 }
             }

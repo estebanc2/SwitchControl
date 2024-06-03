@@ -2,7 +2,6 @@ package com.capa1.switchcontrol.ui
 
 import android.app.Activity
 import android.content.res.Configuration
-import android.media.VolumeShaper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -48,10 +48,12 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 fun MainScreen(
     viewModel: SwViewModel = hiltViewModel()
 ) {
-    val permissionState =
+     val permissionState =
         rememberMultiplePermissionsState(permissions = PermissionUtils.permissions).allPermissionsGranted
     LaunchedEffect(key1 = permissionState) {
-        viewModel.start()
+        if (permissionState) {
+            viewModel.start()
+        }
     }
     val activity = (LocalContext.current as? Activity)
     NoPermissionDialog(
@@ -184,16 +186,7 @@ fun ShowSwitches(
         }
     }
 }
-@Composable
-fun OrientationDetector() {
-    val orientation = LocalConfiguration.current.orientation
-    val orientationText = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        "Landscape"
-    } else {
-        "Portrait"
-    }
-    Text("Orientation: $orientationText")
-}
+
 @Composable
 fun SwRow(
     item: SwScreenData,
@@ -213,7 +206,7 @@ fun SwRow(
             Modifier.fillMaxWidth(),
             Arrangement.SpaceBetween,
             ){
-            Column(modifier = Modifier.size(width = imageSize*3,height = imageSize)) {
+            Column(modifier = Modifier.width(width = imageSize * 3.5f)) {//
                 Text(
                     text = item.name,
                     color = MyColors[item.bkColor]!!.textColor,

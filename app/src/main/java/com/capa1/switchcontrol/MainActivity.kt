@@ -11,8 +11,6 @@ import androidx.compose.ui.Modifier
 import com.capa1.switchcontrol.ui.MainScreen
 import com.capa1.switchcontrol.ui.theme.SwitchControlTheme
 import dagger.hilt.android.AndroidEntryPoint
-
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     lateinit var context: Context
