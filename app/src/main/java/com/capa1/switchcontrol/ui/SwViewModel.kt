@@ -420,6 +420,18 @@ class SwViewModel  @Inject constructor(
         }
     }
     fun saveConfig(){
+        if (swMap.getValue(currentId).name != currentSwData.name ||
+            swMap.getValue(currentId).prgs != currentSwData.prgs ||
+            swMap.getValue(currentId).mode != currentSwData.mode ||
+            swMap.getValue(currentId).secs != currentSwData.secs){
+            val setData = Global.gson.toJson(EspData (  currentSwData.name,
+                SwState.SET_DATA.ordinal,
+                currentSwData.mode.ordinal,
+                currentSwData.secs,
+                currentSwData.prgs,
+                currentSwData.tempX10 ))
+            mqttManager.publish(currentId,setData)
+        }
         if (swMap.getValue(currentId).row > currentSwData.row) {
             swMap.forEach { (id, swData) ->
                 if (swData.row < swMap.getValue(currentId).row && swData.row >= currentSwData.row) {
@@ -440,18 +452,6 @@ class SwViewModel  @Inject constructor(
             swMap[currentId] = currentSwData.copy()
             refreshScreenInfo()
             saveData()
-        }
-        if (swMap.getValue(currentId).name != currentSwData.name ||
-            swMap.getValue(currentId).prgs != currentSwData.prgs ||
-            swMap.getValue(currentId).mode != currentSwData.mode ||
-            swMap.getValue(currentId).secs != currentSwData.secs){
-            val setData = Global.gson.toJson(EspData (  currentSwData.name,
-                SwState.SET_DATA.ordinal,
-                currentSwData.mode.ordinal,
-                currentSwData.secs,
-                currentSwData.prgs,
-                currentSwData.tempX10 ))
-            mqttManager.publish(currentId,setData)
         }
         showConfig = false
     }

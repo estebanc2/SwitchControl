@@ -71,9 +71,8 @@ fun MainScreen(
        }else{
             ConfigScreen (
                 qty = viewModel.swScreenList.size,
-                status = viewModel.currentSwData.status,
                 data = viewModel.currentSwData,
-                changeName = {viewModel.onShowName(true)},
+                changeName = {name -> viewModel.newName(name)},
                 changeColor = {viewModel.onShowColor(true)},
                 changeRow = { pos -> viewModel.changeRow(pos)},
                 changeTimer = {timer -> viewModel.onShowTimer(timer, true)},

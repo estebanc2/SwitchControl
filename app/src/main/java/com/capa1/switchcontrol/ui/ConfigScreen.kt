@@ -17,13 +17,16 @@ import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Handyman
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mode
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,9 +50,8 @@ import com.capa1.switchcontrol.data.model.WeeklyProgram
 @Composable
 fun ConfigScreen(
     qty: Int,
-    status: SwStatus,
     data: SwData,
-    changeName: () -> Unit,
+    changeName: (String) -> Unit,
     changeColor: ()-> Unit,
     changeRow: (Int) -> Unit,
     changeTimer: (Int) -> Unit,
@@ -58,8 +60,10 @@ fun ConfigScreen(
     save:()->Unit,
     onExit:()->Unit
 ){
+    val status = data.status
     var row by remember { mutableStateOf(data.row) }
     val prgs by remember { mutableStateOf(data.prgs) }
+    var name by remember { mutableStateOf(data.name) }
     fun hours(min: Int): String{
         return "${min/60}:${min - (min/60)*60}"
     }
@@ -102,32 +106,28 @@ fun ConfigScreen(
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
         )
-        Row(
+        OutlinedTextField (
+            value = name,
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
                 .padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "nombre: ",
-                style = TextStyle(fontSize = 20.sp),
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = data.name,
-                style = TextStyle(fontSize = 30.sp),
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.padding(horizontal = 10.dp))
-            Icon(
-                Icons.Default.ChangeCircle,
-                contentDescription = "",
-                modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeName() }
-            )
-        }
+            leadingIcon = {
+                Icon(
+                    Icons.Default.ChangeCircle,
+                    contentDescription = "",
+                    modifier = Modifier.clickable {
+                    if (status == SwStatus.CONNECTED) changeName(name)}
+                )
+            },
+            //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
+            onValueChange = {
+                name = it
+            },
+            label = { Text(text = "nombre del interruptor") },
+            //placeholder = { Text(text = "Enter your e-mail") },
+        )
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
         Text(
             text = "VISTA",
@@ -334,7 +334,6 @@ fun ShowConfigPreview()
 {
     ConfigScreen(
         qty = 5,
-        status = SwStatus.CONNECTED,
         data = SwData(
             "luz cocina", SwState.OFF, SwMode.TIMERS, 0, Global.NO_TIMERS,
             10, "nada", 2, SwStatus.CONNECTED
