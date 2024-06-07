@@ -54,6 +54,74 @@ fun MainScreen(
             viewModel.start()
         }
     }
+    val activity = (LocalContext.current as? Activity)
+    NoPermissionDialog(
+        show = !permissionState,
+        onConfirm = { activity?.finish() }
+    )
+    AddSwDialog(
+        show = viewModel.showAdd && permissionState,
+        addSw = {viewModel.onShowNew(true)},
+        addId = {viewModel.onShowNewId(true)},
+        addAll = {viewModel.onShowAll(true)},
+        onExit = {viewModel.onShowAdd(false)}
+    )
+    NewDialog(
+        show = viewModel.showNew,
+        apData = viewModel.myAp,
+        state = viewModel.touchProgress,
+        setPass = {pass -> viewModel.discoverSwitches(pass)},
+        onExit = {viewModel.onShowNew(false)}
+    )
+    NewIdDialog(
+        show = viewModel.showNewId,
+        setId = {id -> viewModel.setSwWithId(id)},
+        onExit = {viewModel.onShowNewId(false)}
+    )
+    NewAllDialog(
+        show = viewModel.showAll,
+        allSwId = viewModel.allSwId,
+        setId = {id -> viewModel.addAllSw(id)},
+        onExit = { viewModel.onShowAll(false)}
+    )
+    NameDialog(
+        show = viewModel.showName,
+        currentName = viewModel.currentSwData.name ,
+        setName = {name -> viewModel.newName(name)},
+        onExit = {viewModel.onShowName(false)}
+    )
+    ColorDialog(
+        show = viewModel.showColor,
+        currentColor = viewModel.currentSwData.bkColor,
+        setColor = {color -> viewModel.newColor(color)},
+        exit = {viewModel.onShowColor(false)}
+    )
+    TimerDialog(
+        show = viewModel.showTimer,
+        currentWP = viewModel.currentSwData.prgs[viewModel.currentTimer],
+        setTimer = {timer -> viewModel.newTimer(timer)},
+        onExit = {viewModel.onShowTimer(0,false)}
+    )
+    ModeDialog(
+        show = viewModel.showMode,
+        currentMode = viewModel.currentSwData.mode,
+        currentSecs = viewModel.currentSwData.secs,
+        setMode = {pair -> viewModel.setMode(pair.first, pair.second)},
+        onExit = {viewModel.onShowMode(false)}
+    )
+    MaintenanceDialog(
+        show = viewModel.showMaintenance,
+        id = viewModel.currentId,
+        upgrading = viewModel.upgrading,
+        lastServer = viewModel.server,
+        lastPort = viewModel.port,
+        upgrade = {pair -> viewModel.firmwareUpgrade(pair.first, pair.second)},
+        name = viewModel.currentSwData.name,
+        local = {viewModel.localErase()},
+        full = {viewModel.fullErase()},
+        onExit = {viewModel.onShowMaintenance(false)}
+    )
+
     Box(
         Modifier.fillMaxSize()
     ) {
@@ -83,7 +151,6 @@ fun MainScreen(
             )
         }
     }
-    initializeDialogs(viewModel, permissionState)
 }
 
 @Composable
@@ -167,76 +234,4 @@ fun SwRow(
             )
         }
     }
-}
-
-
-@Composable
-fun initializeDialogs(viewModel: SwViewModel, permissionState: Boolean) {
-    val activity = (LocalContext.current as? Activity)
-    NoPermissionDialog(
-        show = !permissionState,
-        onConfirm = { activity?.finish() }
-    )
-    AddSwDialog(
-        show = viewModel.showAdd && permissionState,
-        addSw = {viewModel.onShowNew(true)},
-        addId = {viewModel.onShowNewId(true)},
-        addAll = {viewModel.onShowAll(true)},
-        onExit = {viewModel.onShowAdd(false)}
-    )
-    NewDialog(
-        show = viewModel.showNew,
-        apData = viewModel.myAp,
-        state = viewModel.touchProgress,
-        setPass = {pass -> viewModel.discoverSwitches(pass)},
-        onExit = {viewModel.onShowNew(false)}
-    )
-    NewIdDialog(
-        show = viewModel.showNewId,
-        setId = {id -> viewModel.setSwWithId(id)},
-        onExit = {viewModel.onShowNewId(false)}
-    )
-    NewAllDialog(
-        show = viewModel.showAll,
-        allSwId = viewModel.allSwId,
-        setId = {id -> viewModel.addAllSw(id)},
-        onExit = { viewModel.onShowAll(false)}
-    )
-    NameDialog(
-        show = viewModel.showName,
-        currentName = viewModel.currentSwData.name ,
-        setName = {name -> viewModel.newName(name)},
-        onExit = {viewModel.onShowName(false)}
-    )
-    ColorDialog(
-        show = viewModel.showColor,
-        currentColor = viewModel.currentSwData.bkColor,
-        setColor = {color -> viewModel.newColor(color)},
-        exit = {viewModel.onShowColor(false)}
-    )
-    TimerDialog(
-        show = viewModel.showTimer,
-        currentWP = viewModel.currentSwData.prgs[viewModel.currentTimer],
-        setTimer = {timer -> viewModel.newTimer(timer)},
-        onExit = {viewModel.onShowTimer(0,false)}
-    )
-    ModeDialog(
-        show = viewModel.showMode,
-        currentMode = viewModel.currentSwData.mode,
-        currentSecs = viewModel.currentSwData.secs,
-        setMode = {pair -> viewModel.setMode(pair.first, pair.second)},
-        onExit = {viewModel.onShowMode(false)}
-    )
-    MaintenanceDialog(
-        show = viewModel.showMaintenance,
-        id = viewModel.currentId,
-        upgrading = viewModel.upgrading,
-        lastServer = viewModel.server,
-        lastPort = viewModel.port,
-        upgrade = {pair -> viewModel.firmwareUpgrade(pair.first, pair.second)},
-        name = viewModel.currentSwData.name,
-        local = {viewModel.localErase()},
-        full = {viewModel.fullErase()},
-        onExit = {viewModel.onShowMaintenance(false)}
-    )
 }
