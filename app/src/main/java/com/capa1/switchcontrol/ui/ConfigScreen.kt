@@ -1,5 +1,6 @@
 package com.capa1.switchcontrol.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.data.Global
+import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.SwState
@@ -51,7 +53,7 @@ import com.capa1.switchcontrol.data.model.WeeklyProgram
 fun ConfigScreen(
     qty: Int,
     data: SwData,
-    changeName: (String) -> Unit,
+    changeName: () -> Unit,
     changeColor: ()-> Unit,
     changeRow: (Int) -> Unit,
     changeTimer: (Int) -> Unit,
@@ -63,7 +65,6 @@ fun ConfigScreen(
     val status = data.status
     var row by remember { mutableStateOf(data.row) }
     val prgs by remember { mutableStateOf(data.prgs) }
-    var name by remember { mutableStateOf(data.name) }
     fun hours(min: Int): String{
         return "${min/60}:${min - (min/60)*60}"
     }
@@ -106,28 +107,32 @@ fun ConfigScreen(
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
         )
-        OutlinedTextField (
-            value = name,
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
                 .padding(horizontal = 16.dp, vertical = 10.dp),
-            leadingIcon = {
-                Icon(
-                    Icons.Default.ChangeCircle,
-                    contentDescription = "",
-                    modifier = Modifier.clickable {
-                    if (status == SwStatus.CONNECTED) changeName(name)}
-                )
-            },
-            //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
-            onValueChange = {
-                name = it
-            },
-            label = { Text(text = "nombre del interruptor") },
-            //placeholder = { Text(text = "Enter your e-mail") },
-        )
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "nombre: ",
+                style = TextStyle(fontSize = 20.sp),
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = data.name,
+                style = TextStyle(fontSize = 30.sp),
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.padding(horizontal = 10.dp))
+            Icon(
+                Icons.Default.ChangeCircle,
+                contentDescription = "",
+                modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeName() }
+            )
+        }
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
         Text(
             text = "VISTA",
@@ -348,3 +353,32 @@ fun ShowConfigPreview()
         onExit = {}
     )
 }
+/*
+        OutlinedTextField (
+            value = name,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape = MaterialTheme.shapes.medium)
+                .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+            leadingIcon = {
+                Icon(
+                    Icons.Default.ChangeCircle,
+                    contentDescription = "",
+                    modifier = Modifier.clickable {
+                        Log.i(TAG," si cliquea")
+                    if (status == SwStatus.CONNECTED) changeName(name)}
+                )
+            },
+            //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
+            singleLine = true,
+            maxLines = 1,
+            onValueChange = {
+                name = it
+            },
+            label = { Text(text = "nombre del interruptor") },
+            //placeholder = { Text(text = "Enter your e-mail") },
+        )
+
+ */
