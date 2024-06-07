@@ -140,13 +140,27 @@ class SwViewModel  @Inject constructor(
         val gson = Gson()
         when (id) {
             allSwId -> {
-                val toStore = gson.toJson(msg)
-                viewModelScope.launch(Dispatchers.IO) {
-                    swDataStore.saveFlashData(toStore)
+                val gson = Gson()
+                val received = gson.fromJson(msg, ToStore::class.java)
+                if (received != null) {
+                    received.list.forEachIndexed { i, data ->
+                        swMap[data.id] = SwData(
+                            name = data.name,
+                            state = SwState.OFF,
+                            mode = SwMode.TIMERS,
+                            secs = 0,
+                            prgs = NO_TIMERS,
+                            tempX10 = 0,
+                            bkColor = data.bkColor,
+                            row = i + 1,
+                            status = SwStatus.DISCONNECTED
+                        )
+                    }
+                    saveData()
+                    initializeSw()
+                } else {
+                    Log.i(TAG, "bad received data!")
                 }
-                mqttManager.unsubscribe(id)
-                getStoredData()
-                initializeSw()
             }
 
             newSwId -> {
@@ -201,7 +215,7 @@ class SwViewModel  @Inject constructor(
                 }
             }
         }
-        Log.i(TAG, "Rx: $id -> ${swMap.getValue(id).name}")
+        Log.i(TAG, "Rx: $id -> $msg")
         refreshScreenInfo()
     }
 
