@@ -12,41 +12,60 @@ Consiste en lo que necesita el modulo 8266 para operar, esto es un regulador de 
 
 ![alt_text](images/image2.png "image_tooltip")
 
-![alt_text](images/image3.png "image_tooltip")
-
 ## Software
 
 El desarrollo se basa en el uso del protocolo MQTT para enviarle ordenes desde el movil al interruptor conectado a una red Wifi, tambien se configura el nombre, modo de funcionamiento, timers y umbrales. Además desde la app movil con el movil conectado a la red wifi a la que se conectará el interruptor se le envia el password utilizando el protocolo esp-touch desarrollado por Espressif.
 
 ### Esquema de operacion
 
-![alt_text](images/image4.png "image_tooltip")
+![alt_text](images/image3.png "image_tooltip")
 
 Los topicos mqtt son : hacia el interruptor = /mtc/to_sw/8266 MAC address/ y desde el interruptor =  /mtc/from_sw/8266 MAC address/ y el mensage es un string Json que contiene siempre la misma estructura e informacion =
 
 {"name":"velador","mode":0,"secs":0,"state":"on","prgs":[{"days":0,"start":0,"stop":0},{"days":0,"start":0,"stop":0},{"days":0,"start":0,"stop":0},{"days":0,"start":0,"stop":0}],"tempX10":0}
 
 Donde:
+
 name: string up to 32 char
+
 mode: timer		  0
+
       timer/cont  1
+
       pulse na	  2
+
 	  pulse nc	  3
-	  timer/temp  4		
+
+	  timer/temp  4	
+
       temp		  5
+
 secs: seconds as auxiliary info for pulse mode
+
 tempX10: temperatura x 10 (solo sw doble)
+
 days:	bit0= domingo, bit1 = lunes... bit6 = sabado
+
 start:	minutes from 0 hs to sw on
+
 stop:	minutes from 0 hs to sw off
+
 state:	off	    	    0
+
 	    on		        1
+
 	    get_data	    2
+
 	    set_data	    3
+
 	    erase		    4
+
         upgrade	        5
+
 	    server fail 	6
+
 	    upgrade fail	7
+
         upgraded    	8	
 
 ### Programa C
@@ -62,7 +81,9 @@ El desarrollo del programa C para el microcontrolador tiene las siguientes funci
 ### Procedimiento para cargar nuevo firmware “upgrade”.
 
 1. Desde la plataforma ESP8266-RTOS-SDK con la que se escribe y compila el programa, generar el nuevo firmware con el comando:
+
         _make ota_
+
 2. Renombrar el archivo que se generará en el directorio build  “switch_control_c.ota.bin” por “switch_control.ota”:
 
         _cd build_
@@ -303,7 +324,7 @@ La configuración inicial (asociación a una red Wifi), la programación (modos/
 
 Podes prender y apagar un interruptor, tocando su icono. El icono muestra el estado real de cada interruptor, los interruptores programados como pulso tienen un reloj de arena y si algún dispositivo no está disponible por falta de conectividad, te lo mostrará con un sigo “?”, figura 4
 
-![alt_text](images/image5.png "image_tooltip")
+![alt_text](images/image4.png "image_tooltip")
 
 ## Configuración
 
@@ -319,7 +340,7 @@ En cualquier momento podés agregar o eliminar interruptores, modificar el nombr
 
 Para comandar un tomacorriente o una luminaria, el interruptor wifi puede ser instalado dentro de la caja estandar  de 100 x 50 mm existente. A continuación los esquemas respectivos.
 
-![alt_text](images/image6.png "image_tooltip")
+![alt_text](images/image5.png "image_tooltip")
 
 ## Especificaciones
 
@@ -333,6 +354,7 @@ Wifi 802.11 b/g/n
 
 Indicacion de estado mediante led azul incorporado. Repite patrones según tabla: 1 = 100mseg prendido y 0 apagado.
 
+![alt_text](images/image6.png "image_tooltip")
 
 ## Futuros releases
 
