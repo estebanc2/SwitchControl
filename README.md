@@ -1,6 +1,6 @@
 
 ![alt_text](images/image1.png "image_tooltip")
-WiFi Switch
+# WiFi Switch
 
 ## Objetivo
 
@@ -28,17 +28,17 @@ Donde:
 
 name: string up to 32 char
 
-mode: timer		  0
+mode:&nbsp; timer&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;0
 
-      timer/cont  1
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;timer/cont &nbsp; &nbsp; &nbsp;1
 
-      pulse na	  2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;pulse na&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;2
 
-	  pulse nc	  3
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;pulse nc&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;3
 
-	  timer/temp  4	
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;timer/temp&nbsp; &nbsp; &nbsp;4	
 
-      temp		  5
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;temp&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;5
 
 secs: seconds as auxiliary info for pulse mode
 
@@ -50,23 +50,23 @@ start:	minutes from 0 hs to sw on
 
 stop:	minutes from 0 hs to sw off
 
-state:	off	    	    0
+state: &nbsp;&nbsp;off   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;0
 
-	    on		        1
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;on  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; 1
 
-	    get_data	    2
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;get_data	   &nbsp; &nbsp;  2
 
-	    set_data	    3
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;set_data&nbsp; &nbsp;&nbsp; &nbsp;3
 
-	    erase		    4
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;erase	 &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;    4
 
-        upgrade	        5
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;upgrade&nbsp; &nbsp; &nbsp; &nbsp;5
 
-	    server fail 	6
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;server fail  &nbsp; &nbsp;	6
 
-	    upgrade fail	7
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;upgrade fail&nbsp;	7
 
-        upgraded    	8	
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;upgraded&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;8	
 
 ### Programa C
 
