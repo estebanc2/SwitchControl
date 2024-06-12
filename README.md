@@ -1,119 +1,137 @@
 
 ![alt_text](images/image1.png "image_tooltip")
-# WiFi Switch
+ # WiFi Switch
 
-## Objetivo
 
-Desarrollo  integral de interruptores comandados desde Internet. Esto involucro el diseno del hardware, el programa en C para el microcontrolador utilizado, 8266 de Espressif, y el desarrollo de la aplicacion para movil tanto Android, escrita en Kotlin como IOS escrita en SwiftUI.
+## Summary
+
+This repository shows how to build a switch operated from the Internet.
+
+This is an open-source software and hardware project. The schematics and board layout design, the programs in C for the ESP 8266 microcontroller, the program in Kotlin for the Android App, and the program in SwiftUI for the IOS App. All this is under the GPLv3 license schema. See the file LICENSE.txt in the same directory along with this file.
+
+
+## Motivation
+
+The project was born because of the need to manage my home heating. I need a schedule if the temperature is lower than N° and also to add the thermostat functionality. But soon I was using it to manage my garden irrigation, the lights from my home, the garage gateway, etc.
+
 
 ## Hardware
 
-Consiste en lo que necesita el modulo 8266 para operar, esto es un regulador de 3,3V, un rele de 6A con aislacion para 220VAC, una fuente de 220Vac a 5Vdc de unos 200mA lo mas pequena posible
+The hardware design is what the Espressif 8266 module needs to operate, that is 3.3V regulator, uno or two 6A relays isolated for 220VAC, the smallest possible power source from 220Vac to 5Vdc, 200mA, an easy way to transfer sw to the microcontroller.
+
 
 ![alt_text](images/image2.png "image_tooltip")
 
-## Software
 
-El desarrollo se basa en el uso del protocolo MQTT para enviarle ordenes desde el movil al interruptor conectado a una red Wifi, tambien se configura el nombre, modo de funcionamiento, timers y umbrales. Además desde la app movil con el movil conectado a la red wifi a la que se conectará el interruptor se le envia el password utilizando el protocolo esp-touch desarrollado por Espressif.
+Schematic circuit	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;board, top layer
 
-### Esquema de operacion
 
 ![alt_text](images/image3.png "image_tooltip")
 
-Los topicos mqtt son : hacia el interruptor = /mtc/to_sw/8266 MAC address/ y desde el interruptor =  /mtc/from_sw/8266 MAC address/ y el mensage es un string Json que contiene siempre la misma estructura e informacion =
+
+assembly&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cables and power supply added &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;			in the case
+
+
+## Software
+
+Development is around the MQTT protocol to send orders from the mobile phone to the switch connected to a Wifi network, the name, operating mode, timers, and thresholds are also configured. Additionally, from the mobile app with the mobile connected to the Wi-Fi network to which the switch will connect, the password is sent using the esp-touch protocol developed by Espressif.
+
+
+### MQTT dialog
+
+
+![alt_text](images/image4.png "image_tooltip")
+
+
+MQTT topics to the switch “/mtc/to_sw/8266MACaddress/”, from the switch:  “/mtc/from_sw/8266MACaddress/”, the MQTT message is a JSON string with always the same information structure: 
 
 {"name":"velador","mode":0,"secs":0,"state":"on","prgs":[{"days":0,"start":0,"stop":0},{"days":0,"start":0,"stop":0},{"days":0,"start":0,"stop":0},{"days":0,"start":0,"stop":0}],"tempX10":0}
 
-Donde:
+where:
 
-name: string up to 32 char
 
-mode:&nbsp; timer&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;0
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;timer/cont &nbsp; &nbsp; &nbsp;1
+* name: string up to 32 char								
+* mode:	
+1. timer		
+2. timer/cont		
+3. pulse na		
+4. pulse nc		
+5. timer/temp		
+6. temp		
+* secs: seconds as auxiliary info for pulse mode				
+* tempX10: temperature x 10 (only double switch)			
+* days:	bit 0 = Sanday, bit 1 = Monday ... bit 6 = Saturday			
+* start:	minutes from 0 hs to sw on			
+* stop:	minutes from 0 hs to sw off		
+* state:	
+1. off		
+2. on	
+3. get_data	
+4. set_data	
+5. erase	
+6. upgrade	
+7. server fails	
+8. upgrade fails	
+9. upgraded	
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;pulse na&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;2
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;pulse nc&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;3
+### Program in C
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;timer/temp&nbsp; &nbsp; &nbsp;4	
+The C program for the microcontroller has the following functions:
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;temp&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;5
 
-secs: seconds as auxiliary info for pulse mode
 
-tempX10: temperatura x 10 (solo sw doble)
+1. MQTT dialog with the app according to the operation scheme above.
+2. Receive configuration data from the app: name, mode, and timers to save them in non-volatile memory to share with other users.
+3. Manage esp-touch protocol for the initial connection to a Wi-Fi network and when the network parameters change.
+4. Manage the onboard LED of the 8266 board to report the hardware status. See the specifications, below.
+5. Manage firmware updates (versions of this C program), through Espressif “over the air” OTA mechanism.
 
-days:	bit0= domingo, bit1 = lunes... bit6 = sabado
 
-start:	minutes from 0 hs to sw on
+### Firmware upgrade procedure
 
-stop:	minutes from 0 hs to sw off
 
-state: &nbsp;&nbsp;off   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;0
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;on  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; 1
+1. From the ESP8266-RTOS-SDK platform generate a new firmware file:
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;get_data	   &nbsp; &nbsp;  2
+        make ota
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;set_data&nbsp; &nbsp;&nbsp; &nbsp;3
+2. The new file will be in the build directory. Rename it from “switch_control_c.ota.bin” to “switch_control.ota”:
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;erase	 &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;    4
+        cd build
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;upgrade&nbsp; &nbsp; &nbsp; &nbsp;5
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;server fail  &nbsp; &nbsp;	6
+        rm switch_control.ota
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;upgrade fail&nbsp;	7
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;upgraded&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;8	
+        mv switch_control_c.ota.bin switch_control.ota
 
-### Programa C
+3. Turn on an HTTP server in the above directory listening in XX port:
 
-El desarrollo del programa C para el microcontrolador tiene las siguientes funciones:
+        python -m http.server XX
 
-1. Dialogo mqtt con la app de acuerdo al esquema de operación de arriba.
-2. Recibir de la app los datos de configuraci’on: nombre, modo y timers y guardarlos en memoria no volatil para que estenn disponibles para todos los usuarios.
-3. Manejar el protocolo esp-touch para la coneccion inicial a una red wifi y volverloa utilizar si no se logra conectar a la red inicial.
-4. Manejar el on board led de la placa 8266 para informar el estado del hardware. Ver Especificaciones.
-5. Recibir actualizaciones de firmware, versiones de este programa C, mediante el mecanismo OTA “ over the air” de Espressif.
+4. In the Android or IOS app go to config/maintenance/firmware upgrade. From there, load the server address (IP address of the development computer), and XX port.
 
-### Procedimiento para cargar nuevo firmware “upgrade”.
+If the procedure succeeds the switch will turn on with the new firmware and a toast in the app shows “success”, if not, the toast gives some troubleshooting information.
 
-1. Desde la plataforma ESP8266-RTOS-SDK con la que se escribe y compila el programa, generar el nuevo firmware con el comando:
 
-        _make ota_
+### Android App
 
-2. Renombrar el archivo que se generará en el directorio build  “switch_control_c.ota.bin” por “switch_control.ota”:
+This is the switch management app, i.e. switch (turn on and off), manage connection with a wifi network to aggregate new switches to the app, use mode, timers settings, switch name, background color, and position in the screen, firmware upgrade, erase switches from the app and leave them to factory state. Also from this app, you can copy configured switches from other users.
 
-        _cd build_
-
-        _rm switch_control.ota_
-
-        _mv switch_control_c.ota.bin switch_control.ota_
-
-3. Prender un servidor HTTP en el mismo directorio en el que está el archivo renombrado y prender el servidor escuchando al puerto XX:
-
-        _python -m http.server XX_
-
-4. En la App android abrir la configuración del interruptor a realizarle la carga, ir a "mantenimiento" y luego "firmware upgrade". Se abrirá una ventana que invita a cargar la dirección IP (la de la máquina en la que se está desarrollando) y el puerto (XX).
-
-Si  el procedimiento es exitoso, el interruptor se levanta solo con el nuevo firmware y sale un cartel informándolo, sinó, en la App tendremos algo más de información respecto a que falló.
-
-### Aplicacion para Android
-
-Con esta app podes operar: es decir prender y apagar las llaves, configurarles la red wifi a la que se conectaran, el modo de uso, hasta 4 timers, el nombre del interruptor, el color y posicion de la pantalla en la que aparece cada interruptor agregado, hacerles firmware upgrade, borrarlo de la app y dejarlo de fabrica. Tambien desde la app incorporas nuevos interruptores ya configurados por terceros.
-
-El desarrollo esta hecho en Kotlin utilizando el patron MVVM, pantallas con Jetpack Compose, corrutinas e inyeccion de dependencias con Dagger Hilt.
+The app was developed in Kotlin using the MVVM architectural design pattern, Jetpack Compose to design the screens, coroutines, and Dagger Hilt dependency injection.
 
 
 ### Android App upload to Google Play procedure
 
 To upgrade the Android market version do the following:
 
-1. In Studio Project, clone the current anemometer project from Bitbucket.
+
+
+1. In Studio Project, clone the current anemometer project from Bitbucket. 
 2. Upgrade the project and test all new features locally
-3. In the file “build. gradle (: app)”, increase the Version Code and Version Name by one. Google requires this to upload an upgrade
+3. In the file “build. gradle (: app)”, increase the version code and version name by one. Google requires this to upload an upgrade
 4. Upgrade the below version history table
 5. Generate a new Signed Bundle: Build / Android AppBundle / Next
 6. Module: anemometer.app, Key store path: C:\repos\private_key.pepk, Key store password: xxx, Key alias: xxx, Key password: xxx, mark: Export encrypted….., Next
@@ -123,13 +141,14 @@ To upgrade the Android market version do the following:
 
 It will take about 2 days to be available in Google Play.
 
+
 <table>
   <tr>
-   <td><strong>vercion</strong>
+   <td><strong>version</strong>
    </td>
-   <td><strong>fecha</strong>
+   <td><strong>date</strong>
    </td>
-   <td><strong>modificacion</strong>
+   <td><strong>modification</strong>
    </td>
    <td><strong>commit</strong>
    </td>
@@ -141,7 +160,7 @@ It will take about 2 days to be available in Google Play.
 10/07/2021</p>
 
    </td>
-   <td>colores
+   <td>colors
    </td>
    <td>
    </td>
@@ -153,7 +172,7 @@ It will take about 2 days to be available in Google Play.
 13/07/2021</p>
 
    </td>
-   <td>icono
+   <td>icon
    </td>
    <td>
    </td>
@@ -312,53 +331,64 @@ It will take about 2 days to be available in Google Play.
   </tr>
 </table>
 
-### Aplicacion para IOS
 
-La aplicacion para Iphone tiene todas las facilidades de la Android menos la integracion del manejo del protocolo esp-touch que debe utilizarse como una aplicacion aparte. Espressif brinda las librerias para IOS pero en ObjectiveC y no para SwifttUI, aun no he podido “traducirlas” para utilizarlas. Por lo demás tambien se utiliza el patron MVVM y las ventajas de la programacion declarativa propuesta por Apple.
 
-# Operacion del producto terminado
+### IOS App
 
-Encendés y apagás (cerrás y abrís) un interruptor desde tu móvil. Podés programarle horarios, días de la semana y un contacto externo (NA), como por ejemplo un detector de lluvia. Tiene un modo pulso (NA o NC de 1 seg. a 10 min.) para, por ejemplo: apertura de portones y disparo de sirenas. Viene configurado de fábrica para que funcione cuando detecte cambios en la entrada de contactos, de forma tal que se puede conectar a una tecla de luz existente y comandarla en forma manual.
+The iPhone app has the same facilities as the Android app except for esp-touch integration. You should use the esp-touch app available in AppleStore for free. The issue is that Espressif gives esp-touch libraries for Objective-C but not for SwifttUI. I have a workaround to “translate “ them. The app was developed in SwiftUI 5, using MVVM architectural design patterns and the declarative programming advantages proposed by Apple.
 
-La configuración inicial (asociación a una red Wifi), la programación (modos/timers) y la operación (encender/apagar) se hacen con la App Android “Interruptores Wifi” disponible en Google Play. Desde esta App podés operar todos los interruptores que quieras y cada interruptor puede ser operado por varios usuarios que tengan la aplicación instalada y el interruptor agregado.
 
-Podes prender y apagar un interruptor, tocando su icono. El icono muestra el estado real de cada interruptor, los interruptores programados como pulso tienen un reloj de arena y si algún dispositivo no está disponible por falta de conectividad, te lo mostrará con un sigo “?”, figura 4
+# Final user manual
 
-![alt_text](images/image4.png "image_tooltip")
+You turn on and off (close and open) a switch from your mobile. You can program schedules, days of the week, and an external contact (NO), such as a rain detector. It has a pulse mode (NO or NC from 1 sec. to 10 min.) for, for example: opening gates and triggering sirens. It comes configured at the factory to work when it detects changes in the contact input, so it can be connected to an existing light key and controlled manually.
 
-## Configuración
+The initial configuration (association to a Wi-Fi network), programming (modes/timers), and operation (on/off) are done with the Android App “Wifi Switches” available on Google Play. From this app, you can operate all the switches you want and each switch can be operated by several users who have the application installed and the switch added.
 
-a) Configurarlo para operarlo desde tu móvil: Desde la pantalla inicial o desde el menú elegis: agregar interruptor. El interruptor nuevo se configura con tu móvil conectado a la red Wifi a la que lo asociarás. La App te mostrará la red  (ssid) y debes escribir la clave, figura 1. Luego si la clave es correcta, el interruptor está accesible y no configurado previamente, pasarás a la pantalla de configuración, en la que tendrás que definirle: nombre, modo de operación, tiempo de respuesta si es modo pulso, color de fondo y posición relativa. En el ejemplo, figura 3, el nombre es “alargue” y el modo es “timers”.
+You can turn a switch on and off by touching its icon. The icon shows the real status of each switch, the switches programmed as pulse have an hourglass and if a device is not available due to lack of connectivity, it will show it with a “?”, figure 4
 
-b) Incorporar a tu móvil un interruptor existente: La opción agregar interruptor con ID de la pantalla inicial o del menú te pedirá un ID válido que te puede dar quien haya configurado el interruptor siguiendo el punto anterior. El ID de ese interruptor se ve debajo del nombre en la pantalla de configuración, figura 3.
-
-c) Replicar todos los interruptores de un móvil a otro: La opción recibir configuración de la pantalla inicial o del menú te mostrará un ID que deberás copiar en el móvil en el que ya están configurados los interruptores, en la opción del menú enviar configuración. Si ambos móviles tienen conectividad quedarán idénticamente configurados. Las modificaciones posteriores en un móvil no afectan al otro.
-
-En cualquier momento podés agregar o eliminar interruptores, modificar el nombre, modo de operación, color de fondo, posición relativa y los días y horarios de operación de cada interruptor, yendo a las opciones del menú. Si quedó configurado con una red Wifi inalcanzable, lo rescatás siguiendo los pasos detallados en a).
-
-## Instalación
-
-Para comandar un tomacorriente o una luminaria, el interruptor wifi puede ser instalado dentro de la caja estandar  de 100 x 50 mm existente. A continuación los esquemas respectivos.
 
 ![alt_text](images/image5.png "image_tooltip")
 
-## Especificaciones
 
-Dimensiones 33 x 32 x 21 mm
 
-Tensión de entrada 100 a 230 Vac
+## Configuration
 
-Carga máxima 6A
+a) To operate from your mobile: in the initial screen or menu choose: add switch. The new switch is configured with your mobile phone connected to the Wi-Fi network to which you will associate it. The App will show you the network (SSID) and you must write the password, figure 1. Then if the password is correct, the switch is accessible and not previously configured, and you will go to the configuration screen, where you will have to define: the name, operation mode, response time if pulse mode, background color, and relative position. In the example, figure 3, the name is “alargue” and the mode is “timers”.
 
-Wifi 802.11 b/g/n
+b) Add an existing switch to your mobile: The add switch with ID option on the home screen or menu will ask you for a valid ID that can be given to you by whoever configured the switch following the previous point. The ID of that switch is seen below the name on the configuration screen, figure 3.
 
-Indicacion de estado mediante led azul incorporado. Repite patrones según tabla: 1 = 100mseg prendido y 0 apagado.
+c) Replicate all the switches from one mobile to another: The receive configuration option on the initial screen or menu will show you an ID to copy to the mobile on which the switches are already configured, in the send configuration menu option. If both mobile phones have connectivity, they will be identically configured. Subsequent modifications to one mobile phone do not affect the other.
+
+You can add or delete switches, and modify the name, operating mode, background color, relative position, and the days and hours of operation of each switch, by going to the menu options. If the configured Wi-Fi network is unreachable, you can rescue it by following the steps in a).
+
+
+## Installation
+
+To turn on and off outlets or lights, the Wi-Fi switch can be installed inside the existing standard 100 x 50 mm box. Below are the respective diagrams.
 
 ![alt_text](images/image6.png "image_tooltip")
 
-## Futuros releases
 
-1. Reemplazar la fuente de switching de 220Vac a 5Vdc por algo mas chico barato e integrado
-2. Reemplazar el rel por uno de estado solido para disminuirle el tamaño.
-3. Hacerlo compatible con Alexa y con Google home.
-4. Integrara esp-touch a la app en IOS como ya esta hecho en Android.
+
+## Specifications
+
+Size 33 x 32 x 21 mm
+
+Input voltage 100 to 230 Vac
+
+Maximum load 6A
+
+Wifi 802.11 b/g/n
+
+Blue led status indication. Blink as per the table where 1 is on for 100 msec and O off.
+![alt_text](images/image7.png "image_tooltip")
+
+
+## Futures releases
+
+
+
+1. Replace the current switching power supply from 220Vac to 5Vdc for something smoller, chip, and integrated.
+2. Replace the relays for a solid-state switch.
+3. Compatibility with Alexa and Google Home.
+4. Integrate esp-touch to the IOS app.
