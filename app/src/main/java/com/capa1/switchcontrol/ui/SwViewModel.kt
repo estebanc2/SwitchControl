@@ -2,6 +2,7 @@ package com.capa1.switchcontrol.ui
 
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -68,13 +69,13 @@ class SwViewModel  @Inject constructor(
         private set
     var showAll by mutableStateOf (false)
         private set
-    var upgrading by mutableStateOf (0)
+    var upgrading by mutableIntStateOf (0)
         private set
     var myAp by mutableStateOf (ApData(""," ",false))
         private set
     var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
         private set
-    var currentTimer by mutableStateOf(0)
+    var currentTimer by mutableIntStateOf(0)
         private set
     var showMode by mutableStateOf (false)
         private set
@@ -140,7 +141,6 @@ class SwViewModel  @Inject constructor(
         val gson = Gson()
         when (id) {
             allSwId -> {
-                val gson = Gson()
                 val received = gson.fromJson(msg, ToStore::class.java)
                 if (received != null) {
                     received.list.forEachIndexed { i, data ->

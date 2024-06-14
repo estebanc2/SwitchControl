@@ -1,6 +1,5 @@
 package com.capa1.switchcontrol.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,18 +17,16 @@ import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Handyman
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Mode
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,7 +39,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.data.Global
-import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.SwState
@@ -63,7 +59,7 @@ fun ConfigScreen(
     onExit:()->Unit
 ){
     val status = data.status
-    var row by remember { mutableStateOf(data.row) }
+    var row by remember { mutableIntStateOf(data.row) }
     val prgs by remember { mutableStateOf(data.prgs) }
     fun hours(min: Int): String{
         return "${min/60}:${min - (min/60)*60}"
