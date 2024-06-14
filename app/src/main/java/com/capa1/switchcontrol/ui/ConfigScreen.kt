@@ -27,17 +27,18 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwMode
@@ -60,7 +61,6 @@ fun ConfigScreen(
 ){
     val status = data.status
     var row by remember { mutableIntStateOf(data.row) }
-    val prgs by remember { mutableStateOf(data.prgs) }
     fun hours(min: Int): String{
         return "${min/60}:${min - (min/60)*60}"
     }
@@ -158,21 +158,25 @@ fun ConfigScreen(
             Icon(
                 Icons.Default.Upload,
                 contentDescription = "",
-                modifier = Modifier.padding(horizontal = 10.dp)
-                    .clickable { if(row > 1){
-                                    row -= 1
-                                    changeRow(-1)
-                                }
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .clickable {
+                        if (row > 1) {
+                            row -= 1
+                            changeRow(-1)
+                        }
                     }
             )
             Icon(
                 Icons.Default.Download,
                 contentDescription = "",
-                modifier = Modifier.padding(horizontal = 10.dp)
-                    .clickable { if(row< qty){
-                                    row += 1
-                                    changeRow(1)
-                                }
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .clickable {
+                        if (row < qty) {
+                            row += 1
+                            changeRow(1)
+                        }
                     }
             )
             Spacer(modifier = Modifier.padding(horizontal = 10.dp))
@@ -215,11 +219,12 @@ fun ConfigScreen(
                     modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeTimer(0)}
                 )
                 Text(
-                    text = getTimersInfo(prgs[0]),
+                    text = getTimersInfo(data.prgs[0]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable {  if(status == SwStatus.CONNECTED) changeTimer(0) }
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .clickable { if (status == SwStatus.CONNECTED) changeTimer(0) }
                 )
             }
             Row {
@@ -229,11 +234,12 @@ fun ConfigScreen(
                     modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeTimer(1)}
                 )
                 Text(
-                    text = getTimersInfo(prgs[1]),
+                    text = getTimersInfo(data.prgs[1]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable {  if(status == SwStatus.CONNECTED) changeTimer(1) }
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .clickable { if (status == SwStatus.CONNECTED) changeTimer(1) }
                 )
             }
             Row {
@@ -243,11 +249,12 @@ fun ConfigScreen(
                     modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeTimer(2)}
                 )
                 Text(
-                    text = getTimersInfo(prgs[2]),
+                    text = getTimersInfo(data.prgs[2]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable {  if(status == SwStatus.CONNECTED) changeTimer(2) }
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .clickable { if (status == SwStatus.CONNECTED) changeTimer(2) }
                 )
             }
             Row {
@@ -257,11 +264,12 @@ fun ConfigScreen(
                     modifier = Modifier.clickable { if(status == SwStatus.CONNECTED) changeTimer(3)}
                 )
                 Text(
-                    text = getTimersInfo(prgs[3]),
+                    text = getTimersInfo(data.prgs[3]),
                     style = TextStyle(fontSize = 16.sp),
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 10.dp)
-                        .clickable {  if(status == SwStatus.CONNECTED) changeTimer(3) }
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp)
+                        .clickable { if (status == SwStatus.CONNECTED) changeTimer(3) }
                 )
             }
         }
@@ -288,8 +296,9 @@ fun ConfigScreen(
                 text = "modo",
                 style = TextStyle(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 10.dp)
-                    .clickable {  if(status == SwStatus.CONNECTED) changeMode() }
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .clickable { if (status == SwStatus.CONNECTED) changeMode() }
             )
             Spacer(modifier = Modifier.padding(horizontal = 25.dp))
             Icon(
@@ -300,7 +309,8 @@ fun ConfigScreen(
                 text = "mantenimiento",
                 style = TextStyle(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 10.dp)
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
                     .clickable { goMaintenance() }
             )
 
@@ -314,7 +324,7 @@ fun ConfigScreen(
                     Icons.Default.CheckCircle,
                     contentDescription = "",
                 )
-                Text(text = "aceptar")
+                Text(stringResource(R.string.accept))
             }
             TextButton(
                 onClick = { onExit() },
@@ -323,7 +333,7 @@ fun ConfigScreen(
                     Icons.Default.Close,
                     contentDescription = "",
                 )
-                Text(text = "descartar")
+                Text(stringResource(R.string.noAccept))
             }
         }
     }

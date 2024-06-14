@@ -48,9 +48,6 @@ MQTT topics to the switch “/mtc/to_sw/8266MACaddress/”, from the switch:  �
 {"name":"velador","mode":0,"secs":0,"state":"on","prgs":[{"days":0,"start":0,"stop":0},{"days":0,"start":0,"stop":0},{"days":0,"start":0,"stop":0},{"days":0,"start":0,"stop":0}],"tempX10":0}
 
 where:
-
-
-
 * name: string up to 32 char								
 * mode:	
 1. timer		

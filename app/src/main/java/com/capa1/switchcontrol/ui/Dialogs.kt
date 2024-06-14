@@ -50,6 +50,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,6 +60,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -65,6 +68,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.Global.TAG
@@ -115,7 +119,7 @@ fun AddSwDialog( //1
                         modifier = Modifier.padding(10.dp)
                     ){
                         Text(
-                            text = "Agregar interruptor/es",
+                            text = stringResource(R.string.menuTitle),
                             style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
@@ -127,7 +131,7 @@ fun AddSwDialog( //1
                                 Icons.Default.AddCircleOutline,
                                 contentDescription = "",
                             )
-                            Text(text = "agregar un interruptor nuevo",
+                            Text(stringResource(R.string.addNew),
                                 modifier = Modifier.padding(
                                     horizontal = 10.dp,
                                     vertical = 0.dp))
@@ -139,7 +143,7 @@ fun AddSwDialog( //1
                                 Icons.Default.CheckCircleOutline,
                                 contentDescription = "",
                             )
-                            Text(text = "agregar un interruptor con un Id",
+                            Text(stringResource(R.string.addWithId),
                                 modifier = Modifier.padding(
                                     horizontal = 10.dp,
                                     vertical = 0.dp))
@@ -151,7 +155,7 @@ fun AddSwDialog( //1
                                 Icons.Default.FileDownload,
                                 contentDescription = "",
                             )
-                            Text(text = "enviar/recibir configuración completa",
+                            Text(stringResource(R.string.wholeConfig),
                                 modifier = Modifier.padding(
                                     horizontal = 10.dp,
                                     vertical = 0.dp))
@@ -164,20 +168,20 @@ fun AddSwDialog( //1
                                 Icons.Default.Mode,
                                 contentDescription = "",
                             )
-                            Text(text = "configurar interruptor",
+                            Text(stringResource(R.string.configSw),
                                 modifier = Modifier.padding(
                                     horizontal = 10.dp,
                                     vertical = 0.dp))
                         }
                         if(showHow){
                             Text(
-                                text = "toca el nombre del interruptor a configurar",
+                                text = stringResource(R.string.toughtToConfig),
                                 style = TextStyle(fontSize = 18.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
                             )
                             ElevatedButton(onClick = {showHow = false}){
-                                Text(text = "entendido")}
+                                Text(text = stringResource(R.string.gotIt))}
                         }
                         TextButton(
                             onClick = { onExit() },
@@ -186,7 +190,7 @@ fun AddSwDialog( //1
                                 Icons.Default.MoodBad,
                                 contentDescription = ""
                              )
-                            Text(text = " nada de esto por ahora",
+                            Text(text = stringResource(R.string.nothing),
                                 modifier = Modifier.padding(
                                     horizontal = 10.dp,
                                     vertical = 0.dp))
@@ -222,7 +226,7 @@ fun NewDialog( //2
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = "AGREGAR INTERRUPTOR",
+                            text = stringResource(R.string.addNewTitle),
                             style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
 
@@ -236,8 +240,7 @@ fun NewDialog( //2
                                     tint = Color.Red
                                 )
                                 Text(
-                                    text = "Asociado a una red wifi de 5GHz.\n" +
-                                            "Los interruptores requieren 2,4GHz",
+                                    text = stringResource(R.string.msg5Gh),
                                     style = TextStyle(fontSize = 14.sp),
                                     color = Color.Red,
                                     modifier = Modifier.padding(
@@ -279,7 +282,7 @@ fun NewDialog( //2
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                         var showProgress by remember { mutableStateOf(false) }
-                        var currentProgress by remember { mutableStateOf(0f) }
+                        var currentProgress by remember { mutableFloatStateOf(0f) }
                         val scope = rememberCoroutineScope() // Create a coroutine scope
                         var job: Job? by remember { mutableStateOf(null) }
                         if (showProgress){
@@ -325,7 +328,7 @@ fun NewDialog( //2
                                     Icons.Default.CheckCircle,
                                     contentDescription = "",
                                 )
-                                Text(text = "aceptar")
+                                Text(stringResource(R.string.accept))
                             }
                             TextButton(
                                 onClick = { onExit() },
@@ -334,7 +337,7 @@ fun NewDialog( //2
                                     Icons.Default.Close,
                                     contentDescription = "",
                                 )
-                                Text(text = "descartar")
+                                Text(stringResource(R.string.noAccept))
                             }
                         }
                     }
@@ -402,7 +405,7 @@ fun NewIdDialog( //3: Boolean,
                                     Icons.Default.CheckCircle,
                                     contentDescription = "",
                                 )
-                                Text(text = "aceptar")
+                                Text(stringResource(R.string.accept))
                             }
                             TextButton(
                                 onClick = { onExit() },
@@ -411,7 +414,7 @@ fun NewIdDialog( //3: Boolean,
                                     Icons.Default.Close,
                                     contentDescription = "",
                                 )
-                                Text(text = "descartar")
+                                Text(stringResource(R.string.noAccept))
                             }
                         }
                     }
@@ -500,7 +503,7 @@ fun NewAllDialog( //4
                                     Icons.Default.Close,
                                     contentDescription = "",
                                 )
-                                Text(text = "descartar")
+                                Text(stringResource(R.string.noAccept))
                             }
                         }
                     }
@@ -555,7 +558,7 @@ fun NameDialog( //5
                                     Icons.Default.CheckCircle,
                                     contentDescription = "",
                                 )
-                                Text(text = "aceptar")
+                                Text(stringResource(R.string.accept))
                             }
                             TextButton(
                                 onClick = { onExit() },
@@ -564,7 +567,7 @@ fun NameDialog( //5
                                     Icons.Default.Close,
                                     contentDescription = "",
                                 )
-                                Text(text = "descartar")
+                                Text(stringResource(R.string.noAccept))
                             }
                         }
                     }
@@ -654,8 +657,8 @@ fun TimerDialog( //7
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
-                        var start by remember { mutableStateOf(currentWP.start) }
-                        var stop by remember { mutableStateOf(currentWP.stop) }
+                        var start by remember { mutableIntStateOf(currentWP.start) }
+                        var stop by remember { mutableIntStateOf(currentWP.stop) }
                         fun checkMinStop(){
                             if(stop <= start){
                                 stop = start + 1
@@ -915,7 +918,7 @@ fun TimerDialog( //7
                                     Icons.Default.CheckCircle,
                                     contentDescription = "",
                                 )
-                                Text(text = "aceptar")
+                                Text(stringResource(R.string.accept))
                             }
                             TextButton(
                                 onClick = { onExit() },
@@ -924,7 +927,7 @@ fun TimerDialog( //7
                                     Icons.Default.Close,
                                     contentDescription = "",
                                 )
-                                Text(text = "descartar")
+                                Text(stringResource(R.string.noAccept))
                             }
                         }
                     }
@@ -961,7 +964,7 @@ fun ModeDialog( //8
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
                         Spacer(modifier = Modifier.height(10.dp))
-                        var secs by remember { mutableStateOf(currentSecs) }
+                        var secs by remember { mutableIntStateOf(currentSecs) }
                         var mode by remember { mutableStateOf(currentMode) }
                         val options : MutableList<String> = mutableListOf()
                         for (eachMode in SwMode.entries){
@@ -985,7 +988,9 @@ fun ModeDialog( //8
                                                 horizontal = 8.dp,
                                                 vertical = 8.dp
                                             )
-                                            .clickable { mode = SwMode.entries.toTypedArray()[index] }
+                                            .clickable {
+                                                mode = SwMode.entries.toTypedArray()[index]
+                                            }
                                     )
                                     if ((index == 2) || (index == 3)) {
                                         Text(
@@ -1047,7 +1052,7 @@ fun ModeDialog( //8
                                     Icons.Default.CheckCircle,
                                     contentDescription = "",
                                 )
-                                Text(text = "aceptar")
+                                Text(stringResource(R.string.accept))
                             }
                             TextButton(
                                 onClick = { onExit() },
@@ -1056,7 +1061,7 @@ fun ModeDialog( //8
                                     Icons.Default.Close,
                                     contentDescription = "",
                                 )
-                                Text(text = "descartar")
+                                Text(stringResource(R.string.noAccept))
                             }
                         }
                     }
@@ -1341,7 +1346,7 @@ fun MaintenanceDialog( //9
                                     Icons.Default.Close,
                                     contentDescription = "",
                                 )
-                                Text(text = "descartar")
+                                Text(stringResource(R.string.noAccept))
                             }
                         }
                     }

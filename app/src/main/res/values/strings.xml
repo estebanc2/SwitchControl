@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">SwitchControl</string>
+    <string name="accept">aceptar</string>
+    <string name="addWithId">agregar un interruptor con un Id</string>
+    <string name="addNew">agregar un interruptor nuevo</string>
+    <string name="configSw">configurar interruptor</string>
+    <string name="wholeConfig">enviar/recibir configuración completa</string>
+    <string name="toughtToConfig">toca el nombre del interruptor a configurar</string>
+    <string name="gotIt">entendido</string>
+    <string name="nothing">" nada de esto por ahora"</string>
+    <string name="menuTitle">Agregar interruptor/es</string>
+    <string name="addNewTitle">AGREGAR INTERRUPTOR</string>
+    <string name="msg5Gh">Asociado a una red wifi de 5GHz.\nLos interruptores requieren 2,4GHz</string>
+    <string name="noAccept">descartar</string>
 </resources>
