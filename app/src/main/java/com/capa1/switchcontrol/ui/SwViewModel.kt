@@ -1,5 +1,6 @@
 package com.capa1.switchcontrol.ui
 
+import android.content.res.Resources
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -90,7 +91,7 @@ class SwViewModel  @Inject constructor(
         private set
 
     fun start(){
-        Log.i(TAG," EN EL START")
+        Log.i(TAG," IN START")
         if(!started){
             getStoredData()
             mqttManager.connect()
@@ -222,7 +223,7 @@ class SwViewModel  @Inject constructor(
     private fun getStoredData() {
         viewModelScope.launch(Dispatchers.IO) {
             swDataStore.getFlashData().collect { flashData ->
-                Log.i(TAG,"saco: $flashData")
+                Log.i(TAG,"get from memory: $flashData")
                 if (!started) {
                     started = true
                     val gson = Gson()
@@ -275,25 +276,29 @@ class SwViewModel  @Inject constructor(
                                             timerInfo = getLegend(id)
                                         ))
         }
-        Log.i(TAG,"refresco la swScreenList")
+        Log.i(TAG,"swScreenList refresh")
         swScreenList = list
     }
     private fun isSet( days: Int, position: Int): Boolean {
         return days shr position and 1 == 1
     }
+    private fun getText(resource: Int): String{
+       return Resources.getSystem().getString(resource)
+    }
     private fun getLegend(id: String): String {
         if (!swMap.containsKey(id)) {
-            return "Sin Información"
+            return getText(R.string.noInfo)
         }
         when (swMap.getValue(id).mode) {
-            SwMode.PULSE_NA -> return "Pulso de ${swMap[id]?.secs} segundos"
-            SwMode.PULSE_NC -> return "Pulso de ${swMap[id]?.secs} segundos"
-            SwMode.TEMP -> return "Enciende si temp < ${(swMap[id]?.secs ?: 1) / 10}°"
+            SwMode.PULSE_NA,
+            SwMode.PULSE_NC -> return getText(R.string.pulseOf) +  swMap[id]?.secs +
+                    getText(R.string.seconds)
+            SwMode.TEMP -> return getText(R.string.turnOnIf) + (swMap[id]?.secs ?: 1) / 10 + "°"
             else -> {
                 if (swMap[id]?.state != SwState.OFF &&
                     swMap[id]?.state != SwState.ON
                 ) {
-                    return "Sin información"
+                    return Resources.getSystem().getString(R.string.noInfo)
                 }
                 val calendar = Calendar.getInstance()
                 val hour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -341,9 +346,9 @@ class SwViewModel  @Inject constructor(
                     ""
                 }
                 return if (deltaHours < 24) {
-                    "Cambia en $deltaHours:$deltaMin h$tempText"
+                    getText(R.string.changeIn) + "$deltaHours:$deltaMin h$tempText"
                 } else {
-                    "Cambia en más de 24 h$tempText"
+                    getText(R.string.changeMore24) + tempText
                 }
             }
         }

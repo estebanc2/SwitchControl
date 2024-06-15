@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.TAG
-import com.capa1.switchcontrol.data.mqtt.MqttState
 import com.espressif.iot.esptouch.EsptouchTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

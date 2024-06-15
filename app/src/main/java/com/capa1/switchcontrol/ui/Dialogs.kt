@@ -295,14 +295,16 @@ fun NewDialog( //2
                             }
 
                         }
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .padding(horizontal = 10.dp)
-                                .fillMaxWidth()
-                                .height(8.dp)
-                                .clip(RoundedCornerShape(16.dp)),
-                            progress = { currentProgress }
-                        )
+                        if(showProgress){
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .padding(horizontal = 10.dp)
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                                    .clip(RoundedCornerShape(16.dp)),
+                                progress = { currentProgress }
+                            )
+                        }
                         if(state == TouchState.TIMEOUT){
                             job?.cancel()
                             showProgress = false
@@ -1365,13 +1367,13 @@ fun ShowDialog(value: Int = 2) {
     when (value) {
 
         1 -> AddSwDialog(true, {}, {}, {}, {})
-        2 -> NewDialog(true,ApData("fliacastro4", "",false), TouchState.IN_PROGRESS, {""}, {})
+        2 -> NewDialog(true,ApData("myHome", "",false), TouchState.IN_PROGRESS, {""}, {})
         3 -> NewIdDialog(show = true, setId = {}, {})
         4 -> NewAllDialog(true, "all", {}, {})
         5 -> NameDialog(true, "kitchen light", {""}, {})
-        6 -> ColorDialog(true, "cielo", {},{})
+        6 -> ColorDialog(true, "metal", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
         8 -> ModeDialog(true, SwMode.TEMP, 10, {  }, {})
-        9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, "", "", {},"kitchen ligh", {},{},{})
+        9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, "", "", {},"kitchen light", {},{},{})
     }
 }

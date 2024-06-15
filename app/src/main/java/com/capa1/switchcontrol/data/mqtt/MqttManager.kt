@@ -3,7 +3,6 @@ package com.capa1.switchcontrol.data.mqtt
 import com.capa1.switchcontrol.data.Global.FROM_SW
 import com.capa1.switchcontrol.data.Global.MQTT_HOST_AND_PORT
 import com.capa1.switchcontrol.data.Global.TO_SW
-import com.capa1.switchcontrol.data.wifi.TouchState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -107,18 +106,6 @@ class MqttManager @Inject constructor() {
             message.qos = qos
             message.isRetained = retained
             mqttClient.publish(TO_SW + id, message, null, object : IMqttActionListener {
-                override fun onSuccess(asyncActionToken: IMqttToken?) {
-                }
-                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                }
-            })
-        } catch (e: MqttException) {
-            e.printStackTrace()
-        }
-    }
-    fun disconnect() {
-        try {
-            mqttClient.disconnect(null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                 }
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {

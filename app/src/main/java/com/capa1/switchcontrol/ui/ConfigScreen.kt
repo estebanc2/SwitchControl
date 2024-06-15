@@ -1,5 +1,6 @@
 package com.capa1.switchcontrol.ui
 
+import android.content.res.Resources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +51,7 @@ import com.capa1.switchcontrol.data.model.WeeklyProgram
 fun ConfigScreen(
     qty: Int,
     data: SwData,
+    //prgLegend: listOf(String),
     changeName: () -> Unit,
     changeColor: ()-> Unit,
     changeRow: (Int) -> Unit,
@@ -80,7 +82,7 @@ fun ConfigScreen(
         return daysIn
     }
     fun getTimersInfo(prg: WeeklyProgram): String{
-        var legend = "inactivo"
+        var legend = Resources.getSystem().getString(R.string.inactive)
         val days = prg.days
         val start = prg.start
         val stop = prg.stop
@@ -338,6 +340,7 @@ fun ConfigScreen(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

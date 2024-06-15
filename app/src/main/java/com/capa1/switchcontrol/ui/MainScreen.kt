@@ -30,10 +30,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.SwScreenData
@@ -157,13 +159,15 @@ fun MainScreen(
 fun ShowTitle(
     onShowAdd: () -> Unit
 ){
-    Row(Modifier.fillMaxWidth()
-        .padding(horizontal = 20.dp, vertical = 10.dp),
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 10.dp),
         Arrangement.SpaceBetween,
     ) {
         Log.i(TAG, "printing title")
         Text(
-            text = "Interruptores WiFi",
+            text = stringResource(R.string.mainScreenTitle),
             style = TextStyle(fontSize = 30.sp),
             color = MaterialTheme.colorScheme.primary
         )

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 class WifiCredentials @Inject constructor(
     private val context: Context,
 ) {
