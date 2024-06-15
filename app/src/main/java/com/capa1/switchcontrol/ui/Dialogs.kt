@@ -49,6 +49,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -93,7 +94,7 @@ fun NoPermissionDialog( //0
                     fontWeight = FontWeight.Bold)
             }
         }, text = {
-            Text(text = "this app doesn't run without Location permission. Please go to settings and allow it",
+            Text(stringResource(R.string.permissionLegend),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)
         })
@@ -284,30 +285,30 @@ fun NewDialog( //2
                         var showProgress by remember { mutableStateOf(false) }
                         var currentProgress by remember { mutableFloatStateOf(0f) }
                         val scope = rememberCoroutineScope() // Create a coroutine scope
-                        var job: Job? by remember { mutableStateOf(null) }
-                        if (showProgress){
-                            job = scope.launch {
+                        val job: Job? by remember { mutableStateOf(null) }
+                        LaunchedEffect (showProgress){
+                            scope.launch {
                                 loadProgress { progress ->
                                     currentProgress = progress
                                 }
                                 Log.i(TAG,"1")
                             }
-                            LinearProgressIndicator(
-                                modifier = Modifier
-                                    .padding(horizontal = 10.dp)
-                                    .fillMaxWidth()
-                                    .height(8.dp)
-                                    .clip(RoundedCornerShape(16.dp)),
-                                progress = { currentProgress }
-                            )
+
                         }
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp)
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(16.dp)),
+                            progress = { currentProgress }
+                        )
                         if(state == TouchState.TIMEOUT){
                             job?.cancel()
                             showProgress = false
                             currentProgress = 0f
                             Text(
-                                text = "Revisa la clave y volve a intentar,\n" +
-                                        "o no hay interruptores accesibles",
+                                text = stringResource(R.string.badKey),
                                 style = TextStyle(fontSize = 16.sp),
                                 color = Color.Red,
                                 modifier = Modifier
@@ -373,7 +374,7 @@ fun NewIdDialog( //3: Boolean,
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = "AGREGAR INTERRUPTOR CON UN ID",
+                            text = stringResource(R.string.addIdTitle),
                             style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -384,7 +385,7 @@ fun NewIdDialog( //3: Boolean,
                         TextField(
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                            placeholder = { Text(text = "12 caracteres: 0..9 / a..f") },
+                            placeholder = { Text(stringResource(R.string.validChar)) },
                             value = id,
                             singleLine = true,
                             maxLines = 1,
@@ -423,7 +424,6 @@ fun NewIdDialog( //3: Boolean,
         }
     }
 }
-
 @Composable
 fun NewAllDialog( //4
     show: Boolean,
@@ -444,19 +444,19 @@ fun NewAllDialog( //4
                         //verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = "COPIAR TODO DE/A OTRO MOVIL",
+                            text = stringResource(R.string.allTitle),
                             style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                         )
                         Text(
-                            text = "Para recibir la configuración completa de otro movil, pasale este código: $allSwId",
+                            text = stringResource(R.string.wholeConfigReceive, allSwId),
                             style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
                         )
                         Text(
-                            text = "Para enviar la configuración completa a otro movil, anota su código",
+                            text = stringResource(R.string.wholeConfigSend),
                             style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
@@ -465,7 +465,7 @@ fun NewAllDialog( //4
                         TextField (
                             modifier = Modifier.fillMaxWidth(),
                             textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                            placeholder = { Text(text = "12 caracteres: 0..9 / a..f") },
+                            placeholder = { Text(stringResource(R.string.validChar)) },
                             value = id,
                             singleLine = true,
                             maxLines = 1,
@@ -485,7 +485,7 @@ fun NewAllDialog( //4
                                     Icons.Default.Upload,
                                     contentDescription = "",
                                 )
-                                Text(text = "enviar")
+                                Text(text = stringResource(R.string.send))
                             }
                             TextButton(
                                 onClick = {setId("0")},
@@ -494,7 +494,7 @@ fun NewAllDialog( //4
                                     Icons.Default.Download,
                                     contentDescription = "",
                                 )
-                                Text(text = "recibir")
+                                Text(text = stringResource(R.string.receive))
                             }
                             TextButton(
                                 onClick = { onExit() },
@@ -532,7 +532,7 @@ fun NameDialog( //5
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = "CAMBIAR NOMBRE DEL INTERRUPTOR",
+                            text = stringResource(R.string.changeNameTitle),
                             style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -652,7 +652,7 @@ fun TimerDialog( //7
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                          Text(
-                            text = "HORARIO INICIAL",
+                            text = stringResource(R.string.startTime),
                             style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -713,7 +713,7 @@ fun TimerDialog( //7
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
-                            text = "HORARIO FINAL",
+                            text = stringResource(R.string.finalTime),
                             style = TextStyle(fontSize = 18.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -958,7 +958,7 @@ fun ModeDialog( //8
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = "MODO DE FUNCIONAMIENTO",
+                            text = stringResource(R.string.modeTitle),
                             style = TextStyle(fontSize = 20.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -994,7 +994,7 @@ fun ModeDialog( //8
                                     )
                                     if ((index == 2) || (index == 3)) {
                                         Text(
-                                            text = "seg.: $secs",
+                                            text = stringResource(R.string.sec, secs),
                                             style = TextStyle(fontSize = 18.sp),
                                             color = visible,
                                             modifier = Modifier.padding(
@@ -1018,7 +1018,7 @@ fun ModeDialog( //8
                                         }
                                     } else if ((index == 4) || (index == 5)) {
                                         Text(
-                                            text = "grad.: ${secs/10}",
+                                            text = stringResource(R.string.grad, secs / 10),
                                             style = TextStyle(fontSize = 18.sp),
                                             color = visible,
                                             modifier = Modifier.padding(
@@ -1099,7 +1099,7 @@ fun MaintenanceDialog( //9
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
-                            text = "ID PARA CONFIGURAR EN OTRA APP",
+                            text = stringResource(R.string.idToReceive),
                             style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(start = 0.dp,
@@ -1131,7 +1131,7 @@ fun MaintenanceDialog( //9
                             }
                         }
                         Text(
-                            text = "ACTUALIZAR FIRMWARE",
+                            text = stringResource(R.string.firmwareUpgradeTitle),
                             style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(start = 0.dp,
@@ -1147,7 +1147,7 @@ fun MaintenanceDialog( //9
                         {
                             Row (Modifier, verticalAlignment = Alignment.CenterVertically){
                                 Text(
-                                    text = "servidor: ",
+                                    text = stringResource(R.string.server),
                                     style = TextStyle(fontSize = 18.sp),
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(start = 0.dp,
@@ -1164,7 +1164,7 @@ fun MaintenanceDialog( //9
                             }
                             Row (Modifier, verticalAlignment = Alignment.CenterVertically){
                                 Text(
-                                    text = "puerto: ",
+                                    text = stringResource(R.string.port),
                                     style = TextStyle(fontSize = 18.sp),
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(start = 0.dp,
@@ -1186,7 +1186,7 @@ fun MaintenanceDialog( //9
                                 }
                                 SwState.SERVER_FAIL.ordinal->{
                                     Text(
-                                        text = "Revisa server/port y reintenta",
+                                        text = stringResource(R.string.badPortServer),
                                         style = TextStyle(fontSize = 16.sp),
                                         color = Color.Red,
                                         modifier = Modifier
@@ -1197,7 +1197,7 @@ fun MaintenanceDialog( //9
                                 }
                                 SwState.UPGRADE_FAIL.ordinal->{
                                     Text(
-                                        text = "falla al hacer el upgrade",
+                                        text = stringResource(R.string.upgradeFails),
                                         style = TextStyle(fontSize = 16.sp),
                                         color = Color.Red,
                                         modifier = Modifier
@@ -1208,7 +1208,7 @@ fun MaintenanceDialog( //9
                                 }
                                 SwState.UPGRADED.ordinal->{
                                     Text(
-                                        text = "firmware actualizado!",
+                                        text = stringResource(R.string.upgradeSuccess),
                                         style = TextStyle(fontSize = 16.sp),
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -1235,12 +1235,12 @@ fun MaintenanceDialog( //9
                                     Icons.Default.Upgrade,
                                     contentDescription = "",
                                 )
-                                Text(text = "actualizar")
+                                Text(text = stringResource(R.string.upgrade))
                             }
 
                         }
                         Text(
-                            text = "ELIMINAR INTERRUPTOR",
+                            text = stringResource(R.string.eraseTitle),
                             style = TextStyle(fontSize = 14.sp),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(start = 0.dp,
@@ -1261,7 +1261,7 @@ fun MaintenanceDialog( //9
                                             contentDescription = "",
                                 )
                                 Text(
-                                    text = "Eliminar $name en esta aplicación",
+                                    text = stringResource(R.string.localErase, name),
                                     style = TextStyle(fontSize = 14.sp),
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier
@@ -1274,19 +1274,19 @@ fun MaintenanceDialog( //9
                             if (erasing){
                                 Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                                     Text(
-                                        text = "Seguro?",
+                                        text = stringResource(R.string.shure),
                                         style = TextStyle(fontSize = 14.sp),
                                         color = MaterialTheme.colorScheme.primary,
                                     )
                                     Button(
                                         onClick = { local()},
                                     ) {
-                                        Text(text = "si")
+                                        Text(stringResource(R.string.yes))
                                     }
                                     Button(
                                         onClick = { erasing = false },
                                     ) {
-                                        Text(text = "no")
+                                        Text(stringResource(R.string.no))
                                     }
                                 }
                             }
@@ -1297,8 +1297,7 @@ fun MaintenanceDialog( //9
                                     contentDescription = "",
                                 )
                                 Text(
-                                    text = "Eliminar $name en esta aplicación y dejar el interruptor" +
-                                            " desconfigurado (de fábrica)",
+                                    text = stringResource(R.string.fullErase, name),
                                     style = TextStyle(fontSize = 14.sp),
                                     color = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier
@@ -1311,19 +1310,19 @@ fun MaintenanceDialog( //9
                             if (fullErasing){
                                 Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                                     Text(
-                                        text = "Seguro?",
+                                        text = stringResource(R.string.shure),
                                         style = TextStyle(fontSize = 14.sp),
                                         color = MaterialTheme.colorScheme.primary,
                                     )
                                     Button(
                                         onClick = { full()},
                                     ) {
-                                        Text(text = "si")
+                                        Text(stringResource(R.string.yes))
                                     }
                                     Button(
                                         onClick = { fullErasing = false },
                                     ) {
-                                        Text(text = "no")
+                                        Text(stringResource(R.string.no))
                                     }
                                 }
                             }
@@ -1361,18 +1360,18 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 7) {
+fun ShowDialog(value: Int = 2) {
     //Column
     when (value) {
 
         1 -> AddSwDialog(true, {}, {}, {}, {})
         2 -> NewDialog(true,ApData("fliacastro4", "",false), TouchState.IN_PROGRESS, {""}, {})
         3 -> NewIdDialog(show = true, setId = {}, {})
-        4 -> NewAllDialog(true, "tuti", {}, {})
-        5 -> NameDialog(true, "luz cocina", {""}, {})
+        4 -> NewAllDialog(true, "all", {}, {})
+        5 -> NameDialog(true, "kitchen light", {""}, {})
         6 -> ColorDialog(true, "cielo", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
         8 -> ModeDialog(true, SwMode.TEMP, 10, {  }, {})
-        9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, "", "", {},"luz cocina", {},{},{})
+        9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, "", "", {},"kitchen ligh", {},{},{})
     }
 }

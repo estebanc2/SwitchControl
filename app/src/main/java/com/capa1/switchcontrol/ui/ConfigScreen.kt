@@ -98,7 +98,7 @@ fun ConfigScreen(
     ) {
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Text(
-            text = "INTERRUPTOR WiFi",
+            text = stringResource(R.string.configTitle),
             style = TextStyle(fontSize = 16.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -112,7 +112,7 @@ fun ConfigScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "nombre: ",
+                text = stringResource(R.string.name),
                 style = TextStyle(fontSize = 20.sp),
                 color = MaterialTheme.colorScheme.primary
             )
@@ -131,7 +131,7 @@ fun ConfigScreen(
         }
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
         Text(
-            text = "VISTA",
+            text = stringResource(R.string.look),
             style = TextStyle(fontSize = 16.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -275,7 +275,7 @@ fun ConfigScreen(
         }
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
         Text(
-            text = "CONFIGURACION ADICIONAL",
+            text = stringResource(R.string.adicionalConfig),
             style = TextStyle(fontSize = 16.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -293,7 +293,7 @@ fun ConfigScreen(
                 contentDescription = ""
             )
             Text(
-                text = "modo",
+                text = stringResource(R.string.mode),
                 style = TextStyle(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
@@ -306,7 +306,7 @@ fun ConfigScreen(
                 contentDescription = ""
             )
             Text(
-                text = "mantenimiento",
+                text = stringResource(R.string.maintenance),
                 style = TextStyle(fontSize = 16.sp),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
@@ -346,7 +346,7 @@ fun ShowConfigPreview()
     ConfigScreen(
         qty = 5,
         data = SwData(
-            "luz cocina", SwState.OFF, SwMode.TIMERS, 0, Global.NO_TIMERS,
+            "light", SwState.OFF, SwMode.TIMERS, 0, Global.NO_TIMERS,
             10, "nada", 2, SwStatus.CONNECTED
         ),
         changeName = {},
@@ -373,7 +373,7 @@ fun ShowConfigPreview()
                     Icons.Default.ChangeCircle,
                     contentDescription = "",
                     modifier = Modifier.clickable {
-                        Log.i(TAG," si cliquea")
+                        Log.i(TAG," if click")
                     if (status == SwStatus.CONNECTED) changeName(name)}
                 )
             },
@@ -383,7 +383,7 @@ fun ShowConfigPreview()
             onValueChange = {
                 name = it
             },
-            label = { Text(text = "nombre del interruptor") },
+            label = { Text(text = "switch name") },
             //placeholder = { Text(text = "Enter your e-mail") },
         )
 
