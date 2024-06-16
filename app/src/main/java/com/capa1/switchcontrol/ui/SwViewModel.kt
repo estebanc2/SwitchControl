@@ -12,6 +12,7 @@ import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.Global.NO_TIMERS
 import com.capa1.switchcontrol.data.Global.TAG
+import com.capa1.switchcontrol.data.LegendMaker
 import com.capa1.switchcontrol.data.SwDataStore
 import com.capa1.switchcontrol.data.model.EspData
 import com.capa1.switchcontrol.data.model.StoredData
@@ -43,7 +44,8 @@ class SwViewModel  @Inject constructor(
     private val mqttManager: MqttManager,
     private val wifiCredentials: WifiCredentials,
     private val swDataStore: SwDataStore,
-    private val espTouch: EspTouch
+    private val espTouch: EspTouch,
+    private val legendMaker: LegendMaker
 ) : ViewModel() {
 
     private val swMap = mutableMapOf<String, SwData>()
@@ -273,82 +275,11 @@ class SwViewModel  @Inject constructor(
                                             row = swData.row,
                                             bkColor = swData.bkColor,
                                             swImageId = getSwImageId(id),
-                                            timerInfo = getLegend(id)
+                                            timerInfo = legendMaker.getLegend(swData)
                                         ))
         }
         Log.i(TAG,"swScreenList refresh")
         swScreenList = list
-    }
-    private fun isSet( days: Int, position: Int): Boolean {
-        return days shr position and 1 == 1
-    }
-
-    private fun getLegend(id: String): String {
-        if (!swMap.containsKey(id)) {
-            return "Sin Información"
-        }
-        when (swMap.getValue(id).mode) {
-            SwMode.PULSE_NA -> return "Pulso de ${swMap[id]?.secs} segundos"
-            SwMode.PULSE_NC -> return "Pulso de ${swMap[id]?.secs} segundos"
-            SwMode.TEMP -> return "Enciende si temp < ${(swMap[id]?.secs ?: 1) / 10}°"
-            else -> {
-                if (swMap[id]?.state != SwState.OFF &&
-                    swMap[id]?.state != SwState.ON
-                ) {
-                    return "Sin información"
-                }
-                val calendar = Calendar.getInstance()
-                val hour = calendar.get(Calendar.HOUR_OF_DAY)
-                val min = calendar.get(Calendar.MINUTE)
-                val today = calendar.get(Calendar.DAY_OF_WEEK) - 1
-                val tomorrow = (today + 1) % 7
-                val rightNow = (hour * 60) + min
-                var delta = 24 * 60
-                if (swMap[id]?.state == SwState.OFF) {
-                    for (prg in swMap[id]?.prgs ?: NO_TIMERS) {
-                        if (isSet(prg.days, today)) {
-                            val deltaTrans = prg.start - rightNow
-                            if (deltaTrans in 1..<delta) {
-                                delta = deltaTrans
-                            }
-                        }
-                        if (isSet(prg.days, tomorrow)) {
-                            val deltaTrans = prg.start + 24 * 60 - rightNow
-                            if (deltaTrans < delta) {
-                                delta = deltaTrans
-                            }
-                        }
-                    }
-                } else {
-                    for (prg in swMap[id]?.prgs ?: NO_TIMERS) {
-                        if (isSet(prg.days, today)) {
-                            val deltaTrans = prg.stop - rightNow
-                            if (deltaTrans in 1..<delta) {
-                                delta = deltaTrans
-                            }
-                        }
-                        if (isSet(prg.days, tomorrow)) {
-                            val deltaTrans = prg.stop + 24 * 60 - rightNow
-                            if (deltaTrans < delta) {
-                                delta = deltaTrans
-                            }
-                        }
-                    }
-                }
-                val deltaHours = delta / 60
-                val deltaMin = String.format(Locale.ENGLISH, "%02d", delta % 60)
-                val tempText = if (swMap[id]!!.mode == SwMode.TIMERS_TEMP) {
-                    " si temp < ${swMap[id]!!.secs / 10}°. Actual: ${swMap[id]!!.tempX10 / 10}"
-                } else {
-                    ""
-                }
-                return if (deltaHours < 24) {
-                    "Cambia en $deltaHours:$deltaMin h$tempText"
-                } else {
-                    "Cambia en más de 24 h$tempText"
-                }
-            }
-        }
     }
 
     private fun getSwImageId(id: String): Int {

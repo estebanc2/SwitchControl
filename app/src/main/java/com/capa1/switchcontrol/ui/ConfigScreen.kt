@@ -1,5 +1,6 @@
 package com.capa1.switchcontrol.ui
 
+import android.content.Context
 import android.content.res.Resources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -81,8 +83,9 @@ fun ConfigScreen(
         }
         return daysIn
     }
+    @Composable
     fun getTimersInfo(prg: WeeklyProgram): String{
-        var legend = Resources.getSystem().getString(R.string.inactive)
+        var legend = stringResource(R.string.inactive)
         val days = prg.days
         val start = prg.start
         val stop = prg.stop
