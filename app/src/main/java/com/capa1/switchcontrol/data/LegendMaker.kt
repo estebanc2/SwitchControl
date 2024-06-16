@@ -6,7 +6,6 @@ import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwMode
 import com.capa1.switchcontrol.data.model.SwState
 import java.util.Calendar
-import java.util.Locale
 import javax.inject.Inject
 
 class LegendMaker @Inject constructor(
@@ -67,14 +66,14 @@ class LegendMaker @Inject constructor(
                     }
                 }
                 val deltaHours = delta / 60
-                val deltaMin = String.format(Locale.ENGLISH, "%02d", delta % 60)
+                val deltaMin = delta % 60
                 val tempText = if (swData.mode == SwMode.TIMERS_TEMP) {
-                    " si temp < ${swData.secs / 10}°. Actual: ${swData.tempX10 / 10}"
+                    context.getString(R.string.ifTemp, swData.secs / 10, swData.tempX10 / 10)
                 } else {
                     ""
                 }
                 return if (deltaHours < 24) {
-                    "Cambia en $deltaHours:$deltaMin h$tempText"
+                    context.getString(R.string.changeIn, deltaHours, deltaMin, tempText)
                 } else {
                     context.getString(R.string.changeMore24, tempText)
                 }

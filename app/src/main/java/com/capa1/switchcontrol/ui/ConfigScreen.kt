@@ -1,7 +1,5 @@
 package com.capa1.switchcontrol.ui
 
-import android.content.Context
-import android.content.res.Resources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -53,7 +50,6 @@ import com.capa1.switchcontrol.data.model.WeeklyProgram
 fun ConfigScreen(
     qty: Int,
     data: SwData,
-    //prgLegend: listOf(String),
     changeName: () -> Unit,
     changeColor: ()-> Unit,
     changeRow: (Int) -> Unit,
@@ -99,7 +95,6 @@ fun ConfigScreen(
             .fillMaxSize()
             .padding(all = 20.dp),
         horizontalAlignment = Alignment.Start
-        //verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Text(
@@ -280,7 +275,7 @@ fun ConfigScreen(
         }
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
         Text(
-            text = stringResource(R.string.adicionalConfig),
+            text = stringResource(R.string.moreConfig),
             style = TextStyle(fontSize = 16.sp),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
@@ -365,32 +360,3 @@ fun ShowConfigPreview()
         onExit = {}
     )
 }
-/*
-        OutlinedTextField (
-            value = name,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape = MaterialTheme.shapes.medium)
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            textStyle = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-            leadingIcon = {
-                Icon(
-                    Icons.Default.ChangeCircle,
-                    contentDescription = "",
-                    modifier = Modifier.clickable {
-                        Log.i(TAG," if click")
-                    if (status == SwStatus.CONNECTED) changeName(name)}
-                )
-            },
-            //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
-            singleLine = true,
-            maxLines = 1,
-            onValueChange = {
-                name = it
-            },
-            label = { Text(text = "switch name") },
-            //placeholder = { Text(text = "Enter your e-mail") },
-        )
-
- */

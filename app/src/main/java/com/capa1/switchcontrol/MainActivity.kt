@@ -1,7 +1,5 @@
 package com.capa1.switchcontrol
 
-import android.content.Context
-import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity

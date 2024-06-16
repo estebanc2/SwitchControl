@@ -1,7 +1,6 @@
 package com.capa1.switchcontrol.ui
 
 import android.app.Activity
-import android.content.Context
 import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.Image

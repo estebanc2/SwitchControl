@@ -176,7 +176,7 @@ fun AddSwDialog( //1
                         }
                         if(showHow){
                             Text(
-                                text = stringResource(R.string.toughtToConfig),
+                                text = stringResource(R.string.touchToConfig),
                                 style = TextStyle(fontSize = 18.sp),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
@@ -1276,7 +1276,7 @@ fun MaintenanceDialog( //9
                             if (erasing){
                                 Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                                     Text(
-                                        text = stringResource(R.string.shure),
+                                        text = stringResource(R.string.sure),
                                         style = TextStyle(fontSize = 14.sp),
                                         color = MaterialTheme.colorScheme.primary,
                                     )
@@ -1312,7 +1312,7 @@ fun MaintenanceDialog( //9
                             if (fullErasing){
                                 Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                                     Text(
-                                        text = stringResource(R.string.shure),
+                                        text = stringResource(R.string.sure),
                                         style = TextStyle(fontSize = 14.sp),
                                         color = MaterialTheme.colorScheme.primary,
                                     )
@@ -1362,7 +1362,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 2) {
+fun ShowDialog(value: Int = 1) {
     //Column
     when (value) {
 

@@ -5,7 +5,7 @@
     <string name="addNew">agregar un interruptor nuevo</string>
     <string name="configSw">configurar interruptor</string>
     <string name="wholeConfig">enviar/recibir configuración completa</string>
-    <string name="toughtToConfig">toca el nombre del interruptor a configurar</string>
+    <string name="touchToConfig">toca el nombre del interruptor a configurar</string>
     <string name="gotIt">entendido</string>
     <string name="nothing">" nada de esto por ahora"</string>
     <string name="menuTitle">Agregar interruptor/es</string>
@@ -13,7 +13,7 @@
     <string name="msg5Gh">Asociado a una red wifi de 5GHz.\nLos interruptores requieren 2,4GHz</string>
     <string name="noAccept">descartar</string>
     <string name="maintenance">mantenimiento</string>
-    <string name="adicionalConfig">CONFIGURACION ADICIONAL</string>
+    <string name="moreConfig">CONFIGURACION ADICIONAL</string>
     <string name="name">"nombre: "</string>
     <string name="look">VISTA</string>
     <string name="configTitle">INTERRUPTOR WiFi</string>
@@ -43,7 +43,7 @@
     <string name="eraseTitle">ELIMINAR INTERRUPTOR</string>
     <string name="localErase">Eliminar %1$s en esta aplicación</string>
     <string name="fullErase">Eliminar %1$s en esta aplicación y dejar el interruptor desconfigurado (de fábrica)</string>
-    <string name="shure">Seguro?</string>
+    <string name="sure">Seguro?</string>
     <string name="yes">si</string>
     <string name="no">no</string>
     <string name="allTitle">COPIAR TODO DE/A OTRO MOVIL</string>
@@ -51,6 +51,8 @@
     <string name="inactive">inactivo</string>
     <string name="noInfo">Sin Información</string>
     <string name="changeMore24">Cambia en más de 24 h%1$s</string>
-    <string name="turnIf"><![CDATA[Enciende si temp < %d°]]></string>
+    <string name="turnIf"><![CDATA[Enciende si temp < %02d°]]></string>
     <string name="pulse">Pulso de %d segundos</string>
+    <string name="changeIn">Cambia en %d : %02d h %s</string>
+    <string name="ifTemp"><![CDATA[" si temp < %d°. Actual: %d"]]></string>
 </resources>

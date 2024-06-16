@@ -1,6 +1,5 @@
 package com.capa1.switchcontrol.ui
 
-import android.content.res.Resources
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,8 +32,6 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import java.util.Locale
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
 import kotlin.random.Random
