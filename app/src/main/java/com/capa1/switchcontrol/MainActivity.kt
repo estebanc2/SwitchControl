@@ -1,6 +1,7 @@
 package com.capa1.switchcontrol
 
 import android.content.Context
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -13,6 +14,8 @@ import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.ui.MainScreen
 import com.capa1.switchcontrol.ui.theme.SwitchControlTheme
 import dagger.hilt.android.AndroidEntryPoint
+
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     lateinit var context: Context

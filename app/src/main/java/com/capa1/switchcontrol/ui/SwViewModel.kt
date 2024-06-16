@@ -348,7 +348,7 @@ class SwViewModel  @Inject constructor(
                 return if (deltaHours < 24) {
                     getText(R.string.changeIn) + "$deltaHours:$deltaMin h$tempText"
                 } else {
-                    getText(R.string.changeMore24) + tempText
+                    getText(R.string.changeMore) + tempText
                 }
             }
         }

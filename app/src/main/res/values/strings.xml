@@ -48,11 +48,13 @@
     <string name="no">no</string>
     <string name="allTitle">COPIAR TODO DE/A OTRO MOVIL</string>
     <string name="mainScreenTitle">Interruptores WiFi</string>
-    <string name="noInfo">Sin Información</string>
     <string name="inactive">inactivo</string>
     <string name="pulseOf">Pulso de</string>
     <string name="seconds">segundos</string>
-    <string name="changeMore24">Cambia en más de 24 h</string>
+    <string name="changeMore">Cambia en más de 24 h</string>
     <string name="turnOnIf"><![CDATA["Enciende si temp < "]]></string>
     <string name="changeIn">"Cambia en "</string>
+    <string name="cambia_en_m_s_de_24_h">"Cambia en más de 24 h "</string>
+    <string name="frafrfa">frafrfa</string>
+    <string name="noInfo">Sin Información</string>
 </resources>
