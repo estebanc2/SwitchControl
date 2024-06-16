@@ -80,5 +80,4 @@ class LegendMaker @Inject constructor(
             }
         }
     }
-
 }

@@ -86,7 +86,7 @@ class SwViewModel  @Inject constructor(
     var touchProgress by mutableStateOf (TouchState.IN_PROGRESS)
         private set
     var currentSwData by mutableStateOf (SwData("", SwState.OFF, SwMode.TIMERS, 0,
-        NO_TIMERS, 0, "nada", 2, SwStatus.DISCONNECTED))
+        NO_TIMERS, 0, "nothing", 2, SwStatus.DISCONNECTED))
         private set
 
     fun start(){
