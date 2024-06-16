@@ -55,6 +55,5 @@
     <string name="turnOnIf"><![CDATA["Enciende si temp < "]]></string>
     <string name="changeIn">"Cambia en "</string>
     <string name="cambia_en_m_s_de_24_h">"Cambia en más de 24 h "</string>
-    <string name="frafrfa">frafrfa</string>
     <string name="noInfo">Sin Información</string>
 </resources>

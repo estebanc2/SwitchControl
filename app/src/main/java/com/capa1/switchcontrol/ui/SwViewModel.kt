@@ -282,23 +282,20 @@ class SwViewModel  @Inject constructor(
     private fun isSet( days: Int, position: Int): Boolean {
         return days shr position and 1 == 1
     }
-    private fun getText(resource: Int): String{
-       return Resources.getSystem().getString(resource)
-    }
+
     private fun getLegend(id: String): String {
         if (!swMap.containsKey(id)) {
-            return getText(R.string.noInfo)
+            return "Sin Información"
         }
         when (swMap.getValue(id).mode) {
-            SwMode.PULSE_NA,
-            SwMode.PULSE_NC -> return getText(R.string.pulseOf) +  swMap[id]?.secs +
-                    getText(R.string.seconds)
-            SwMode.TEMP -> return getText(R.string.turnOnIf) + (swMap[id]?.secs ?: 1) / 10 + "°"
+            SwMode.PULSE_NA -> return "Pulso de ${swMap[id]?.secs} segundos"
+            SwMode.PULSE_NC -> return "Pulso de ${swMap[id]?.secs} segundos"
+            SwMode.TEMP -> return "Enciende si temp < ${(swMap[id]?.secs ?: 1) / 10}°"
             else -> {
                 if (swMap[id]?.state != SwState.OFF &&
                     swMap[id]?.state != SwState.ON
                 ) {
-                    return Resources.getSystem().getString(R.string.noInfo)
+                    return "Sin información"
                 }
                 val calendar = Calendar.getInstance()
                 val hour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -346,13 +343,14 @@ class SwViewModel  @Inject constructor(
                     ""
                 }
                 return if (deltaHours < 24) {
-                    getText(R.string.changeIn) + "$deltaHours:$deltaMin h$tempText"
+                    "Cambia en $deltaHours:$deltaMin h$tempText"
                 } else {
-                    getText(R.string.changeMore) + tempText
+                    "Cambia en más de 24 h$tempText"
                 }
             }
         }
     }
+
     private fun getSwImageId(id: String): Int {
         if (!swMap.containsKey(id) || swMap.getValue(id).status == SwStatus.DISCONNECTED) {
             return R.drawable.no_info
