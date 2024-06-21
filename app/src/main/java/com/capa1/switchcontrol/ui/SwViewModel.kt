@@ -186,8 +186,8 @@ class SwViewModel  @Inject constructor(
             }
 
             upgradingId -> {
-                val upgradeState = gson.fromJson(msg, EspData::class.java).state
-                if (upgradeState == SwState.UPGRADED.ordinal) {
+                upgrading = gson.fromJson(msg, EspData::class.java).state
+                if (upgrading == SwState.UPGRADED.ordinal) {
                     upgradingId = ""
                 }
             }

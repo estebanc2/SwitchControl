@@ -1362,7 +1362,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 1) {
+fun ShowDialog(value: Int = 9) {
     //Column
     when (value) {
 
