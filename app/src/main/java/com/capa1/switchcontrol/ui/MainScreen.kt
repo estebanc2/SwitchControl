@@ -184,18 +184,16 @@ fun ShowSwitches(
     click: (String) -> Unit,
     onConfig: (SwScreenData)-> Unit
 ) {
-    if (!switches.isEmpty()){
-        LazyColumn(
-            contentPadding = PaddingValues(all = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(5.dp)
-        ) {
-            items(switches) { switch ->
-                SwRow(
-                    item = switch,
-                    click = { click(switch.id) },
-                    onConfig = {item -> onConfig(item)}
-                )
-            }
+    LazyColumn(
+        contentPadding = PaddingValues(all = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
+        items(switches) { switch ->
+            SwRow(
+                item = switch,
+                click = { click(switch.id) },
+                onConfig = {item -> onConfig(item)}
+            )
         }
     }
 }

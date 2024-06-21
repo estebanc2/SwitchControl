@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global
+import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.Global.NO_TIMERS
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.LegendMaker
@@ -233,6 +234,8 @@ class SwViewModel  @Inject constructor(
                             showAdd = true
                         } else {
                             stored.list.forEachIndexed { i, data ->
+                                var color = data.bkColor
+                                if (!MyColors.containsKey(color)) color = "nothing"
                                 swMap[data.id] = SwData(
                                     name = data.name,
                                     state = SwState.OFF,
@@ -240,7 +243,7 @@ class SwViewModel  @Inject constructor(
                                     secs = 0,
                                     prgs = NO_TIMERS,
                                     tempX10 = 0,
-                                    bkColor = data.bkColor,
+                                    bkColor = color,
                                     row = i + 1,
                                     status = SwStatus.DISCONNECTED
                                 )
