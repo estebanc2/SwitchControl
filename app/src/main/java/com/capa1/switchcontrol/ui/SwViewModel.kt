@@ -177,7 +177,7 @@ class SwViewModel  @Inject constructor(
                         secs = esp.secs,
                         prgs = esp.prgs,
                         tempX10 = esp.tempX10,
-                        bkColor = "nada",
+                        bkColor = "nothing",
                         row = swMap.size + 1,
                         status = SwStatus.CONNECTED
                     )
