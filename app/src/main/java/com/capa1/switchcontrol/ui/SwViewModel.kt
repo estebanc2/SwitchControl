@@ -123,6 +123,7 @@ class SwViewModel  @Inject constructor(
             espTouch.touched.collect { result ->
                 touchProgress = result.second
                 if(touchProgress == TouchState.READY){
+                    Log.i(TAG, "esptouch gave mac: $result.first")
                     setSwWithId(result.first)
                 }
             }

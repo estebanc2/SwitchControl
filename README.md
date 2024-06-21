@@ -307,6 +307,19 @@ It will take about 2 days to be available in Google Play.
    </td>
   </tr>
   <tr>
+    <td>17(1.17)
+   </td>
+   <td><p style="text-align: right">
+16/06/2024</p>
+
+   </td>
+   <td>String resources no more hardcoded
+   </td>
+   <td>085b01e0
+   </td>
+  </tr>
+  <tr>
+
    <td>
    </td>
    <td>
