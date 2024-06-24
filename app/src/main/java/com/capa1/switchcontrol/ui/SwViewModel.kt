@@ -187,6 +187,7 @@ class SwViewModel  @Inject constructor(
 
             upgradingId -> {
                 upgrading = gson.fromJson(msg, EspData::class.java).state
+                Log.i(TAG,"durante el upgrade recibo los sig estados: $upgrading")
                 if (upgrading == SwState.UPGRADED.ordinal) {
                     upgradingId = ""
                 }
