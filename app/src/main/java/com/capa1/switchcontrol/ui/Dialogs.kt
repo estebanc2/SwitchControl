@@ -17,10 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Check
@@ -1097,7 +1099,8 @@ fun MaintenanceDialog( //9
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
+                        modifier = Modifier.padding(20.dp)
+                            .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Text(
@@ -1362,7 +1365,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 6) {
+fun ShowDialog(value: Int = 9) {
     //Column
     when (value) {
 
