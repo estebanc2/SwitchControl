@@ -1,20 +1,21 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     id ("kotlin-kapt")
     id("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "com.capa1.switchcontrol"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.capa1.switchcontrol"
-        minSdk = 26
-        targetSdk = 34
-        versionCode = 18
-        versionName = "1.18"
+        minSdk = 29
+        targetSdk = 36
+        versionCode = 19
+        versionName = "1.19"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -41,9 +42,7 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -52,43 +51,40 @@ android {
 }
 
 dependencies {
-    implementation ("androidx.core:core-ktx:1.13.1")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
-    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.8.2")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
-    implementation ("androidx.compose.runtime:runtime-livedata:1.6.8")
-    implementation ("androidx.activity:activity-compose:1.9.0")
-    implementation (platform("androidx.compose:compose-bom:2024.06.00"))
-    implementation ("androidx.compose.ui:ui")
-    implementation ("androidx.compose.ui:ui-graphics")
-    implementation ("androidx.compose.ui:ui-tooling-preview")
-    implementation ("androidx.compose.material3:material3-android:1.2.1")
-    testImplementation ("junit:junit:4.13.2")
-    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation (platform("androidx.compose:compose-bom:2024.06.00"))
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4")
-    debugImplementation ("androidx.compose.ui:ui-tooling")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
     // store
-    implementation ("androidx.datastore:datastore-preferences:1.1.1")
+    implementation (libs.androidx.datastore.preferences)
     //extra icons
-    implementation("androidx.compose.material:material-icons-extended-android:1.6.8")
+    implementation(libs.androidx.material.icons.extended.android)
     //di
-    implementation ("com.google.dagger:hilt-android:2.49")
-    kapt ("com.google.dagger:hilt-android-compiler:2.48")
+    implementation (libs.hilt.android)
+    kapt (libs.hilt.android.compiler)
     //kapt ("androidx.hilt:hilt-compiler:1.2.0")
-    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation (libs.androidx.hilt.navigation.compose)
     //mqtt
-    implementation ("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
-    implementation ("org.eclipse.paho:org.eclipse.paho.android.service:1.1.1")
+    implementation (libs.org.eclipse.paho.client.mqttv3)
+    implementation (libs.org.eclipse.paho.android.service)
     //json
-    implementation ("com.google.code.gson:gson:2.10.1")
+    implementation (libs.gson)
     //Permissions
-    implementation ("com.google.accompanist:accompanist-permissions:0.28.0")
+    implementation (libs.accompanist.permissions)
     //esptouch
-    implementation ("com.github.EspressifApp:lib-esptouch-android:1.1.1")
-    implementation ("com.github.EspressifApp:lib-esptouch-v2-android:2.2.1")
+    implementation (libs.lib.esptouch.android)
+    implementation (libs.lib.esptouch.v2.android)
 }
 // Allow references to generated code
 kapt {
