@@ -1,8 +1,8 @@
 package com.capa1.switchcontrol.ui
 
-import android.app.Activity
 import android.content.res.Configuration
 import android.util.Log
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,7 +28,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -56,7 +55,7 @@ fun MainScreen(
             viewModel.start()
         }
     }
-    val activity = (LocalContext.current as? Activity)
+    val activity = LocalActivity.current
     NoPermissionDialog(
         show = !permissionState,
         onConfirm = { activity?.finish() }
