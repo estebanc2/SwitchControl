@@ -94,7 +94,7 @@ class SwViewModel  @Inject constructor(
         Log.i(TAG," IN START")
         if(!started){
             getStoredData()
-            mqttManager.connect()
+            mqttManager.mqttInit()
             subscribeToChanges()
             wifiCredentials.get()
         }
@@ -102,9 +102,16 @@ class SwViewModel  @Inject constructor(
     private fun subscribeToChanges() {
         viewModelScope.launch(Dispatchers.IO) {
             mqttManager.mqttState.collect { result ->
-                if (result == MqttState.UP) {
-                    mqttUp = true
-                    initializeSw()
+                when(result){
+                    MqttState.UP -> {
+                        mqttUp = true
+                        initializeSw()
+                    }
+                    MqttState.DOWN -> mqttUp = false
+                    MqttState.LOST -> {
+                        mqttManager.connect()
+                        mqttUp = false
+                    }
                 }
             }
         }

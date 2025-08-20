@@ -1,5 +1,6 @@
 package com.capa1.switchcontrol.data.mqtt
 
+import android.util.Log
 import com.capa1.switchcontrol.data.Global.FROM_SW
 import com.capa1.switchcontrol.data.Global.MQTT_HOST_AND_PORT
 import com.capa1.switchcontrol.data.Global.TO_SW
@@ -20,7 +21,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 enum class MqttState {
-    UP, DOWN
+    UP, DOWN, LOST
 }
 class MqttManager @Inject constructor() {
     private lateinit var mqttClient: MqttAsyncClient
@@ -29,38 +30,54 @@ class MqttManager @Inject constructor() {
     val subscribedId: MutableStateFlow<String> = MutableStateFlow("")
     val arrival: MutableStateFlow<Pair<String, String>> = MutableStateFlow(Pair("", ""))
 
-    fun connect() {
-        mqttClient = MqttAsyncClient(MQTT_HOST_AND_PORT,
+    fun mqttInit() {
+        mqttClient = MqttAsyncClient(
+            MQTT_HOST_AND_PORT,
             UUID.randomUUID().toString(),
             MemoryPersistence()
         )
         mqttClient.setCallback(object : MqttCallback {
             override fun messageArrived(topic: String, message: MqttMessage?) {
-                coroutineScope.launch { arrival.emit(Pair(topic.split("/").last(), message.toString()))}
+                coroutineScope.launch {
+                    arrival.emit(
+                        Pair(
+                            topic.split("/").last(),
+                            message.toString()
+                        )
+                    )
+                }
             }
 
             override fun connectionLost(cause: Throwable?) {
-                coroutineScope.launch { mqttState.emit(MqttState.DOWN)}
+                coroutineScope.launch { mqttState.emit(MqttState.DOWN) }
+                Log.i(TAG, "callback connectionLost $cause")
             }
 
             override fun deliveryComplete(token: IMqttDeliveryToken) {
+                Log.i(TAG, "callback deliveryComplete $token")
             }
         })
+        connect()
+    }
+    fun connect() {
         val options = MqttConnectOptions()
         try {
             mqttClient.connect(options, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     coroutineScope.launch { mqttState.emit(MqttState.UP)}
-
+                    Log.i(TAG, "callback onSuccess $asyncActionToken")
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                    coroutineScope.launch { mqttState.emit(MqttState.DOWN)}
+                    Log.i(TAG, "callback onFailure $asyncActionToken")
                 }
             })
         } catch (e: MqttException) {
             e.printStackTrace()
         }
     }
+
     fun subscribe(id: String, qos: Int = 1) {
         try {
             mqttClient.subscribe(FROM_SW + id, qos, null, object : IMqttActionListener {
@@ -74,6 +91,7 @@ class MqttManager @Inject constructor() {
             e.printStackTrace()
         }
     }
+
     fun subscribeFromPhone(id: String, qos: Int = 1) {
         try {
             mqttClient.subscribe(TO_SW + id, qos, null, object : IMqttActionListener {
@@ -114,5 +132,9 @@ class MqttManager @Inject constructor() {
         } catch (e: MqttException) {
             e.printStackTrace()
         }
+    }
+
+    companion object {
+        val TAG = "Mqtt"
     }
 }
