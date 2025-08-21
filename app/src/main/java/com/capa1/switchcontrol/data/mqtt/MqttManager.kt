@@ -54,7 +54,7 @@ class MqttManager @Inject constructor() {
             }
 
             override fun deliveryComplete(token: IMqttDeliveryToken) {
-                Log.i(TAG, "callback deliveryComplete $token")
+                //Log.i(TAG, "callback deliveryComplete $token")
             }
         })
         connect()

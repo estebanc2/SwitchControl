@@ -164,7 +164,6 @@ fun ShowTitle(
             .padding(horizontal = 20.dp, vertical = 10.dp),
         Arrangement.SpaceBetween,
     ) {
-        Log.i(TAG, "printing title")
         Text(
             text = stringResource(R.string.mainScreenTitle),
             style = TextStyle(fontSize = 30.sp),
