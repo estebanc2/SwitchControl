@@ -1,6 +1,6 @@
 [versions]
 accompanistPermissions = "0.37.3"
-agp = "8.11.1"
+agp = "8.11.2"
 datastorePreferences = "1.1.7"
 gson = "2.13.1"
 hiltAndroid = "2.56.2"

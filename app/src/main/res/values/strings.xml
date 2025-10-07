@@ -55,4 +55,5 @@
     <string name="pulse">Pulso de %d segundos</string>
     <string name="changeIn">Cambia en %d : %02d h %s</string>
     <string name="ifTemp"><![CDATA[" si temp < %d°. Actual: %d"]]></string>
+    <string name="no_sensor">sensor de temperatura no conectado</string>
 </resources>

@@ -20,7 +20,13 @@ class LegendMaker @Inject constructor(
         when (swData.mode) {
             SwMode.PULSE_NA,
             SwMode.PULSE_NC -> return context.getString(R.string.pulse, swData.secs)
-            SwMode.TEMP -> return context.getString(R.string.turnIf, swData.secs/10)
+            SwMode.TEMP -> {
+                if (swData.tempX10 == -700) {
+                    return context.getString(R.string.no_sensor)
+                } else {
+                    return context.getString(R.string.turnIf, swData.secs/10)
+                }
+            }
             else -> {
                 if (swData.state != SwState.OFF &&
                     swData.state != SwState.ON

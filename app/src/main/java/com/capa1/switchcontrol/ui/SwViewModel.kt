@@ -376,6 +376,7 @@ class SwViewModel  @Inject constructor(
             }
         }
     }
+
     fun saveConfig(){
         if (swMap.getValue(currentId).name != currentSwData.name ||
             swMap.getValue(currentId).prgs != currentSwData.prgs ||
