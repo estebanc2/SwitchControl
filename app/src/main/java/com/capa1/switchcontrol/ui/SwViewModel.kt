@@ -347,7 +347,9 @@ class SwViewModel  @Inject constructor(
         }
     }
     private fun initSw(id: String) {
-        mqttManager.publish(id, Global.SEND_GET)
+        val msg = Global.SEND_GET
+        mqttManager.publish(id, msg)
+        Log.i(TAG, "init Tx: $id -> $msg")
     }
     fun setSwWithId(id: String) {
         if (!swMap.contains(id)) {
