@@ -1,11 +1,11 @@
 [versions]
 accompanistPermissions = "0.37.3"
-agp = "8.11.2"
+agp = "9.0.1"
 datastorePreferences = "1.1.7"
 gson = "2.13.1"
 hiltAndroid = "2.56.2"
 hiltNavigationCompose = "1.2.0"
-kotlin = "2.0.21"
+kotlin = "2.2.10"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
