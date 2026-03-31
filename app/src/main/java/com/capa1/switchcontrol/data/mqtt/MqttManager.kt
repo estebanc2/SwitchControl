@@ -21,12 +21,12 @@ import java.util.UUID
 import javax.inject.Inject
 
 enum class MqttState {
-    UP, DOWN, LOST
+    CONNECTED, CONNECTING, DISCONNECTED
 }
 class MqttManager @Inject constructor() {
     private lateinit var mqttClient: MqttAsyncClient
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    val mqttState: MutableStateFlow<MqttState> = MutableStateFlow(MqttState.DOWN)
+    val mqttState: MutableStateFlow<MqttState> = MutableStateFlow(MqttState.CONNECTING)
     val subscribedId: MutableStateFlow<String> = MutableStateFlow("")
     val arrival: MutableStateFlow<Pair<String, String>> = MutableStateFlow(Pair("", ""))
 
@@ -49,7 +49,7 @@ class MqttManager @Inject constructor() {
             }
 
             override fun connectionLost(cause: Throwable?) {
-                coroutineScope.launch { mqttState.emit(MqttState.DOWN) }
+                coroutineScope.launch { mqttState.emit(MqttState.CONNECTING) }
                 Log.i(TAG, "callback connectionLost $cause")
             }
 
@@ -64,12 +64,12 @@ class MqttManager @Inject constructor() {
         try {
             mqttClient.connect(options, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    coroutineScope.launch { mqttState.emit(MqttState.UP)}
+                    coroutineScope.launch { mqttState.emit(MqttState.CONNECTED)}
                     Log.i(TAG, "callback onSuccess $asyncActionToken")
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    coroutineScope.launch { mqttState.emit(MqttState.DOWN)}
+                    coroutineScope.launch { mqttState.emit(MqttState.CONNECTING)}
                     Log.i(TAG, "callback onFailure $asyncActionToken")
                 }
             })

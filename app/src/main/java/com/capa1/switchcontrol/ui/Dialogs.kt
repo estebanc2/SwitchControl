@@ -75,7 +75,7 @@ import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.Global.TAG
-import com.capa1.switchcontrol.data.model.SwMode
+import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.SwState
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
@@ -943,9 +943,9 @@ fun TimerDialog( //7
 @Composable
 fun ModeDialog( //8
     show: Boolean,
-    currentMode:SwMode,
+    currentMode:Mode,
     currentSecs: Int,
-    setMode: (Pair<SwMode,Int>) -> Unit,
+    setMode: (Pair<Mode,Int>) -> Unit,
     onExit: () -> Unit
 ) {
 
@@ -971,7 +971,7 @@ fun ModeDialog( //8
                         var secs by remember { mutableIntStateOf(currentSecs) }
                         var mode by remember { mutableStateOf(currentMode) }
                         val options : MutableList<String> = mutableListOf()
-                        for (eachMode in SwMode.entries){
+                        for (eachMode in Mode.entries){
                             options += eachMode.name
                         }
                         options.forEachIndexed { index, label ->
@@ -993,7 +993,7 @@ fun ModeDialog( //8
                                                 vertical = 8.dp
                                             )
                                             .clickable {
-                                                mode = SwMode.entries.toTypedArray()[index]
+                                                mode = Mode.entries.toTypedArray()[index]
                                             }
                                     )
                                     if ((index == 2) || (index == 3)) {
@@ -1376,7 +1376,7 @@ fun ShowDialog(value: Int = 8) {
         5 -> NameDialog(true, "kitchen light", {""}, {})
         6 -> ColorDialog(true, "metal", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
-        8 -> ModeDialog(true, SwMode.TEMP, 10, {  }, {})
+        8 -> ModeDialog(true, Mode.TEMP, 10, {  }, {})
         9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, "", "", {},"kitchen light", {},{},{})
     }
 }

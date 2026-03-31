@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.model.SwData
-import com.capa1.switchcontrol.data.model.SwMode
+import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.SwState
 import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.data.model.WeeklyProgram
@@ -185,12 +185,12 @@ fun ConfigScreen(
                 contentDescription = "",
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
-            Text(text = data.bkColor,
+            Text(text = data.icon,
                 style = TextStyle(fontSize = 16.sp),
-                color = Global.MyColors[data.bkColor]!!.textColor,
+                color = Global.MyColors[data.icon]!!.textColor,
                 modifier = Modifier
                     .background(
-                        color = Global.MyColors[data.bkColor]!!.backColor
+                        color = Global.MyColors[data.icon]!!.backColor
                     )
                     .clickable { changeColor() }
                     .padding(all = 8.dp)
@@ -347,7 +347,7 @@ fun ShowConfigPreview()
     ConfigScreen(
         qty = 5,
         data = SwData(
-            "light", SwState.OFF, SwMode.TIMERS, 0, Global.NO_TIMERS,
+            "light", SwState.OFF, Mode.TIMERS, 0, Global.NO_TIMERS,
             10, "nada", 2, SwStatus.CONNECTED
         ),
         changeName = {},

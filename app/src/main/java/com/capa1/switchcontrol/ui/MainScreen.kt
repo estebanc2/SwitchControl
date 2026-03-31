@@ -93,7 +93,7 @@ fun MainScreen(
     )
     ColorDialog(
         show = viewModel.showColor,
-        currentColor = viewModel.currentSwData.bkColor,
+        currentColor = viewModel.currentSwData.icon,
         setColor = {color -> viewModel.newColor(color)},
         exit = {viewModel.onShowColor(false)}
     )

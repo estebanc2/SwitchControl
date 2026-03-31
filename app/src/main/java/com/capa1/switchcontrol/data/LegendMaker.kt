@@ -3,7 +3,7 @@ package com.capa1.switchcontrol.data
 import android.content.Context
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.model.SwData
-import com.capa1.switchcontrol.data.model.SwMode
+import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.SwState
 import java.util.Calendar
 import javax.inject.Inject
@@ -18,9 +18,9 @@ class LegendMaker @Inject constructor(
 
     fun getLegend(swData: SwData): String {
         when (swData.mode) {
-            SwMode.PULSE_NA,
-            SwMode.PULSE_NC -> return context.getString(R.string.pulse, swData.secs)
-            SwMode.TEMP -> {
+            Mode.PULSE_NA,
+            Mode.PULSE_NC -> return context.getString(R.string.pulse, swData.secs)
+            Mode.TEMP -> {
                 if (swData.tempX10 == -700) {
                     return context.getString(R.string.no_sensor)
                 } else {
@@ -73,7 +73,7 @@ class LegendMaker @Inject constructor(
                 }
                 val deltaHours = delta / 60
                 val deltaMin = delta % 60
-                val tempText = if (swData.mode == SwMode.TIMERS_TEMP) {
+                val tempText = if (swData.mode == Mode.TIMERS_TEMP) {
                     context.getString(R.string.ifTemp, swData.secs / 10, swData.tempX10 / 10)
                 } else {
                     ""

@@ -9,15 +9,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global
-import com.capa1.switchcontrol.data.Global.MyColors
-import com.capa1.switchcontrol.data.Global.NO_TIMERS
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.LegendMaker
 import com.capa1.switchcontrol.data.SwDataStore
 import com.capa1.switchcontrol.data.model.EspData
 import com.capa1.switchcontrol.data.model.StoredData
 import com.capa1.switchcontrol.data.model.SwData
-import com.capa1.switchcontrol.data.model.SwMode
+import com.capa1.switchcontrol.data.model.Mode
+import com.capa1.switchcontrol.data.model.NO_TIMERS
+import com.capa1.switchcontrol.data.model.SEND_ERASE
+import com.capa1.switchcontrol.data.model.SEND_GET
+import com.capa1.switchcontrol.data.model.SEND_OFF
+import com.capa1.switchcontrol.data.model.SEND_ON
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.SwState
 import com.capa1.switchcontrol.data.model.SwStatus
@@ -86,7 +89,7 @@ class SwViewModel  @Inject constructor(
         private set
     var touchProgress by mutableStateOf (TouchState.IN_PROGRESS)
         private set
-    var currentSwData by mutableStateOf (SwData("", SwState.OFF, SwMode.TIMERS, 0,
+    var currentSwData by mutableStateOf (SwData("", SwState.OFF, Mode.TIMERS, 0,
         NO_TIMERS, 0, "nothing", 2, SwStatus.DISCONNECTED))
         private set
 
@@ -103,12 +106,12 @@ class SwViewModel  @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             mqttManager.mqttState.collect { result ->
                 when(result){
-                    MqttState.UP -> {
+                    MqttState.CONNECTED -> {
                         mqttUp = true
                         initializeSw()
                     }
-                    MqttState.DOWN -> mqttUp = false
-                    MqttState.LOST -> {
+                    MqttState.CONNECTING -> mqttUp = false
+                    MqttState.DISCONNECTED -> {
                         mqttManager.connect()
                         mqttUp = false
                     }
@@ -156,11 +159,11 @@ class SwViewModel  @Inject constructor(
                         swMap[data.id] = SwData(
                             name = data.name,
                             state = SwState.OFF,
-                            mode = SwMode.TIMERS,
+                            mode = Mode.TIMERS,
                             secs = 0,
                             prgs = NO_TIMERS,
                             tempX10 = 0,
-                            bkColor = data.bkColor,
+                            icon = "tv.fill",
                             row = i + 1,
                             status = SwStatus.DISCONNECTED
                         )
@@ -180,11 +183,11 @@ class SwViewModel  @Inject constructor(
                     swMap[id] = SwData(
                         name = esp.name,
                         state = SwState.entries[esp.state],
-                        mode = SwMode.entries[esp.mode],
+                        mode = Mode.entries[esp.mode],
                         secs = esp.secs,
                         prgs = esp.prgs,
                         tempX10 = esp.tempX10,
-                        bkColor = "nothing",
+                        icon = "nothing",
                         row = swMap.size + 1,
                         status = SwStatus.CONNECTED
                     )
@@ -206,15 +209,15 @@ class SwViewModel  @Inject constructor(
                     swMap[id] = SwData(
                         esp.name,
                         SwState.entries[esp.state],
-                        SwMode.entries[esp.mode],
+                        Mode.entries[esp.mode],
                         esp.secs,
                         esp.prgs,
                         esp.tempX10,
-                        swMap[id]?.bkColor ?: "nada",
+                        swMap[id]?.icon ?: "nada",
                         swMap[id]?.row ?: 1,
                         SwStatus.CONNECTED
                     )
-                    if (swMap[id]?.mode == SwMode.TIMERS_TEMP) {
+                    if (swMap[id]?.mode == Mode.TIMERS_TEMP) {
                         val tempId = (if (id.substring(0, 2).toInt(16) == 255)
                             254 else id.substring(0, 2)
                             .toInt(16) + 1).toString(16) + id.substring(2, id.length)
@@ -242,16 +245,14 @@ class SwViewModel  @Inject constructor(
                             showAdd = true
                         } else {
                             stored.list.forEachIndexed { i, data ->
-                                var color = data.bkColor
-                                if (!MyColors.containsKey(color)) color = "nothing"
                                 swMap[data.id] = SwData(
                                     name = data.name,
                                     state = SwState.OFF,
-                                    mode = SwMode.TIMERS,
+                                    mode = Mode.TIMERS,
                                     secs = 0,
                                     prgs = NO_TIMERS,
                                     tempX10 = 0,
-                                    bkColor = color,
+                                    icon = "color",
                                     row = i + 1,
                                     status = SwStatus.DISCONNECTED
                                 )
@@ -268,7 +269,7 @@ class SwViewModel  @Inject constructor(
     private fun saveData() {
         val list = mutableListOf<StoredData>()
         swMap.toList().sortedBy { it.second.row }. forEach { (id, swData) ->
-            list.add(StoredData(swData.name, id, swData.bkColor))
+            list.add(StoredData(swData.name, id, swData.icon))
         }
         val gson = Gson()
         val toStore = gson.toJson(ToStore(list))
@@ -280,52 +281,18 @@ class SwViewModel  @Inject constructor(
         val list = mutableListOf<SwScreenData>()
         swMap.toList().sortedBy { it.second.row }.forEach { (id, swData) ->
             list.add(SwScreenData(  name = swData.name,
-                                            id = id,
-                                            row = swData.row,
-                                            bkColor = swData.bkColor,
-                                            swImageId = getSwImageId(id),
-                                            timerInfo = legendMaker.getLegend(swData)
+                                    id = id,
+                                    icon = swData.icon,
+                                    timerInfo = legendMaker.getLegend(swData),
+                                    isOn = swData.state == SwState.ON,
+                                    connected = swData.status == SwStatus.CONNECTED
                                         ))
         }
         Log.i(TAG,"swScreenList refresh")
         swScreenList = list
     }
 
-    private fun getSwImageId(id: String): Int {
-        if (!swMap.containsKey(id) || swMap.getValue(id).status == SwStatus.DISCONNECTED) {
-            return R.drawable.no_info
-        }
-        if (swMap.getValue(id).status == SwStatus.CONNECTING){
-            if (swMap.getValue(id).state == SwState.OFF) {
-                return R.drawable.opening
-            }
-            if (swMap.getValue(id).state == SwState.ON) {
-                return R.drawable.closing
-            }
-        }
 
-        when (swMap.getValue(id).mode to swMap.getValue(id).state) {
-            (SwMode.TIMERS to SwState.ON),
-            (SwMode.TIMERS_TEMP to SwState.ON),
-            (SwMode.TIMERS_CONTACT to SwState.ON) -> {
-                return R.drawable.close
-            }
-
-            (SwMode.TIMERS to SwState.OFF),
-            (SwMode.TIMERS_TEMP to SwState.OFF),
-            (SwMode.TIMERS_CONTACT to SwState.OFF) -> {
-                return R.drawable.open
-            }
-
-            (SwMode.PULSE_NA to SwState.ON) -> return R.drawable.na
-            (SwMode.PULSE_NA to SwState.OFF) -> return R.drawable.nc
-            (SwMode.PULSE_NC to SwState.ON) -> return R.drawable.nc
-            (SwMode.PULSE_NC to SwState.OFF) -> return R.drawable.na
-            (SwMode.TEMP to SwState.ON) -> return R.drawable.close_lock
-            (SwMode.TEMP to SwState.OFF) -> return R.drawable.open_lock
-            else -> return R.drawable.no_info
-        }
-    }
     private fun initializeSw() {
         for (id in swMap.keys) {
             mqttManager.subscribe(id)
@@ -347,7 +314,7 @@ class SwViewModel  @Inject constructor(
         }
     }
     private fun initSw(id: String) {
-        val msg = Global.SEND_GET
+        val msg = SEND_GET
         mqttManager.publish(id, msg)
         Log.i(TAG, "init Tx: $id -> $msg")
     }
@@ -367,10 +334,10 @@ class SwViewModel  @Inject constructor(
             swMap [id]?.status = SwStatus.CONNECTING
             when ( swMap[id]?.state ) {
                 SwState.OFF -> {
-                    mqttManager.publish(id, Global.SEND_ON)
+                    mqttManager.publish(id, SEND_ON)
                 }
                 SwState.ON -> {
-                    mqttManager.publish(id, Global.SEND_OFF)
+                    mqttManager.publish(id, SEND_OFF)
                 }
                 else -> {
                     swMap [id]?.status = SwStatus.CONNECTED
@@ -407,7 +374,7 @@ class SwViewModel  @Inject constructor(
             }
         }
         if (swMap.getValue(currentId).name != currentSwData.name ||
-            swMap.getValue(currentId).bkColor != currentSwData.bkColor ||
+            swMap.getValue(currentId).icon != currentSwData.icon ||
             swMap.getValue(currentId).row != currentSwData.row ){
             swMap[currentId] = currentSwData.copy()
             refreshScreenInfo()
@@ -432,7 +399,7 @@ class SwViewModel  @Inject constructor(
         showName = false
     }
     fun newColor(color: String){
-         currentSwData.bkColor = color
+         currentSwData.icon = color
     }
     fun changeRow(pos: Int) {
         currentSwData.row += pos
@@ -441,7 +408,7 @@ class SwViewModel  @Inject constructor(
         currentSwData.prgs[currentTimer] = newPrg.copy()
         showTimer = false
     }
-    fun setMode(mode: SwMode, secs: Int) {
+    fun setMode(mode: Mode, secs: Int) {
         currentSwData.mode = mode
         currentSwData.secs = secs
         showMode = false
@@ -524,7 +491,7 @@ class SwViewModel  @Inject constructor(
     }
     fun fullErase(){
         localErase()
-        mqttManager.publish(currentId, Global.SEND_ERASE)
+        mqttManager.publish(currentId, SEND_ERASE)
         mqttManager.unsubscribe(currentId)
     }
 }
