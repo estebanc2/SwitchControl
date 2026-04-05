@@ -39,11 +39,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.R
-import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.NO_TIMERS
-import com.capa1.switchcontrol.data.model.SwState
+import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 
@@ -348,7 +347,7 @@ fun ShowConfigPreview()
     ConfigScreen(
         qty = 5,
         data = SwData(
-            "light", SwState.OFF, Mode.TIMERS, 0, NO_TIMERS,
+            "light", State.OFF, Mode.TIMERS, 0, NO_TIMERS,
             10, "nada", 2, SwStatus.CONNECTED
         ),
         changeName = {},

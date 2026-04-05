@@ -8,13 +8,12 @@ enum class SwStatus {
 
 data class SwData(
     var name: String,
-    var state: SwState,
+    var swOn: Boolean,
     var mode: Mode,
     var secs: Int,
     var prgs: MutableList<WeeklyProgram>,
     var tempX10: Int,
     var icon: String,
-    var row: Int,
-    var status: SwStatus
+    var row: Int
 )
 

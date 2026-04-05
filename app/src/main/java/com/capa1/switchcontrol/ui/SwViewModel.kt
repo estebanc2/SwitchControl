@@ -7,23 +7,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.LegendMaker
 import com.capa1.switchcontrol.data.SwDataStore
+import com.capa1.switchcontrol.data.model.DialogState
 import com.capa1.switchcontrol.data.model.EspData
-import com.capa1.switchcontrol.data.model.StoredData
-import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.NO_TIMERS
 import com.capa1.switchcontrol.data.model.SEND_ERASE
 import com.capa1.switchcontrol.data.model.SEND_GET
-import com.capa1.switchcontrol.data.model.SEND_OFF
-import com.capa1.switchcontrol.data.model.SEND_ON
-import com.capa1.switchcontrol.data.model.SwScreenData
-import com.capa1.switchcontrol.data.model.SwState
-import com.capa1.switchcontrol.data.model.SwStatus
+import com.capa1.switchcontrol.data.model.ScreenData
+import com.capa1.switchcontrol.data.model.State
+import com.capa1.switchcontrol.data.model.StoredData
+import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.data.model.TEST
 import com.capa1.switchcontrol.data.model.ToStore
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.mqtt.MqttManager
@@ -37,7 +35,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.concurrent.fixedRateTimer
 import kotlin.random.Random
 
 @HiltViewModel
@@ -55,53 +52,62 @@ class SwViewModel  @Inject constructor(
     private var newSwId = ""
     private var mqttUp = false
     private var upgradingId = ""
-    private var started = false
     var currentId = ""
     var server = ""
     var port = ""
-    var showName by mutableStateOf (false)
-        private set
-    var showColor by mutableStateOf (false)
-        private set
-    var showTimer by mutableStateOf (false)
-        private set
-    var showAdd by mutableStateOf (false)
-        private set
-    var showNewId by mutableStateOf (false)
-        private set
-    var showNew by mutableStateOf (false)
-        private set
-    var showAll by mutableStateOf (false)
+
+    var dialogState by mutableStateOf(DialogState())
         private set
     var upgrading by mutableIntStateOf (0)
         private set
     var myAp by mutableStateOf (ApData(""," ",false))
         private set
-    var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
+    var swScreenList by mutableStateOf<List<ScreenData>>(listOf())
         private set
     var currentTimer by mutableIntStateOf(0)
         private set
-    var showMode by mutableStateOf (false)
-        private set
-    var showMaintenance by mutableStateOf (false)
-        private set
-    var showConfig by mutableStateOf (false)
-        private set
+
     var touchProgress by mutableStateOf (TouchState.IN_PROGRESS)
         private set
-    var currentSwData by mutableStateOf (SwData("", SwState.OFF, Mode.TIMERS, 0,
-        NO_TIMERS, 0, "nothing", 2, SwStatus.DISCONNECTED))
+
+    var currentSwData by mutableStateOf (SwData("", false, Mode.TIMERS, 0,
+        NO_TIMERS, 0, "", 2))
         private set
 
     fun start(){
         Log.i(TAG," IN START")
-        if(!started){
-            getStoredData()
-            mqttManager.mqttInit()
-            subscribeToChanges()
-            wifiCredentials.get()
+        getStoredData()
+        mqttManager.mqttInit()
+        subscribeToChanges()
+        wifiCredentials.get()
+    }
+
+    fun toggle(id: String){
+
+    }
+
+    private fun refresh(stored: ToStore) {
+        Log.i(TAG, "en el refresh!!")
+        stored.list.forEachIndexed { i, data ->
+            swScreenList = swScreenList + ScreenData (
+                name = data.name,
+                id = data.id,
+                icon = data.icon,
+                timerInfo = legendMaker.legend(swMap[data.id]),
+                swOn = false,
+                connected = false )
+            swMap[data.id] = SwData (
+                name = data.name,
+                swOn = false,
+                mode = Mode.TIMERS,
+                secs = 0,
+                prgs = NO_TIMERS,
+                tempX10 = 0,
+                icon = data.icon,
+                row = i + 1 )
         }
     }
+
     private fun subscribeToChanges() {
         viewModelScope.launch(Dispatchers.IO) {
             mqttManager.mqttState.collect { result ->
@@ -153,22 +159,10 @@ class SwViewModel  @Inject constructor(
         val gson = Gson()
         when (id) {
             allSwId -> {
-                val received = gson.fromJson(msg, ToStore::class.java)
-                if (received != null) {
-                    received.list.forEachIndexed { i, data ->
-                        swMap[data.id] = SwData(
-                            name = data.name,
-                            state = SwState.OFF,
-                            mode = Mode.TIMERS,
-                            secs = 0,
-                            prgs = NO_TIMERS,
-                            tempX10 = 0,
-                            icon = "tv.fill",
-                            row = i + 1,
-                            status = SwStatus.DISCONNECTED
-                        )
+                if (msg.isNotEmpty()) {
+                    viewModelScope.launch(Dispatchers.IO){
+                        swDataStore.saveFlashData(msg)
                     }
-                    saveData()
                     initializeSw()
                 } else {
                     Log.i(TAG, "bad received data!")
@@ -182,40 +176,39 @@ class SwViewModel  @Inject constructor(
                 if (esp != null) {
                     swMap[id] = SwData(
                         name = esp.name,
-                        state = SwState.entries[esp.state],
-                        mode = Mode.entries[esp.mode],
+                        swOn = esp.state == State.ON,
+                        mode = esp.mode,
                         secs = esp.secs,
                         prgs = esp.prgs,
                         tempX10 = esp.tempX10,
                         icon = "nothing",
                         row = swMap.size + 1,
-                        status = SwStatus.CONNECTED
+                        //status = SwStatus.CONNECTED
                     )
                     saveData()
                 }
             }
 
             upgradingId -> {
-                upgrading = gson.fromJson(msg, EspData::class.java).state
+                /*upgrading = gson.fromJson(msg, EspData::class.java).state
                 Log.i(TAG,"durante el upgrade recibo los sig estados: $upgrading")
-                if (upgrading == SwState.UPGRADED.ordinal) {
+                if (upgrading == State.UPGRADED) {
                     upgradingId = ""
-                }
+                }*/
             }
 
             else -> {
                 val esp = gson.fromJson(msg, EspData::class.java)
                 if (swMap[id] != null) {
                     swMap[id] = SwData(
-                        esp.name,
-                        SwState.entries[esp.state],
-                        Mode.entries[esp.mode],
-                        esp.secs,
-                        esp.prgs,
-                        esp.tempX10,
-                        swMap[id]?.icon ?: "nada",
-                        swMap[id]?.row ?: 1,
-                        SwStatus.CONNECTED
+                        name = esp.name,
+                        swOn = esp.state == State.ON,
+                        mode = esp.mode,
+                        secs = esp.secs,
+                        prgs = esp.prgs,
+                        tempX10 = esp.tempX10,
+                        icon = swMap[id]?.icon ?: "nada",
+                        row = swMap[id]?.row ?: 1
                     )
                     if (swMap[id]?.mode == Mode.TIMERS_TEMP) {
                         val tempId = (if (id.substring(0, 2).toInt(16) == 255)
@@ -234,42 +227,22 @@ class SwViewModel  @Inject constructor(
 
     private fun getStoredData() {
         viewModelScope.launch(Dispatchers.IO) {
-            swDataStore.getFlashData().collect { flashData ->
-                Log.i(TAG,"get from memory: $flashData")
-                if (!started) {
-                    started = true
+            swDataStore.myFlashData.collect { json ->
+                if (json.isNotEmpty()) {
                     val gson = Gson()
-                    val stored = gson.fromJson(flashData, ToStore::class.java)
-                    if (stored != null) {
-                        if (stored.list.size == 0) {
-                            showAdd = true
-                        } else {
-                            stored.list.forEachIndexed { i, data ->
-                                swMap[data.id] = SwData(
-                                    name = data.name,
-                                    state = SwState.OFF,
-                                    mode = Mode.TIMERS,
-                                    secs = 0,
-                                    prgs = NO_TIMERS,
-                                    tempX10 = 0,
-                                    icon = "color",
-                                    row = i + 1,
-                                    status = SwStatus.DISCONNECTED
-                                )
-                            }
-                            refreshScreenInfo()
-                        }
-                    } else {
-                        Log.i(TAG, "bad stored data!")
-                    }
+                    refresh(gson.fromJson(json, ToStore::class.java))
+                } else {
+                    refresh(TEST)
                 }
             }
         }
     }
+
+
     private fun saveData() {
         val list = mutableListOf<StoredData>()
-        swMap.toList().sortedBy { it.second.row }. forEach { (id, swData) ->
-            list.add(StoredData(swData.name, id, swData.icon))
+        swScreenList.toList().forEach { sw ->
+            list.add(StoredData(sw.name, sw.id, sw.icon))
         }
         val gson = Gson()
         val toStore = gson.toJson(ToStore(list))
@@ -278,14 +251,14 @@ class SwViewModel  @Inject constructor(
         }
     }
     private fun refreshScreenInfo() {
-        val list = mutableListOf<SwScreenData>()
+        val list = mutableListOf<ScreenData>()
         swMap.toList().sortedBy { it.second.row }.forEach { (id, swData) ->
-            list.add(SwScreenData(  name = swData.name,
+            list.add(ScreenData(  name = swData.name,
                                     id = id,
                                     icon = swData.icon,
-                                    timerInfo = legendMaker.getLegend(swData),
-                                    isOn = swData.state == SwState.ON,
-                                    connected = swData.status == SwStatus.CONNECTED
+                                    timerInfo = legendMaker.legend(swData),
+                                    swOn = swData.swOn,
+                                    connected = true
                                         ))
         }
         Log.i(TAG,"swScreenList refresh")
@@ -297,8 +270,10 @@ class SwViewModel  @Inject constructor(
         for (id in swMap.keys) {
             mqttManager.subscribe(id)
         }
-        checkSwitches()
+        //checkSwitches()
     }
+
+    /*
     private fun checkSwitches() {
         val timerInSec = 1L
         fixedRateTimer("timer", false, timerInSec * 1000, timerInSec * 1000) {
@@ -312,7 +287,9 @@ class SwViewModel  @Inject constructor(
                 initSw(id)
             }
         }
-    }
+    }*/
+
+
     private fun initSw(id: String) {
         val msg = SEND_GET
         mqttManager.publish(id, msg)
@@ -326,24 +303,8 @@ class SwViewModel  @Inject constructor(
                 mqttManager.subscribe(id)
             }
         }
-        showNewId = false
-        showAdd = false
-    }
-    fun imageClick(id: String){
-        if (swMap[id]?.status == SwStatus.CONNECTED) {
-            swMap [id]?.status = SwStatus.CONNECTING
-            when ( swMap[id]?.state ) {
-                SwState.OFF -> {
-                    mqttManager.publish(id, SEND_ON)
-                }
-                SwState.ON -> {
-                    mqttManager.publish(id, SEND_OFF)
-                }
-                else -> {
-                    swMap [id]?.status = SwStatus.CONNECTED
-                }
-            }
-        }
+        dialogState = dialogState.copy(showNewId = false)
+        dialogState = dialogState.copy(showAdd = false)
     }
 
     fun saveConfig(){
@@ -352,8 +313,8 @@ class SwViewModel  @Inject constructor(
             swMap.getValue(currentId).mode != currentSwData.mode ||
             swMap.getValue(currentId).secs != currentSwData.secs){
             val setData = Global.gson.toJson(EspData (  currentSwData.name,
-                SwState.SET_DATA.ordinal,
-                currentSwData.mode.ordinal,
+                State.SET_DATA,
+                currentSwData.mode,
                 currentSwData.secs,
                 currentSwData.prgs,
                 currentSwData.tempX10 ))
@@ -380,80 +341,80 @@ class SwViewModel  @Inject constructor(
             refreshScreenInfo()
             saveData()
         }
-        showConfig = false
+        dialogState = dialogState.copy(showConfig = false)
     }
     fun exitConfig(){
-        showConfig = false
+        dialogState = dialogState.copy(showConfig = false)
     }
-    fun goConfig(item: SwScreenData) {
+    fun goConfig(item: ScreenData) {
         currentId = item.id
         currentSwData = swMap.getValue(currentId).copy()
         currentSwData.prgs = swMap.getValue(currentId).prgs.toMutableList()
         for (i in 0..< currentSwData.prgs.size) {
             currentSwData.prgs[i] = (swMap.getValue(currentId).prgs[i]).copy()
         }
-        showConfig = true
+        dialogState = dialogState.copy(showConfig = true)
     }
+
     fun newName(name: String){
         currentSwData.name = name
-        showName = false
+        dialogState = dialogState.copy(showName = false)
     }
-    fun newColor(color: String){
-         currentSwData.icon = color
-    }
+
     fun changeRow(pos: Int) {
-        currentSwData.row += pos
+        //currentSwData.row += pos
     }
+
     fun newTimer(newPrg: WeeklyProgram){
         currentSwData.prgs[currentTimer] = newPrg.copy()
-        showTimer = false
+        dialogState = dialogState.copy(showTimer = false)
     }
     fun setMode(mode: Mode, secs: Int) {
         currentSwData.mode = mode
         currentSwData.secs = secs
-        showMode = false
+        dialogState = dialogState.copy(showMode = false)
     }
     fun discoverSwitches(pass: String) {
         espTouch.discover(myAp.ssid, myAp.bssid, pass)
     }
     fun onShowAdd(show: Boolean) {
-        showAdd = show
+        dialogState = dialogState.copy(showAdd = show)
     }
     fun onShowName(show: Boolean) {
-        showName = show
+        dialogState = dialogState.copy(showName = show)
     }
-    fun onShowColor(show: Boolean) {
-        showColor = show
-    }
+
     fun onShowTimer(timer: Int, show: Boolean) {
         if (show){
             currentTimer = timer
         }
-        showTimer = show
+        dialogState = dialogState.copy(showTimer = show)
     }
     fun onShowMode(show: Boolean) {
-        showMode = show
+        dialogState = dialogState.copy(showMode = show)
     }
     fun onShowNewId(show: Boolean) {
-        showNewId = show
+        dialogState = dialogState.copy(showNewId = show)
     }
     fun onShowNew(show: Boolean) {
-        showNew = show
+        dialogState = dialogState.copy(showNew = show)
     }
     fun onShowAll(show: Boolean) {
-        showAll = show
+        dialogState = dialogState.copy(showAll = show)
     }
+
     fun onShowMaintenance(show: Boolean) {
-        showMaintenance = show
+        dialogState = dialogState.copy(showMaintenance = show)
     }
+
     fun firmwareUpgrade(server: String, port: String) {
         this.server = server
         this.port = port
         upgradingId = currentId
         val setData = Global.gson.toJson( EspData(
             name = server,
-            state = SwState.UPGRADE.ordinal,
-            mode = 0,
+            state = State.UPGRADE,
+            mode = Mode.TIMERS,
             secs = port.toInt(),
             prgs = NO_TIMERS,
             tempX10 = 0
@@ -463,7 +424,7 @@ class SwViewModel  @Inject constructor(
     fun addAllSw(id: String) {
         if(id != "0"){
             viewModelScope.launch(Dispatchers.IO) {
-                swDataStore.getFlashData().collect { flashData ->
+                swDataStore.myFlashData.collect { flashData ->
                     mqttManager.publish(id, flashData)
                 }
             }
@@ -473,8 +434,8 @@ class SwViewModel  @Inject constructor(
                 mqttManager.subscribeFromPhone(allSwId)
             }
         }
-        showAdd = false
-        showAll = false
+        dialogState = dialogState.copy(showAdd = false)
+        dialogState = dialogState.copy(showAll = false)
     }
     fun localErase(){
         val erasedRow = swMap.getValue(currentId).row
@@ -486,7 +447,7 @@ class SwViewModel  @Inject constructor(
         }
         saveData()
         refreshScreenInfo()
-        showMaintenance = false
+        dialogState = dialogState.copy(showMaintenance = false)
         exitConfig()
     }
     fun fullErase(){

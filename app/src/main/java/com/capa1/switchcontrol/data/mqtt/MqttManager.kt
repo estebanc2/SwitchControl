@@ -1,9 +1,6 @@
 package com.capa1.switchcontrol.data.mqtt
 
 import android.util.Log
-import com.capa1.switchcontrol.data.Global.FROM_SW
-import com.capa1.switchcontrol.data.Global.MQTT_HOST_AND_PORT
-import com.capa1.switchcontrol.data.Global.TO_SW
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +20,16 @@ import javax.inject.Inject
 enum class MqttState {
     CONNECTED, CONNECTING, DISCONNECTED
 }
-class MqttManager @Inject constructor() {
+
+class MqttManager @Inject constructor()
+{
+    companion object {
+        const val TO_SW = "/mtc/to_sw/"
+        const val FROM_SW = "/mtc/from_sw/"
+        const val MQTT_HOST_AND_PORT =
+            "tcp://linode.1.poplarlabs.net:1883" //"tcp://test.mosquitto.org:1883"; //
+        const val TAG = "Mqtt"
+    }
     private lateinit var mqttClient: MqttAsyncClient
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     val mqttState: MutableStateFlow<MqttState> = MutableStateFlow(MqttState.CONNECTING)
@@ -132,9 +138,5 @@ class MqttManager @Inject constructor() {
         } catch (e: MqttException) {
             e.printStackTrace()
         }
-    }
-
-    companion object {
-        val TAG = "Mqtt"
     }
 }

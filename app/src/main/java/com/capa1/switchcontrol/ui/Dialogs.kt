@@ -8,15 +8,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -73,10 +70,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
-import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.Mode
-import com.capa1.switchcontrol.data.model.SwState
+import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
@@ -580,62 +576,7 @@ fun NameDialog( //5
         }
     }
 }
-@Composable
-fun ColorDialog( //6
-    show: Boolean,
-    currentColor: String,
-    setColor: (String) -> Unit,
-    exit:()->Unit
-) {
-    val colorsList = MyColors.entries.toList()
-    if (show) {
-        Dialog(onDismissRequest = {}) {
-            Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    LazyColumn(
-                        contentPadding = PaddingValues(all = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        items(colorsList){ data->
-                            Row {
-                              Box(
-                                  contentAlignment = Alignment.Center,
-                                  modifier = Modifier
-                                      .size(70.dp, 30.dp)
-                                      .background(
-                                          color = data.value.backColor
-                                      )
-                              ){
-                                  Text(
-                                      text = data.key,
-                                      style = TextStyle(fontSize = 16.sp),
-                                      color = data.value.textColor,
-                                      modifier = Modifier
-                                          .clickable {
-                                              setColor(data.key)
-                                              exit()
-                                          }
-                                          .padding(all = 3.dp)
-                                  )
-                              }
-                              if(data.key == currentColor){
-                                  Icon(
-                                      Icons.Default.Check,
-                                      contentDescription = "",
-                                  )
-                              }
-                          }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+
 @Composable
 fun TimerDialog( //7
     show: Boolean,
@@ -975,7 +916,7 @@ fun ModeDialog( //8
                             options += eachMode.name
                         }
                         options.forEachIndexed { index, label ->
-                            val visible = if (index != mode.ordinal) Color(0xFFEEEEEA)
+                            val visible = if (index != mode) Color(0xFFEEEEEA)
                                         else MaterialTheme.colorScheme.primary
                             Column {
                                 Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
@@ -1186,10 +1127,10 @@ fun MaintenanceDialog( //9
                                 )
                             }
                             when(upgrading){
-                                SwState.UPGRADE.ordinal->{
+                                State.UPGRADE.ordinal->{
                                     showProgress = true
                                 }
-                                SwState.SERVER_FAIL.ordinal->{
+                                State.SERVER_FAIL.ordinal->{
                                     Text(
                                         text = stringResource(R.string.badPortServer),
                                         style = TextStyle(fontSize = 16.sp),
@@ -1200,7 +1141,7 @@ fun MaintenanceDialog( //9
                                     )
                                     showProgress = false
                                 }
-                                SwState.UPGRADE_FAIL.ordinal->{
+                                State.UPGRADE_FAIL.ordinal->{
                                     Text(
                                         text = stringResource(R.string.upgradeFails),
                                         style = TextStyle(fontSize = 16.sp),
@@ -1211,7 +1152,7 @@ fun MaintenanceDialog( //9
                                     )
                                     showProgress = false
                                 }
-                                SwState.UPGRADED.ordinal->{
+                                State.UPGRADED.ordinal->{
                                     Text(
                                         text = stringResource(R.string.upgradeSuccess),
                                         style = TextStyle(fontSize = 16.sp),
@@ -1374,9 +1315,8 @@ fun ShowDialog(value: Int = 8) {
         3 -> NewIdDialog(show = true, setId = {}, {})
         4 -> NewAllDialog(true, "all", {}, {})
         5 -> NameDialog(true, "kitchen light", {""}, {})
-        6 -> ColorDialog(true, "metal", {},{})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
         8 -> ModeDialog(true, Mode.TEMP, 10, {  }, {})
-        9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, "", "", {},"kitchen light", {},{},{})
+        9 -> MaintenanceDialog(true, "1234", State.SERVER_FAIL.ordinal, "", "", {},"kitchen light", {},{},{})
     }
 }

@@ -2,9 +2,8 @@ package com.capa1.switchcontrol.data
 
 import android.content.Context
 import com.capa1.switchcontrol.R
-import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.Mode
-import com.capa1.switchcontrol.data.model.SwState
+import com.capa1.switchcontrol.data.model.SwData
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -16,23 +15,21 @@ class LegendMaker @Inject constructor(
         return days shr position and 1 == 1
     }
 
-    fun getLegend(swData: SwData): String {
+    fun legend(swData: SwData?): String {
+        if (swData == null) {
+            return  context.getString(R.string.noInfo)
+        }
         when (swData.mode) {
             Mode.PULSE_NA,
             Mode.PULSE_NC -> return context.getString(R.string.pulse, swData.secs)
             Mode.TEMP -> {
-                if (swData.tempX10 == -700) {
-                    return context.getString(R.string.no_sensor)
+                return if (swData.tempX10 == -700) {
+                    context.getString(R.string.no_sensor)
                 } else {
-                    return context.getString(R.string.turnIf, swData.secs/10)
+                    context.getString(R.string.turnIf, swData.secs/10)
                 }
             }
             else -> {
-                if (swData.state != SwState.OFF &&
-                    swData.state != SwState.ON
-                ) {
-                    return  context.getString(R.string.noInfo)
-                }
                 val calendar = Calendar.getInstance()
                 val hour = calendar.get(Calendar.HOUR_OF_DAY)
                 val min = calendar.get(Calendar.MINUTE)
@@ -40,7 +37,7 @@ class LegendMaker @Inject constructor(
                 val tomorrow = (today + 1) % 7
                 val rightNow = (hour * 60) + min
                 var delta = 24 * 60
-                if (swData.state == SwState.OFF) {
+                if (!swData.swOn) {
                     for (prg in swData.prgs) {
                         if (isSet(prg.days, today)) {
                             val deltaTrans = prg.start - rightNow
