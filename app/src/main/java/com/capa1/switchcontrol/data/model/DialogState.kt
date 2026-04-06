@@ -8,6 +8,7 @@ data class DialogState (
     val showNew: Boolean = false,
     val showAll: Boolean = false,
     val showMode: Boolean = false,
+    val showIcon: Boolean = false,
     val showMaintenance: Boolean = false,
     val showConfig: Boolean = false,
 )

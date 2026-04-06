@@ -916,7 +916,7 @@ fun ModeDialog( //8
                             options += eachMode.name
                         }
                         options.forEachIndexed { index, label ->
-                            val visible = if (index != mode) Color(0xFFEEEEEA)
+                            val visible = if (index != mode.ordinal) Color(0xFFEEEEEA)
                                         else MaterialTheme.colorScheme.primary
                             Column {
                                 Row(Modifier, verticalAlignment = Alignment.CenterVertically) {

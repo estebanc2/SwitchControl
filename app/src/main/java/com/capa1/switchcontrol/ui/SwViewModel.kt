@@ -393,6 +393,11 @@ class SwViewModel  @Inject constructor(
     fun onShowMode(show: Boolean) {
         dialogState = dialogState.copy(showMode = show)
     }
+
+    fun onShowIcon (show: Boolean) {
+        dialogState = dialogState.copy(showIcon = show)
+    }
+
     fun onShowNewId(show: Boolean) {
         dialogState = dialogState.copy(showNewId = show)
     }

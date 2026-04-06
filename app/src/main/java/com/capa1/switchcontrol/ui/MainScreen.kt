@@ -86,7 +86,7 @@ fun MainScreen(
         onExit = { viewModel.onShowNew(false) }
     )
     NewIdDialog(
-        show = viewModel.showNewId,
+        show = viewModel.dialogState.showNewId,
         setId = { id -> viewModel.setSwWithId(id) },
         onExit = { viewModel.onShowNewId(false) }
     )
@@ -138,7 +138,7 @@ fun MainScreen(
                 ShowTitle(onShowAdd = { viewModel.onShowAdd(true) })
                 ShowSwitches(
                     switches = viewModel.swScreenList,
-                    click = { id -> viewModel.imageClick(id) },
+                    click = { id -> viewModel.toggle(id) },
                     onConfig = { item -> viewModel.goConfig(item) }
                 )
             }
@@ -147,7 +147,7 @@ fun MainScreen(
                 qty = viewModel.swScreenList.size,
                 data = viewModel.currentSwData,
                 changeName = { viewModel.onShowName(true) },
-                changeColor = { viewModel.onShowColor(true) },
+                changeIcon = { viewModel.onShowIcon(true) },
                 changeRow = { pos -> viewModel.changeRow(pos) },
                 changeTimer = { timer -> viewModel.onShowTimer(timer, true) },
                 changeMode = { viewModel.onShowMode(true) },
