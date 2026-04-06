@@ -41,13 +41,14 @@ import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.NO_TIMERS
-import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.data.model.EspData
+import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 
 @Composable
 fun ConfigScreen(
     qty: Int,
-    data: SwData,
+    data: EspData,
     changeName: () -> Unit,
     changeIcon: ()-> Unit,
     changeRow: (Int) -> Unit,
@@ -57,7 +58,7 @@ fun ConfigScreen(
     save:()->Unit,
     onExit:()->Unit
 ){
-    var row by remember { mutableIntStateOf(data.row) }
+    //var row by remember { mutableIntStateOf(data.row) }
     fun hours(min: Int): String{
         return "${min/60}:${min - (min/60)*60}"
     }
@@ -146,7 +147,7 @@ fun ConfigScreen(
                 contentDescription = ""
             )
             Text(
-                text = "$row",
+                text = "1",
                 style = TextStyle(fontSize = 20.sp),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -158,10 +159,10 @@ fun ConfigScreen(
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
                     .clickable {
-                        if (row > 1) {
-                            row -= 1
+                        //if (row > 1) {
+                            //row -= 1
                             changeRow(-1)
-                        }
+                        //}
                     }
             )
             Icon(
@@ -170,10 +171,10 @@ fun ConfigScreen(
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
                     .clickable {
-                        if (row < qty) {
-                            row += 1
+                        //if (row < qty) {
+                        //    row += 1
                             changeRow(1)
-                        }
+                        //}
                     }
             )
             Spacer(modifier = Modifier.padding(horizontal = 10.dp))
@@ -182,7 +183,7 @@ fun ConfigScreen(
                 contentDescription = "",
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
-            Text(text = data.icon,
+            Text(text = "data.icon",
                 style = TextStyle(fontSize = 16.sp),
                 //color = Global.MyColors[data.icon]!!.textColor,
                 modifier = Modifier
@@ -343,9 +344,9 @@ fun ShowConfigPreview()
 {
     ConfigScreen(
         qty = 5,
-        data = SwData(
-            "light", false, Mode.TIMERS, 0, NO_TIMERS,
-            10, "nada", 2
+        data = EspData(
+            "light", State.ON, Mode.TIMERS, 0, NO_TIMERS,
+            10
         ),
         changeName = {},
         changeIcon = {},

@@ -98,20 +98,20 @@ fun MainScreen(
     )
     NameDialog(
         show = viewModel.dialogState.showName,
-        currentName = viewModel.currentSwData.name,
+        currentName = viewModel.currentEspData.name,
         setName = { name -> viewModel.newName(name) },
         onExit = { viewModel.onShowName(false) }
     )
     TimerDialog(
         show = viewModel.dialogState.showTimer,
-        currentWP = viewModel.currentSwData.prgs[viewModel.currentTimer],
+        currentWP = viewModel.currentEspData.prgs[viewModel.currentTimer],
         setTimer = { timer -> viewModel.newTimer(timer) },
         onExit = { viewModel.onShowTimer(0, false) }
     )
     ModeDialog(
         show = viewModel.dialogState.showMode,
-        currentMode = viewModel.currentSwData.mode,
-        currentSecs = viewModel.currentSwData.secs,
+        currentMode = viewModel.currentEspData.mode,
+        currentSecs = viewModel.currentEspData.secs,
         setMode = { pair -> viewModel.setMode(pair.first, pair.second) },
         onExit = { viewModel.onShowMode(false) }
     )
@@ -122,7 +122,7 @@ fun MainScreen(
         lastServer = viewModel.server,
         lastPort = viewModel.port,
         upgrade = { pair -> viewModel.firmwareUpgrade(pair.first, pair.second) },
-        name = viewModel.currentSwData.name,
+        name = viewModel.currentEspData.name,
         local = { viewModel.localErase() },
         full = { viewModel.fullErase() },
         onExit = { viewModel.onShowMaintenance(false) }
@@ -145,7 +145,7 @@ fun MainScreen(
         } else {
             ConfigScreen(
                 qty = viewModel.swScreenList.size,
-                data = viewModel.currentSwData,
+                data = viewModel.currentEspData,
                 changeName = { viewModel.onShowName(true) },
                 changeIcon = { viewModel.onShowIcon(true) },
                 changeRow = { pos -> viewModel.changeRow(pos) },
