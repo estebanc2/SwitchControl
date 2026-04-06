@@ -3,11 +3,11 @@ package com.capa1.switchcontrol.data.model
 import com.capa1.switchcontrol.data.Global.gson
 
 data class EspData(
-    val name: String,
-    val state: State, //SwState,
-    val mode: Mode, //SwMode,
-    val secs: Int,
-    val prgs: MutableList<WeeklyProgram>,
+    var name: String,
+    var state: State, //SwState,
+    var mode: Mode, //SwMode,
+    var secs: Int,
+    var prgs: MutableList<WeeklyProgram>,
     val tempX10:Int
 )
 

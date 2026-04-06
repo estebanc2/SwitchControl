@@ -1,10 +1,10 @@
 package com.capa1.switchcontrol.data.model
 
 data class ScreenData(
-    val name: String,
+    var name: String,
     val id: String,
-    val icon: String,
-    val timerInfo: String,
-    val swOn: Boolean,
-    val connected: Boolean
+    var icon: String,
+    var timerInfo: String,
+    var swOn: Boolean,
+    var connected: Boolean
 )
