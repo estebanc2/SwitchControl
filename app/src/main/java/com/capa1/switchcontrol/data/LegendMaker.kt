@@ -5,7 +5,6 @@ import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.model.EspData
 import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.State
-import com.capa1.switchcontrol.data.model.SwData
 import java.util.Calendar
 import javax.inject.Inject
 
