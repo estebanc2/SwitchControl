@@ -51,6 +51,7 @@ class SwViewModel  @Inject constructor(
     private var newSwId = ""
     private var mqttUp = false
     private var upgradingId = ""
+    private var savedOnce = false
     var currentId = ""
     var server = ""
     var port = ""
@@ -172,6 +173,7 @@ class SwViewModel  @Inject constructor(
         }
         if (id == allSwId) {
             createSwScreenList(msg)
+            savedOnce = false
             initializeSw()
         } else {
             val gson = Gson()
@@ -189,6 +191,7 @@ class SwViewModel  @Inject constructor(
                     swOn = espMap[id]?.state == State.ON,
                     connected = true)
                 )
+                savedOnce = false
                 if (espMap[id]?.mode == Mode.TIMERS_TEMP) {
                     val termoId = (if (id.substring(0, 2).toInt(16) == 255)
                         254 else id.substring(0, 2)
@@ -202,18 +205,22 @@ class SwViewModel  @Inject constructor(
                sw.swOn = espMap[id]?.state == State.ON
                sw.connected = true
             }
+            savedOnce = false
         }
     }
 
-    private fun saveData() {
-        val list = mutableListOf<StoredData>()
-        swScreenList.toList().forEach { sw ->
-            list.add(StoredData(sw.name, sw.id, sw.icon))
-        }
-        val gson = Gson()
-        val toStore = gson.toJson(ToStore(list))
-        viewModelScope.launch(Dispatchers.IO){
-            swDataStore.saveFlashData(toStore)
+    fun saveData() {
+        if (!savedOnce){
+            savedOnce = true
+            val list = mutableListOf<StoredData>()
+            swScreenList.toList().forEach { sw ->
+                list.add(StoredData(sw.name, sw.id, sw.icon))
+            }
+            val gson = Gson()
+            val toStore = gson.toJson(ToStore(list))
+            viewModelScope.launch(Dispatchers.IO){
+                swDataStore.saveFlashData(toStore)
+            }
         }
     }
 

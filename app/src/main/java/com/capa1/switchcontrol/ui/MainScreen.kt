@@ -30,6 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.IconMapper
@@ -58,6 +61,7 @@ fun MainScreen(
     viewModel: SwViewModel = hiltViewModel()
 ) {
     Log.i(TAG, "init MainScreen")
+    val lifecycleOwner = LocalLifecycleOwner.current
     val permissionState =
         rememberMultiplePermissionsState(permissions = PermissionUtils.permissions).allPermissionsGranted
     LaunchedEffect(key1 = permissionState) {
@@ -69,6 +73,21 @@ fun MainScreen(
     }
     val activity = LocalActivity.current
 
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> viewModel.saveData()
+                Lifecycle.Event.ON_STOP -> { /* ya guardaste, opcional */
+                }
+
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
     // All dialogs unchanged
     NoPermissionDialog(show = !permissionState, onConfirm = { activity?.finish() })
     AddSwDialog(
