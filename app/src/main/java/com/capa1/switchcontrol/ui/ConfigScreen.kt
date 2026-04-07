@@ -25,24 +25,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.R
-import com.capa1.switchcontrol.data.model.Mode
-import com.capa1.switchcontrol.data.model.NO_TIMERS
 import com.capa1.switchcontrol.data.model.EspData
-import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 
 @Composable
@@ -335,26 +327,4 @@ fun ConfigScreen(
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun ShowConfigPreview()
-{
-    ConfigScreen(
-        qty = 5,
-        data = EspData(
-            "light", State.ON, Mode.TIMERS, 0, NO_TIMERS,
-            10
-        ),
-        changeName = {},
-        changeIcon = {},
-        changeRow = {},
-        changeTimer = {},
-        changeMode = {},
-        goMaintenance = {},
-        save = {},
-        onExit = {}
-    )
 }

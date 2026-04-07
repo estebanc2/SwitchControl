@@ -8,16 +8,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.capa1.switchcontrol.data.Global
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.LegendMaker
 import com.capa1.switchcontrol.data.SwDataStore
 import com.capa1.switchcontrol.data.model.DialogState
 import com.capa1.switchcontrol.data.model.EspData
 import com.capa1.switchcontrol.data.model.Mode
-import com.capa1.switchcontrol.data.model.NO_TIMERS
-import com.capa1.switchcontrol.data.model.SEND_ERASE
-import com.capa1.switchcontrol.data.model.SEND_GET
 import com.capa1.switchcontrol.data.model.ScreenData
 import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.StoredData
@@ -43,8 +39,27 @@ class SwViewModel  @Inject constructor(
     private val wifiCredentials: WifiCredentials,
     private val swDataStore: SwDataStore,
     private val espTouch: EspTouch,
-    private val legendMaker: LegendMaker
+    private val legendMaker: LegendMaker,
+    private val gson: Gson
 ) : ViewModel() {
+
+    val NO_TIMERS: MutableList<WeeklyProgram> = mutableListOf ( WeeklyProgram(0,0,0),
+        WeeklyProgram(0,0,0),
+        WeeklyProgram(0,0,0),
+        WeeklyProgram(0,0,0)
+    )
+    val SEND_ON: String = gson.toJson(
+        EspData("", State.ON, Mode.TIMERS, 0, NO_TIMERS, 0)
+    )
+    val SEND_OFF: String = gson.toJson(
+        EspData("", State.OFF, Mode.TIMERS, 0, NO_TIMERS, 0)
+    )
+    val SEND_GET: String = gson.toJson(
+        EspData("", State.GET_DATA, Mode.TIMERS, 0, NO_TIMERS, 0)
+    )
+    val SEND_ERASE: String = gson.toJson(
+        EspData("", State.ERASE, Mode.TIMERS, 0, NO_TIMERS, 0)
+    )
     private val espMap = mutableMapOf<String, EspData>()
     val allSwId = Random.nextInt(9).toString() + "0123456789"+ Random.nextInt(9).toString()
     private val newSw = mutableListOf<String>()
@@ -69,7 +84,7 @@ class SwViewModel  @Inject constructor(
         private set
 
     fun start(){
-        Log.i(TAG," IN START")
+        Log.i(TAG," IN START actualizado!!")
         getStoredData()
         mqttManager.mqttInit()
         subscribeToChanges()
@@ -77,7 +92,11 @@ class SwViewModel  @Inject constructor(
     }
 
     fun toggle(id: String){
-
+        if(espMap[id]?.state == State.ON){
+            mqttManager.publish(id,SEND_OFF)
+        } else if (espMap[id]?.state == State.OFF) {
+            mqttManager.publish(id,SEND_ON)
+        }
     }
 
     private fun getStoredData() {
@@ -89,8 +108,10 @@ class SwViewModel  @Inject constructor(
     }
 
     private fun createSwScreenList(json: String) {
+        Log.i(TAG, "----ENTRANDO AL createSwScreenList-----")
+        refresh(TEST)
         if (json.isNotEmpty()) {
-            val gson = Gson()
+            //val gson = Gson()
             refresh(gson.fromJson(json, ToStore::class.java))
         } else {
             refresh(TEST)
@@ -98,6 +119,7 @@ class SwViewModel  @Inject constructor(
     }
 
     private fun refresh(stored: ToStore) {
+        Log.i(TAG, "--------en el refresh--------")
         swScreenList.clear()
         stored.list.forEach { data ->
             swScreenList.add (ScreenData (
@@ -176,7 +198,7 @@ class SwViewModel  @Inject constructor(
             savedOnce = false
             initializeSw()
         } else {
-            val gson = Gson()
+
             espMap[id] = gson.fromJson(msg, EspData::class.java)
             if (id == upgradingId && espMap[id]?.state == State.UPGRADED) {
                 upgradingId = ""
@@ -216,7 +238,7 @@ class SwViewModel  @Inject constructor(
             swScreenList.toList().forEach { sw ->
                 list.add(StoredData(sw.name, sw.id, sw.icon))
             }
-            val gson = Gson()
+            //val gson = Gson()
             val toStore = gson.toJson(ToStore(list))
             viewModelScope.launch(Dispatchers.IO){
                 swDataStore.saveFlashData(toStore)
@@ -293,7 +315,7 @@ class SwViewModel  @Inject constructor(
     }
 
     fun changeRow(pos: Int) {
-        //currentSwData.row += pos
+        Log.i(TAG, "currentSwData.row += $pos")
     }
 
     fun newTimer(newPrg: WeeklyProgram){
@@ -347,7 +369,7 @@ class SwViewModel  @Inject constructor(
         this.server = server
         this.port = port
         upgradingId = currentId
-        val setData = Global.gson.toJson( EspData(
+        val setData = gson.toJson( EspData(
             name = server,
             state = State.UPGRADE,
             mode = Mode.TIMERS,

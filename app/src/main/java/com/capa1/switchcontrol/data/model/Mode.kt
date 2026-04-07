@@ -6,5 +6,8 @@ enum class Mode {
     PULSE_NA,
     PULSE_NC,
     TIMERS_TEMP,
-    TEMP
+    TEMP;
+    companion object {
+        fun fromInt(value: Int): Mode = entries.getOrElse(value) { TIMERS }
+    }
 }

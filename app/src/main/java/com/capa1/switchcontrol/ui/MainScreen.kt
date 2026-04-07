@@ -44,22 +44,14 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 // ── Design tokens (matching the SwiftUI app) ────────────────────────────────
 private val BgPage        = Color(0xFF1C1C1E)   // main background
 private val BgCard        = Color(0xFF2C2C2E)   // inactive card
-private val BgCardActive  = Color(0xFF1A2E24)   // active card tint
-private val BgIcon        = Color(0xFF3A3A3C)   // icon container (inactive)
-private val BgIconActive  = Color(0xFF1F4D35)   // icon container (active)
 private val AccentGreen   = Color(0xFF34C759)   // iOS system green
 private val TextPrimary   = Color(0xFFFFFFFF)
-private val TextSecondary = Color(0xFF8E8E93)
-private val DividerColor  = Color(0xFF3A3A3C)
-private val BorderActive  = Color(0xFF34C759)
-private val BorderInactive= Color(0xFF3A3A3C)
 
 // ── Main entry point ─────────────────────────────────────────────────────────
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun MainScreen(
-    viewModel: SwViewModel = hiltViewModel()
-) {
+fun MainScreen(viewModel: SwViewModel = hiltViewModel())
+{
     Log.i(TAG, "init MainScreen")
     val lifecycleOwner = LocalLifecycleOwner.current
     val permissionState =

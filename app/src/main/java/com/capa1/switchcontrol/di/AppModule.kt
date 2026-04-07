@@ -2,10 +2,16 @@ package com.capa1.switchcontrol.di
 
 import android.content.Context
 import com.capa1.switchcontrol.data.LegendMaker
+import com.capa1.switchcontrol.data.ModeAdapter
+import com.capa1.switchcontrol.data.StateAdapter
 import com.capa1.switchcontrol.data.SwDataStore
+import com.capa1.switchcontrol.data.model.Mode
+import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.mqtt.MqttManager
 import com.capa1.switchcontrol.data.wifi.EspTouch
 import com.capa1.switchcontrol.data.wifi.WifiCredentials
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,5 +48,13 @@ object AppModule {
     @Singleton
     fun providesLegendMaker (@ApplicationContext context: Context): LegendMaker {
         return LegendMaker(context)
+    }
+    @Provides
+    @Singleton
+    fun providesGson(): Gson {
+        return GsonBuilder()
+            .registerTypeAdapter(Mode::class.java, ModeAdapter())
+            .registerTypeAdapter(State::class.java, StateAdapter())
+            .create()
     }
 }
