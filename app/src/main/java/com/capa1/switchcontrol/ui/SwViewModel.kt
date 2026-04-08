@@ -84,7 +84,7 @@ class SwViewModel  @Inject constructor(
         private set
 
     fun start(){
-        Log.i(TAG," IN START actualizado!!")
+        Log.i(TAG," IN START miercoles 1528!!")
         getStoredData()
         mqttManager.mqttInit()
         subscribeToChanges()
@@ -111,25 +111,25 @@ class SwViewModel  @Inject constructor(
         Log.i(TAG, "----ENTRANDO AL createSwScreenList-----")
         refresh(TEST)
         if (json.isNotEmpty()) {
-            //val gson = Gson()
-            refresh(gson.fromJson(json, ToStore::class.java))
-        } else {
-            refresh(TEST)
+            //refresh(gson.fromJson(json, ToStore::class.java))
         }
     }
 
     private fun refresh(stored: ToStore) {
         Log.i(TAG, "--------en el refresh--------")
-        swScreenList.clear()
-        stored.list.forEach { data ->
-            swScreenList.add (ScreenData (
+        val newList = stored.list.map { data ->
+            ScreenData(
                 name = data.name,
                 id = data.id,
                 icon = data.icon,
                 timerInfo = legendMaker.legend(espMap[data.id]),
                 swOn = false,
-                connected = false )
+                connected = false
             )
+        }
+        viewModelScope.launch(Dispatchers.Main){
+            swScreenList.clear()
+            swScreenList.addAll(newList)
         }
     }
 
@@ -205,14 +205,18 @@ class SwViewModel  @Inject constructor(
             } else if (id == newSwId){
                 newSwId = ""
                 newSw -= id
-                swScreenList.add (ScreenData(
-                    name = espMap[id]?.name ?: "",
-                    id = id,
-                    icon = "",
-                    timerInfo = legendMaker.legend(espMap[id]),
-                    swOn = espMap[id]?.state == State.ON,
-                    connected = true)
-                )
+                viewModelScope.launch(Dispatchers.Main) {
+                    swScreenList.add(
+                        ScreenData(
+                            name = espMap[id]?.name ?: "",
+                            id = id,
+                            icon = "",
+                            timerInfo = legendMaker.legend(espMap[id]),
+                            swOn = espMap[id]?.state == State.ON,
+                            connected = true
+                        )
+                    )
+                }
                 savedOnce = false
                 if (espMap[id]?.mode == Mode.TIMERS_TEMP) {
                     val termoId = (if (id.substring(0, 2).toInt(16) == 255)
@@ -221,12 +225,14 @@ class SwViewModel  @Inject constructor(
                     mqttManager.subscribe(termoId)
                 }
             } else
-            swScreenList.find { it.id == id }?.let {sw ->
-               sw.name = espMap[id]?.name ?: ""
-               sw.timerInfo = legendMaker.legend(espMap[id])
-               sw.swOn = espMap[id]?.state == State.ON
-               sw.connected = true
-            }
+                viewModelScope.launch(Dispatchers.Main) {
+                    swScreenList.find { it.id == id }?.let { sw ->
+                        sw.name = espMap[id]?.name ?: ""
+                        sw.timerInfo = legendMaker.legend(espMap[id])
+                        sw.swOn = espMap[id]?.state == State.ON
+                        sw.connected = true
+                    }
+                }
             savedOnce = false
         }
     }

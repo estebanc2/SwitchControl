@@ -44,7 +44,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 // ── Design tokens (matching the SwiftUI app) ────────────────────────────────
 private val BgPage        = Color(0xFF1C1C1E)   // main background
 private val BgCard        = Color(0xFF2C2C2E)   // inactive card
-private val AccentGreen   = Color(0xFF34C759)   // iOS system green
+private val AccentColor   = Color(0xFF34C759)   // iOS system green
 private val TextPrimary   = Color(0xFFFFFFFF)
 
 // ── Main entry point ─────────────────────────────────────────────────────────
@@ -197,7 +197,7 @@ fun ShowTitle(onShowAdd: () -> Unit) {
             Icon(
                 Icons.Default.Add,
                 contentDescription = "Agregar",
-                tint = AccentGreen,
+                tint = AccentColor,
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -230,7 +230,6 @@ fun ShowSwitches(
 @Composable
 fun RowView(
     item: ScreenData,
-    accentColor: Color = Color(0xFF6C63FF),
     onToggle: (String) -> Unit,
     onConfig: (ScreenData) -> Unit //onConfigTap: (String) -> Unit,
 ) {
@@ -239,11 +238,11 @@ fun RowView(
 
     // Animaciones de color
     val accentBarColor by animateColorAsState(
-        targetValue = if (isOn) accentColor else Color.White.copy(alpha = 0.1f),
+        targetValue = if (isOn) AccentColor else Color.White.copy(alpha = 0.1f),
         animationSpec = tween(300), label = "barColor"
     )
     val borderColor by animateColorAsState(
-        targetValue = if (isOn) accentColor.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.06f),
+        targetValue = if (isOn) AccentColor.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.06f),
         animationSpec = tween(300), label = "borderColor"
     )
     val bgAlpha by animateFloatAsState(
@@ -281,11 +280,11 @@ fun RowView(
 
         // Ícono
         val iconBgColor by animateColorAsState(
-            targetValue = if (isOn) accentColor.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.06f),
+            targetValue = if (isOn) AccentColor.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.06f),
             animationSpec = tween(300), label = "iconBg"
         )
         val iconTint by animateColorAsState(
-            targetValue = if (isOn) accentColor else Color.Gray,
+            targetValue = if (isOn) AccentColor else Color.Gray,
             animationSpec = tween(300), label = "iconTint"
         )
 
@@ -320,7 +319,7 @@ fun RowView(
                 text = item.timerInfo,
                 fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace,
-                color = if (isOn) accentColor.copy(alpha = 0.7f) else Color.Gray.copy(alpha = 0.7f),
+                color = if (isOn) AccentColor.copy(alpha = 0.7f) else Color.Gray.copy(alpha = 0.7f),
                 maxLines = 3
             )
         }
@@ -329,7 +328,6 @@ fun RowView(
         ToggleSwitch(
             isOn = isOn,
             isConnected = connected,
-            accentColor = accentColor,
             onToggle = { onToggle(item.id) }
         )
     }
@@ -340,13 +338,12 @@ fun RowView(
 fun ToggleSwitch(
     isOn: Boolean,
     isConnected: Boolean,
-    accentColor: Color,
     onToggle: () -> Unit,
 ) {
     val trackColor by animateColorAsState(
         targetValue = when {
             !isConnected -> Color.Gray.copy(alpha = 0.25f)
-            isOn         -> accentColor
+            isOn         -> AccentColor
             else         -> Color.White.copy(alpha = 0.12f)
         },
         animationSpec = spring(dampingRatio = 0.7f, stiffness = 300f),
