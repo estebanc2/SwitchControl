@@ -180,6 +180,7 @@ class SwViewModel  @Inject constructor(
     private fun initializeSw() {
         swScreenList.forEach {data ->
             mqttManager.subscribe(data.id)
+            Log.i(TAG, "suscribe: $data.name, id: $data.id")
         }
     }
 
@@ -198,8 +199,8 @@ class SwViewModel  @Inject constructor(
             savedOnce = false
             initializeSw()
         } else {
-
             espMap[id] = gson.fromJson(msg, EspData::class.java)
+            Log.i(TAG," Contesta al GET el: $id")
             if (id == upgradingId && espMap[id]?.state == State.UPGRADED) {
                 upgradingId = ""
             } else if (id == newSwId){

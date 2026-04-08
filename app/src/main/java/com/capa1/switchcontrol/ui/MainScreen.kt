@@ -217,7 +217,7 @@ fun ShowSwitches(
     ) {
         items(switches) { switch ->
             RowView(
-                item = switch,
+                screenData = switch,
                 onToggle = { click(switch.id) },
                 onConfig = { item -> onConfig(item) }
             )
@@ -229,12 +229,12 @@ fun ShowSwitches(
 
 @Composable
 fun RowView(
-    item: ScreenData,
+    screenData: ScreenData,
     onToggle: (String) -> Unit,
     onConfig: (ScreenData) -> Unit //onConfigTap: (String) -> Unit,
 ) {
-    val isOn = item.swOn
-    val connected = item.connected
+    val isOn = screenData.swOn
+    val connected = screenData.connected
 
     // Animaciones de color
     val accentBarColor by animateColorAsState(
@@ -295,8 +295,8 @@ fun RowView(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = IconMapper.fromName(item.icon),
-                contentDescription = item.name,
+                imageVector = IconMapper.fromName(screenData.icon),
+                contentDescription = screenData.name,
                 tint = iconTint,
                 modifier = Modifier.size(24.dp)
             )
@@ -306,17 +306,17 @@ fun RowView(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .clickable{ onConfig(item) },
+                .clickable{ onConfig(screenData) },
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = item.name,
+                text = screenData.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = if (connected) Color.White else Color.Gray.copy(alpha = 0.7f)
             )
             Text(
-                text = item.timerInfo,
+                text = screenData.timerInfo,
                 fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace,
                 color = if (isOn) AccentColor.copy(alpha = 0.7f) else Color.Gray.copy(alpha = 0.7f),
@@ -328,7 +328,7 @@ fun RowView(
         ToggleSwitch(
             isOn = isOn,
             isConnected = connected,
-            onToggle = { onToggle(item.id) }
+            onToggle = { onToggle(screenData.id) }
         )
     }
 }
