@@ -7,20 +7,20 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 object IconMapper {
     fun fromName(name: String): ImageVector = when (name) {
-        "drop"               -> Icons.Rounded.WaterDrop
-        "bolt"               -> Icons.Rounded.Bolt
+        "air"               -> Icons.Rounded.Air
         "bluetooth"          -> Icons.Rounded.Bluetooth
+        "lamp"               -> Icons.Rounded.Light
         "lightbulb"          -> Icons.Rounded.Lightbulb
         "lock"               -> Icons.Rounded.Lock
-        "fan"                -> Icons.Rounded.Air
-        "thermometer"        -> Icons.Rounded.Thermostat
+        "On"                 -> Icons.Rounded.PowerSettingsNew
         "power"              -> Icons.Rounded.Power
-        "camera"             -> Icons.Rounded.PhotoCamera
         "speaker"            -> Icons.Rounded.Speaker
         "tv"                 -> Icons.Rounded.Tv
-        "pump"               -> Icons.Rounded.HeatPump
-        "lamp.desk"         -> Icons.Rounded.Desk
-        "tree"               -> Icons.Rounded.AccountTree
+        "thermometer"        -> Icons.Rounded.Thermostat
+        "tree"               -> Icons.Rounded.Forest
+        "drop"               -> Icons.Rounded.WaterDrop
+        "pump"               -> Icons.Rounded.Water
+        "fan"                -> Icons.Rounded.WindPower
         else                 -> Icons.Rounded.DeviceUnknown
     }
 }

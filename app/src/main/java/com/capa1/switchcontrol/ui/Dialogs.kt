@@ -1019,7 +1019,7 @@ fun ModeDialog( //8
 fun MaintenanceDialog( //9
     show: Boolean,
     id: String,
-    upgrading: Int,
+    upgrading: State,
     lastServer: String,
     lastPort: String,
     upgrade: (Pair<String, String>) -> Unit,
@@ -1127,10 +1127,10 @@ fun MaintenanceDialog( //9
                                 )
                             }
                             when(upgrading){
-                                State.UPGRADE.ordinal->{
+                                State.UPGRADE->{
                                     showProgress = true
                                 }
-                                State.SERVER_FAIL.ordinal->{
+                                State.SERVER_FAIL->{
                                     Text(
                                         text = stringResource(R.string.badPortServer),
                                         style = TextStyle(fontSize = 16.sp),
@@ -1141,7 +1141,7 @@ fun MaintenanceDialog( //9
                                     )
                                     showProgress = false
                                 }
-                                State.UPGRADE_FAIL.ordinal->{
+                                State.UPGRADE_FAIL->{
                                     Text(
                                         text = stringResource(R.string.upgradeFails),
                                         style = TextStyle(fontSize = 16.sp),
@@ -1152,7 +1152,7 @@ fun MaintenanceDialog( //9
                                     )
                                     showProgress = false
                                 }
-                                State.UPGRADED.ordinal->{
+                                State.UPGRADED->{
                                     Text(
                                         text = stringResource(R.string.upgradeSuccess),
                                         style = TextStyle(fontSize = 16.sp),
@@ -1317,6 +1317,6 @@ fun ShowDialog(value: Int = 8) {
         5 -> NameDialog(true, "kitchen light", {""}, {})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
         8 -> ModeDialog(true, Mode.TEMP, 10, {  }, {})
-        9 -> MaintenanceDialog(true, "1234", State.SERVER_FAIL.ordinal, "", "", {},"kitchen light", {},{},{})
+        9 -> MaintenanceDialog(true, "1234", State.SERVER_FAIL, "", "", {},"kitchen light", {},{},{})
     }
 }

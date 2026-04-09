@@ -34,13 +34,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.R
-import com.capa1.switchcontrol.data.model.EspData
+import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 
 @Composable
 fun ConfigScreen(
     qty: Int,
-    data: EspData,
+    data: SwData,
     changeName: () -> Unit,
     changeIcon: ()-> Unit,
     changeRow: (Int) -> Unit,

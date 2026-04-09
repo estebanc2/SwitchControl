@@ -2,9 +2,9 @@ package com.capa1.switchcontrol.data
 
 import android.content.Context
 import com.capa1.switchcontrol.R
-import com.capa1.switchcontrol.data.model.EspData
 import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.State
+import com.capa1.switchcontrol.data.model.SwData
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -16,18 +16,18 @@ class LegendMaker @Inject constructor(
         return days shr position and 1 == 1
     }
 
-    fun legend(espData: EspData?): String {
-        if (espData == null) {
+    fun legend(swData: SwData?): String {
+        if (swData == null) {
             return  context.getString(R.string.noInfo)
         }
-        when (espData.mode) {
+        when (swData.mode) {
             Mode.PULSE_NA,
-            Mode.PULSE_NC -> return context.getString(R.string.pulse, espData.secs)
+            Mode.PULSE_NC -> return context.getString(R.string.pulse, swData.secs)
             Mode.TEMP -> {
-                return if (espData.tempX10 == -700) {
+                return if (swData.tempX10 == -700) {
                     context.getString(R.string.no_sensor)
                 } else {
-                    context.getString(R.string.turnIf, espData.secs/10)
+                    context.getString(R.string.turnIf, swData.secs/10)
                 }
             }
             else -> {
@@ -38,8 +38,8 @@ class LegendMaker @Inject constructor(
                 val tomorrow = (today + 1) % 7
                 val rightNow = (hour * 60) + min
                 var delta = 24 * 60
-                if (espData.state != State.ON) {
-                    for (prg in espData.prgs) {
+                if (swData.state != State.ON) {
+                    for (prg in swData.prgs) {
                         if (isSet(prg.days, today)) {
                             val deltaTrans = prg.start - rightNow
                             if (deltaTrans in 1..<delta) {
@@ -54,7 +54,7 @@ class LegendMaker @Inject constructor(
                         }
                     }
                 } else {
-                    for (prg in espData.prgs) {
+                    for (prg in swData.prgs) {
                         if (isSet(prg.days, today)) {
                             val deltaTrans = prg.stop - rightNow
                             if (deltaTrans in 1..<delta) {
@@ -71,8 +71,8 @@ class LegendMaker @Inject constructor(
                 }
                 val deltaHours = delta / 60
                 val deltaMin = delta % 60
-                val tempText = if (espData.mode == Mode.TIMERS_TEMP) {
-                    context.getString(R.string.ifTemp, espData.secs / 10, espData.tempX10 / 10)
+                val tempText = if (swData.mode == Mode.TIMERS_TEMP) {
+                    context.getString(R.string.ifTemp, swData.secs / 10, swData.tempX10 / 10)
                 } else {
                     ""
                 }

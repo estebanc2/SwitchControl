@@ -109,20 +109,20 @@ fun MainScreen(viewModel: SwViewModel = hiltViewModel())
     )
     NameDialog(
         show = viewModel.dialogState.showName,
-        currentName = viewModel.currentEspData.name,
+        currentName = viewModel.currentSwData.name,
         setName = { name -> viewModel.newName(name) },
         onExit = { viewModel.onShowName(false) }
     )
     TimerDialog(
         show = viewModel.dialogState.showTimer,
-        currentWP = viewModel.currentEspData.prgs[viewModel.currentTimer],
+        currentWP = viewModel.currentSwData.prgs[viewModel.currentTimer],
         setTimer = { timer -> viewModel.newTimer(timer) },
         onExit = { viewModel.onShowTimer(0, false) }
     )
     ModeDialog(
         show = viewModel.dialogState.showMode,
-        currentMode = viewModel.currentEspData.mode,
-        currentSecs = viewModel.currentEspData.secs,
+        currentMode = viewModel.currentSwData.mode,
+        currentSecs = viewModel.currentSwData.secs,
         setMode = { pair -> viewModel.setMode(pair.first, pair.second) },
         onExit = { viewModel.onShowMode(false) }
     )
@@ -133,7 +133,7 @@ fun MainScreen(viewModel: SwViewModel = hiltViewModel())
         lastServer = viewModel.server,
         lastPort = viewModel.port,
         upgrade = { pair -> viewModel.firmwareUpgrade(pair.first, pair.second) },
-        name = viewModel.currentEspData.name,
+        name = viewModel.currentSwData.name,
         local = { viewModel.localErase() },
         full = { viewModel.fullErase() },
         onExit = { viewModel.onShowMaintenance(false) }
@@ -156,7 +156,7 @@ fun MainScreen(viewModel: SwViewModel = hiltViewModel())
         } else {
             ConfigScreen(
                 qty = viewModel.swScreenList.size,
-                data = viewModel.currentEspData,
+                data = viewModel.currentSwData,
                 changeName = { viewModel.onShowName(true) },
                 changeIcon = { viewModel.onShowIcon(true) },
                 changeRow = { pos -> viewModel.changeRow(pos) },
