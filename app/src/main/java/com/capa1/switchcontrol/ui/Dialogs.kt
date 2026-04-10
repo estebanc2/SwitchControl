@@ -70,6 +70,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
+//import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.State

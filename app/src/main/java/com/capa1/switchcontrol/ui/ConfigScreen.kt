@@ -10,16 +10,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChangeCircle
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ColorLens
-import androidx.compose.material.icons.filled.DensityMedium
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Handyman
-import androidx.compose.material.icons.filled.Mode
-import androidx.compose.material.icons.filled.Restore
-import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.rounded.ChangeCircle
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.ColorLens
+import androidx.compose.material.icons.rounded.Create
+import androidx.compose.material.icons.rounded.DensityMedium
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Handyman
+import androidx.compose.material.icons.rounded.Mode
+import androidx.compose.material.icons.rounded.Restore
+import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.WeeklyProgram
+import com.capa1.switchcontrol.ui.theme.*
 
 @Composable
 fun ConfigScreen(
@@ -97,7 +99,7 @@ fun ConfigScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                //.background(color = MaterialTheme.colorScheme.secondaryContainer)
                 .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -114,8 +116,9 @@ fun ConfigScreen(
             )
             Spacer(modifier = Modifier.padding(horizontal = 10.dp))
             Icon(
-                Icons.Default.ChangeCircle,
+                Icons.Rounded.ChangeCircle,
                 contentDescription = "",
+                tint = AccentColor,
                 modifier = Modifier.clickable {  changeName() }
             )
         }
@@ -130,12 +133,12 @@ fun ConfigScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(horizontal = 16.dp, vertical = 11.dp),
+                .padding(horizontal = 10.dp, vertical = 11.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                Icons.Default.DensityMedium,
+                Icons.Rounded.DensityMedium,
+                tint = AccentColor,
                 contentDescription = ""
             )
             Text(
@@ -146,7 +149,8 @@ fun ConfigScreen(
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
             Icon(
-                Icons.Default.Upload,
+                Icons.Rounded.Upload,
+                tint = AccentColor,
                 contentDescription = "",
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
@@ -158,7 +162,8 @@ fun ConfigScreen(
                     }
             )
             Icon(
-                Icons.Default.Download,
+                Icons.Rounded.Download,
+                tint = AccentColor,
                 contentDescription = "",
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
@@ -171,13 +176,14 @@ fun ConfigScreen(
             )
             Spacer(modifier = Modifier.padding(horizontal = 10.dp))
             Icon(
-                Icons.Default.ColorLens,
+                Icons.Rounded.Create,
+                tint = AccentColor,
                 contentDescription = "",
                 modifier = Modifier.padding(horizontal = 10.dp)
             )
-            Text(text = "data.icon",
+            Text(text = data.icon,
                 style = TextStyle(fontSize = 16.sp),
-                //color = Global.MyColors[data.icon]!!.textColor,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                   //  .background(
                     //    color = Global.MyColors[data.icon]!!.backColor
@@ -198,13 +204,14 @@ fun ConfigScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                //.background(color = MaterialTheme.colorScheme.secondaryContainer)
                 .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Row {
                 Icon(
-                    Icons.Default.Restore,
+                    Icons.Rounded.Restore,
+                    tint = AccentColor,
                     contentDescription = "",
                     modifier = Modifier.clickable { changeTimer(0)}
                 )
@@ -219,8 +226,9 @@ fun ConfigScreen(
             }
             Row {
                 Icon(
-                    Icons.Default.Restore,
+                    Icons.Rounded.Restore,
                     contentDescription = "",
+                    tint = AccentColor,
                     modifier = Modifier.clickable {  changeTimer(1)}
                 )
                 Text(
@@ -234,7 +242,8 @@ fun ConfigScreen(
             }
             Row {
                 Icon(
-                    Icons.Default.Restore,
+                    Icons.Rounded.Restore,
+                    tint = AccentColor,
                     contentDescription = "",
                     modifier = Modifier.clickable { changeTimer(2)}
                 )
@@ -249,7 +258,8 @@ fun ConfigScreen(
             }
             Row {
                 Icon(
-                    Icons.Default.Restore,
+                    Icons.Rounded.Restore,
+                    tint = AccentColor,
                     contentDescription = "",
                     modifier = Modifier.clickable {  changeTimer(3)}
                 )
@@ -274,12 +284,13 @@ fun ConfigScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                //.background(color = MaterialTheme.colorScheme.secondaryContainer)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                Icons.Default.Mode,
+                Icons.Rounded.Mode,
+                tint = AccentColor,
                 contentDescription = ""
             )
             Text(
@@ -292,13 +303,14 @@ fun ConfigScreen(
             )
             Spacer(modifier = Modifier.padding(horizontal = 25.dp))
             Icon(
-                Icons.Default.Handyman,
+                Icons.Rounded.Handyman,
+                tint = AccentColor,
                 contentDescription = ""
             )
             Text(
                 text = stringResource(R.string.maintenance),
                 style = TextStyle(fontSize = 16.sp),
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
                     .clickable { goMaintenance() }
@@ -311,7 +323,8 @@ fun ConfigScreen(
                 onClick = {save()},
             ) {
                 Icon(
-                    Icons.Default.CheckCircle,
+                    Icons.Rounded.CheckCircle,
+                    tint = AccentColor,
                     contentDescription = "",
                 )
                 Text(stringResource(R.string.accept))
@@ -320,7 +333,8 @@ fun ConfigScreen(
                 onClick = { onExit() },
             ) {
                 Icon(
-                    Icons.Default.Close,
+                    Icons.Rounded.Close,
+                    tint = AccentColor,
                     contentDescription = "",
                 )
                 Text(stringResource(R.string.noAccept))

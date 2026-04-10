@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 object IconMapper {
     fun fromName(name: String): ImageVector = when (name) {
-        "air"               -> Icons.Rounded.Air
+        "air"                -> Icons.Rounded.Air
         "bluetooth"          -> Icons.Rounded.Bluetooth
         "lamp"               -> Icons.Rounded.Light
         "lightbulb"          -> Icons.Rounded.Lightbulb
@@ -18,6 +18,7 @@ object IconMapper {
         "tv"                 -> Icons.Rounded.Tv
         "thermometer"        -> Icons.Rounded.Thermostat
         "tree"               -> Icons.Rounded.Forest
+        "filter"             -> Icons.Rounded.FilterAlt
         "drop"               -> Icons.Rounded.WaterDrop
         "pump"               -> Icons.Rounded.Water
         "fan"                -> Icons.Rounded.WindPower
