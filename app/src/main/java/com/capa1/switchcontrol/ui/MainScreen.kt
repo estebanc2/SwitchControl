@@ -123,6 +123,12 @@ fun MainScreen(
         setName = { name -> viewModel.newName(name) },
         onExit = { viewModel.onShowName(false) }
     )
+    IconDialog(
+        show = viewModel.dialogState.showIcon,
+        currentIcon = viewModel.currentSwData.icon,
+        setIcon = { icon -> viewModel.newIcon(icon) },
+        onExit = { viewModel.onShowIcon(show = false) }
+    )
     TimerDialog(
         show = viewModel.dialogState.showTimer,
         currentWP = viewModel.currentSwData.prgs[viewModel.currentTimer],
@@ -302,7 +308,7 @@ fun RowView(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .clickable{ onConfig(screenData) },
+                .clickable { onConfig(screenData) },
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(

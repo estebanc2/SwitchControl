@@ -397,6 +397,10 @@ class SwViewModel  @Inject constructor(
         dialogState = dialogState.copy(showName = false)
     }
 
+    fun newIcon(icon: String){
+        currentSwData.icon = icon
+    }
+
     fun changeRow(pos: Int) {
         currentSwData.row += pos
         Log.i(TAG, "currentSwData.row += $pos")
@@ -421,6 +425,10 @@ class SwViewModel  @Inject constructor(
         dialogState = dialogState.copy(showName = show)
     }
 
+    fun onShowIcon(show: Boolean) {
+        dialogState = dialogState.copy(showIcon = show)
+    }
+
     fun onShowTimer(timer: Int, show: Boolean) {
         if (show){
             currentTimer = timer
@@ -430,11 +438,6 @@ class SwViewModel  @Inject constructor(
     fun onShowMode(show: Boolean) {
         dialogState = dialogState.copy(showMode = show)
     }
-
-    fun onShowIcon (show: Boolean) {
-        dialogState = dialogState.copy(showIcon = show)
-    }
-
     fun onShowNewId(show: Boolean) {
         dialogState = dialogState.copy(showNewId = show)
     }

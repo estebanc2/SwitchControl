@@ -8,12 +8,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.AddCircleOutline
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -71,6 +75,7 @@ import androidx.compose.ui.window.Dialog
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.TAG
+import com.capa1.switchcontrol.data.model.IconMapper
 import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.WeeklyProgram
@@ -582,7 +587,67 @@ fun NameDialog( //5
         }
     }
 }
+@Composable
+fun IconDialog( //6
+    show: Boolean,
+    currentIcon: String,
+    setIcon: (String) -> Unit,
+    onExit:() -> Unit
+) {
+    val icons = IconMapper.getAllIcons()
+    var selectedIcon = currentIcon
+    if (show) {
+        Dialog(onDismissRequest = {}) {
+            Surface(
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column{
+                    LazyColumn {
+                        items(icons) { (name, icon) ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { selectedIcon = name }
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(text = name)
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = name,
+                                    //modifier = Modifier.size(48.dp)
+                                )
+                            }
+                        }
+                    }
+                    Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
+                        TextButton(
+                            onClick = {
 
+                                setIcon(selectedIcon)
+                            },
+                        ) {
+                            Icon(
+                                Icons.Rounded.CheckCircle,
+                                contentDescription = "",
+                            )
+                            Text(stringResource(R.string.accept))
+                        }
+                        TextButton(
+                            onClick = { onExit() },
+                        ) {
+                            Icon(
+                                Icons.Rounded.Close,
+                                contentDescription = "",
+                            )
+                            Text(stringResource(R.string.noAccept))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 @Composable
 fun TimerDialog( //7
     show: Boolean,
@@ -1046,7 +1111,8 @@ fun MaintenanceDialog( //9
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp)
+                        modifier = Modifier
+                            .padding(20.dp)
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {

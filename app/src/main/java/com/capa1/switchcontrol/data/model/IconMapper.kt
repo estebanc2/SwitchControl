@@ -24,4 +24,13 @@ object IconMapper {
         "fan"                -> Icons.Rounded.WindPower
         else                 -> Icons.Rounded.DeviceUnknown
     }
+
+    fun getAllIcons(): List<Pair<String, ImageVector>> {
+        val names = listOf(
+            "air", "bluetooth", "lamp", "lightbulb", "lock",
+            "On", "power", "speaker", "tv", "thermometer",
+            "tree", "filter", "drop", "pump", "fan"
+        )
+        return names.map { it to fromName(it) }
+    }
 }
