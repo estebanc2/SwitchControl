@@ -123,7 +123,6 @@ fun MainScreen(
         setName = { name -> viewModel.newName(name) },
         onExit = { viewModel.onShowName(false) }
     )
-
     TimerDialog(
         show = viewModel.dialogState.showTimer,
         currentWP = viewModel.currentSwData.prgs[viewModel.currentTimer],

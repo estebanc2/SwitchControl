@@ -146,7 +146,7 @@ fun ConfigScreen(
                 contentDescription = ""
             )
             Text(
-                text = "1",
+                text = "$row",
                 style = TextStyle(fontSize = 20.sp),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,

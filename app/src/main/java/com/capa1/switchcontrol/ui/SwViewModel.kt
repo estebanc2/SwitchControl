@@ -19,7 +19,6 @@ import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.StoredData
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwStatus
-import com.capa1.switchcontrol.data.model.TEST
 import com.capa1.switchcontrol.data.model.ToStore
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.mqtt.MqttManager
@@ -112,13 +111,10 @@ class SwViewModel  @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             swDataStore.myFlashData.collect { flashData ->
                 Log.i(TAG, "get from memory: $flashData")
-                //if (!started) {
-                //  started = true
-                val gson = Gson()
                 val stored = gson.fromJson(flashData, ToStore::class.java)
                 if (stored != null) {
-                    if (stored.list.size == 0) {
-                        //showAdd = true
+                    if (stored.list.isEmpty()) {
+                        dialogState = dialogState.copy(showAdd = true)
                     } else {
                         stored.list.forEachIndexed { i, data ->
                             swMap[data.id] = SwData(
@@ -138,7 +134,6 @@ class SwViewModel  @Inject constructor(
                 } else {
                     Log.i(TAG, "bad stored data!")
                 }
-                //}
             }
         }
     }
@@ -216,7 +211,7 @@ class SwViewModel  @Inject constructor(
     private fun initSw(id: String) {
         val msg = SEND_GET
         mqttManager.publish(id, msg)
-        Log.i(TAG, "init Tx: $id -> $msg")
+        //Log.i(TAG, "init Tx: $id -> $msg")
     }
 
     private fun processArrival(id:String, msg: String){
@@ -372,6 +367,7 @@ class SwViewModel  @Inject constructor(
                 }
             }
         }
+        Log.i("cambio", "row antes: ${swMap.getValue(currentId).row}, row despues: ${currentSwData.row}")
         if (swMap.getValue(currentId).name != currentSwData.name ||
             swMap.getValue(currentId).icon != currentSwData.icon ||
             swMap.getValue(currentId).row != currentSwData.row ){
@@ -387,6 +383,7 @@ class SwViewModel  @Inject constructor(
 
     fun goConfig(item: ScreenData) {
         currentId = item.id
+        Log.i(TAG, "_ _ _ _ _ _ _ id: $currentId")
         currentSwData = swMap.getValue(currentId).copy()
         currentSwData.prgs = swMap.getValue(currentId).prgs.toMutableList()
         for (i in 0..< currentSwData.prgs.size) {
@@ -401,6 +398,7 @@ class SwViewModel  @Inject constructor(
     }
 
     fun changeRow(pos: Int) {
+        currentSwData.row += pos
         Log.i(TAG, "currentSwData.row += $pos")
     }
 
