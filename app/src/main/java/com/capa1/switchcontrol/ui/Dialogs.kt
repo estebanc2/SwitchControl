@@ -21,22 +21,22 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CheckCircleOutline
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Mode
-import androidx.compose.material.icons.filled.MoodBad
-import androidx.compose.material.icons.filled.PhonelinkErase
-import androidx.compose.material.icons.filled.Upgrade
-import androidx.compose.material.icons.filled.Upload
-import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material.icons.rounded.AddCircleOutline
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.CheckCircleOutline
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.FileDownload
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Mode
+import androidx.compose.material.icons.rounded.MoodBad
+import androidx.compose.material.icons.rounded.PhonelinkErase
+import androidx.compose.material.icons.rounded.Upgrade
+import androidx.compose.material.icons.rounded.Upload
+import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
@@ -70,7 +70,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
-//import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.State
@@ -80,6 +79,7 @@ import com.capa1.switchcontrol.data.wifi.TouchState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.capa1.switchcontrol.ui.theme.*
 
 @Composable
 fun NoPermissionDialog( //0
@@ -110,7 +110,7 @@ fun AddSwDialog( //1
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.TopEnd//   .Center
@@ -128,7 +128,8 @@ fun AddSwDialog( //1
                             onClick = { addSw() },
                         ) {
                             Icon(
-                                Icons.Default.AddCircleOutline,
+                                Icons.Rounded.AddCircleOutline,
+                                tint = AccentColor,
                                 contentDescription = "",
                             )
                             Text(stringResource(R.string.addNew),
@@ -140,7 +141,8 @@ fun AddSwDialog( //1
                             onClick = { addId()},
                         ) {
                             Icon(
-                                Icons.Default.CheckCircleOutline,
+                                Icons.Rounded.CheckCircleOutline,
+                                tint = AccentColor,
                                 contentDescription = "",
                             )
                             Text(stringResource(R.string.addWithId),
@@ -152,7 +154,8 @@ fun AddSwDialog( //1
                             onClick = { addAll() },
                         ) {
                             Icon(
-                                Icons.Default.FileDownload,
+                                Icons.Rounded.FileDownload,
+                                tint = AccentColor,
                                 contentDescription = "",
                             )
                             Text(stringResource(R.string.wholeConfig),
@@ -165,7 +168,8 @@ fun AddSwDialog( //1
                             onClick = { showHow = true },
                         ) {
                             Icon(
-                                Icons.Default.Mode,
+                                Icons.Rounded.Mode,
+                                tint = AccentColor,
                                 contentDescription = "",
                             )
                             Text(stringResource(R.string.configSw),
@@ -187,7 +191,8 @@ fun AddSwDialog( //1
                             onClick = { onExit() },
                         ) {
                             Icon(
-                                Icons.Default.MoodBad,
+                                Icons.Rounded.MoodBad,
+                                tint = AccentColor,
                                 contentDescription = ""
                              )
                             Text(text = stringResource(R.string.nothing),
@@ -216,7 +221,7 @@ fun NewDialog( //2
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -235,7 +240,7 @@ fun NewDialog( //2
                         if(apData.is5G) {
                             Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    Icons.Default.WarningAmber,
+                                    Icons.Rounded.WarningAmber,
                                     contentDescription = "",
                                     tint = Color.Red
                                 )
@@ -327,7 +332,7 @@ fun NewDialog( //2
                                 },
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Rounded.CheckCircle,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.accept))
@@ -336,7 +341,7 @@ fun NewDialog( //2
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -365,7 +370,7 @@ fun NewIdDialog( //3: Boolean,
      if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -404,7 +409,7 @@ fun NewIdDialog( //3: Boolean,
                                 },
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Rounded.CheckCircle,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.accept))
@@ -413,7 +418,7 @@ fun NewIdDialog( //3: Boolean,
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -435,7 +440,7 @@ fun NewAllDialog( //4
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -483,7 +488,7 @@ fun NewAllDialog( //4
                                 },
                             ) {
                                 Icon(
-                                    Icons.Default.Upload,
+                                    Icons.Rounded.Upload,
                                     contentDescription = "",
                                 )
                                 Text(text = stringResource(R.string.send))
@@ -492,7 +497,7 @@ fun NewAllDialog( //4
                                 onClick = {setId("0")},
                             ) {
                                 Icon(
-                                    Icons.Default.Download,
+                                    Icons.Rounded.Download,
                                     contentDescription = "",
                                 )
                                 Text(text = stringResource(R.string.receive))
@@ -501,7 +506,7 @@ fun NewAllDialog( //4
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -523,7 +528,7 @@ fun NameDialog( //5
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -556,7 +561,7 @@ fun NameDialog( //5
                                 },
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Rounded.CheckCircle,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.accept))
@@ -565,7 +570,7 @@ fun NameDialog( //5
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -588,7 +593,7 @@ fun TimerDialog( //7
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -622,7 +627,7 @@ fun TimerDialog( //7
                                 )
                             Column{
                                 Icon(
-                                    Icons.Default.KeyboardArrowUp,
+                                    Icons.Rounded.KeyboardArrowUp,
                                     contentDescription = "",
                                     Modifier.clickable {
                                         if(start < 23*60) start += 60
@@ -630,7 +635,7 @@ fun TimerDialog( //7
                                     }
                                 )
                                 Icon(
-                                    Icons.Default.KeyboardArrowDown,
+                                    Icons.Rounded.KeyboardArrowDown,
                                     contentDescription = "",
                                     Modifier.clickable { if(start > 60) start -= 60 }
                                 )
@@ -643,7 +648,7 @@ fun TimerDialog( //7
                             )
                             Column{
                                 Icon(
-                                    Icons.Default.KeyboardArrowUp,
+                                    Icons.Rounded.KeyboardArrowUp,
                                     contentDescription = "",
                                     Modifier.clickable {
                                         if(getMinutes(start) < 59) start += 1
@@ -651,7 +656,7 @@ fun TimerDialog( //7
                                     }
                                 )
                                 Icon(
-                                    Icons.Default.KeyboardArrowDown,
+                                    Icons.Rounded.KeyboardArrowDown,
                                     contentDescription = "",
                                     Modifier.clickable { if(getMinutes(start) > 0) start -= 1 }
                                 )
@@ -672,12 +677,12 @@ fun TimerDialog( //7
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp))
                             Column{
                                 Icon(
-                                    Icons.Default.KeyboardArrowUp,
+                                    Icons.Rounded.KeyboardArrowUp,
                                     contentDescription = "",
                                     Modifier.clickable { if(stop < 23*60) stop += 60 }
                                 )
                                 Icon(
-                                    Icons.Default.KeyboardArrowDown,
+                                    Icons.Rounded.KeyboardArrowDown,
                                     contentDescription = "",
                                     Modifier.clickable {
                                         if(stop > 60) stop -= 60
@@ -693,12 +698,12 @@ fun TimerDialog( //7
                             )
                             Column{
                                 Icon(
-                                    Icons.Default.KeyboardArrowUp,
+                                    Icons.Rounded.KeyboardArrowUp,
                                     contentDescription = "",
                                     Modifier.clickable { if(getMinutes(stop) < 59) stop += 1 }
                                 )
                                 Icon(
-                                    Icons.Default.KeyboardArrowDown,
+                                    Icons.Rounded.KeyboardArrowDown,
                                     contentDescription = "",
                                     Modifier.clickable {
                                         if(getMinutes(stop) > 0) stop -= 1
@@ -861,7 +866,7 @@ fun TimerDialog( //7
                             },
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Rounded.CheckCircle,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.accept))
@@ -870,7 +875,7 @@ fun TimerDialog( //7
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -894,7 +899,7 @@ fun ModeDialog( //8
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -922,7 +927,7 @@ fun ModeDialog( //8
                             Column {
                                 Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        Icons.Default.Check,
+                                        Icons.Rounded.Check,
                                         contentDescription = "",
                                         tint = visible
                                     )
@@ -950,13 +955,13 @@ fun ModeDialog( //8
                                         )
                                         Column {
                                             Icon(
-                                                Icons.Default.KeyboardArrowUp,
+                                                Icons.Rounded.KeyboardArrowUp,
                                                 contentDescription = "",
                                                 tint = visible,
                                                 modifier = Modifier.clickable { if (secs < 250) secs += 1 }
                                             )
                                             Icon(
-                                                Icons.Default.KeyboardArrowDown,
+                                                Icons.Rounded.KeyboardArrowDown,
                                                 contentDescription = "",
                                                 tint = visible,
                                                 modifier = Modifier.clickable { if (secs > 0) secs -= 1 }
@@ -974,13 +979,13 @@ fun ModeDialog( //8
                                         )
                                         Column {
                                             Icon(
-                                                Icons.Default.KeyboardArrowUp,
+                                                Icons.Rounded.KeyboardArrowUp,
                                                 contentDescription = "",
                                                 tint = visible,
                                                 modifier = Modifier.clickable { if (secs < 220) secs += 10 }
                                             )
                                             Icon(
-                                                Icons.Default.KeyboardArrowDown,
+                                                Icons.Rounded.KeyboardArrowDown,
                                                 contentDescription = "",
                                                 tint = visible,
                                                 modifier = Modifier.clickable { if (secs > 0) secs -= 10 }
@@ -995,7 +1000,7 @@ fun ModeDialog( //8
                             TextButton(onClick = { setMode(Pair(mode, secs))},
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Rounded.CheckCircle,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.accept))
@@ -1004,7 +1009,7 @@ fun ModeDialog( //8
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -1035,7 +1040,7 @@ fun MaintenanceDialog( //9
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -1179,7 +1184,7 @@ fun MaintenanceDialog( //9
                                 onClick = { upgrade(Pair(server, port)) },
                             ) {
                                 Icon(
-                                    Icons.Default.Upgrade,
+                                    Icons.Rounded.Upgrade,
                                     contentDescription = "",
                                 )
                                 Text(text = stringResource(R.string.upgrade))
@@ -1204,7 +1209,7 @@ fun MaintenanceDialog( //9
                             var erasing by remember { mutableStateOf(false)}
                             ElevatedButton(onClick = { erasing = true}) {
                                 Icon(
-                                      Icons.Default.PhonelinkErase,
+                                      Icons.Rounded.PhonelinkErase,
                                             contentDescription = "",
                                 )
                                 Text(
@@ -1240,7 +1245,7 @@ fun MaintenanceDialog( //9
                             var fullErasing by remember { mutableStateOf(false)}
                             ElevatedButton(onClick = { fullErasing = true}){
                                 Icon(
-                                    Icons.Default.Delete,
+                                    Icons.Rounded.Delete,
                                     contentDescription = "",
                                 )
                                 Text(
@@ -1289,7 +1294,7 @@ fun MaintenanceDialog( //9
                                     onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))

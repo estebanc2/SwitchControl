@@ -26,6 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,7 +56,8 @@ fun ConfigScreen(
     save:()->Unit,
     onExit:()->Unit
 ){
-    //var row by remember { mutableIntStateOf(data.row) }
+    var status = data.status
+    var row by remember { mutableIntStateOf(data.row) }
     fun hours(min: Int): String{
         return "${min/60}:${min - (min/60)*60}"
     }
@@ -99,7 +104,6 @@ fun ConfigScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
-                //.background(color = MaterialTheme.colorScheme.secondaryContainer)
                 .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -155,10 +159,10 @@ fun ConfigScreen(
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
                     .clickable {
-                        //if (row > 1) {
-                            //row -= 1
+                        if (row > 1) {
+                            row -= 1
                             changeRow(-1)
-                        //}
+                        }
                     }
             )
             Icon(
@@ -168,10 +172,10 @@ fun ConfigScreen(
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
                     .clickable {
-                        //if (row < qty) {
-                        //    row += 1
+                        if (row < qty) {
+                            row += 1
                             changeRow(1)
-                        //}
+                        }
                     }
             )
             Spacer(modifier = Modifier.padding(horizontal = 10.dp))
@@ -204,7 +208,6 @@ fun ConfigScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
-                //.background(color = MaterialTheme.colorScheme.secondaryContainer)
                 .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
@@ -284,7 +287,6 @@ fun ConfigScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
-                //.background(color = MaterialTheme.colorScheme.secondaryContainer)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

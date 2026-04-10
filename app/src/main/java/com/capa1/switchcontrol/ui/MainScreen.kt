@@ -149,37 +149,30 @@ fun MainScreen(
         full = { viewModel.fullErase() },
         onExit = { viewModel.onShowMaintenance(false) }
     )
-
-    /*Box(
-        Modifier
-            .fillMaxSize()
-            .background(BgPage)
-    ) {*/
-        if (!viewModel.dialogState.showConfig) {
-            Column {
-                ShowTitle(onShowAdd = { viewModel.onShowAdd(true) })
-                ShowSwitches(
-                    switches = viewModel.swScreenList,
-                    click = { id -> viewModel.toggle(id) },
-                    onConfig = { item -> viewModel.goConfig(item) }
-                )
-            }
-        } else {
-            ConfigScreen(
-                qty = viewModel.swScreenList.size,
-                data = viewModel.currentSwData,
-                changeName = { viewModel.onShowName(true) },
-                changeIcon = { viewModel.onShowIcon(true) },
-                changeRow = { pos -> viewModel.changeRow(pos) },
-                changeTimer = { timer -> viewModel.onShowTimer(timer, true) },
-                changeMode = { viewModel.onShowMode(true) },
-                goMaintenance = { viewModel.onShowMaintenance(true) },
-                save = { viewModel.saveConfig() },
-                onExit = { viewModel.exitConfig() }
+    if (!viewModel.dialogState.showConfig) {
+        Column {
+            ShowTitle(onShowAdd = { viewModel.onShowAdd(true) })
+            ShowSwitches(
+                switches = viewModel.swScreenList,
+                click = { id -> viewModel.toggle(id) },
+                onConfig = { item -> viewModel.goConfig(item) }
             )
         }
+    } else {
+        ConfigScreen(
+            qty = viewModel.swScreenList.size,
+            data = viewModel.currentSwData,
+            changeName = { viewModel.onShowName(true) },
+            changeIcon = { viewModel.onShowIcon(true) },
+            changeRow = { pos -> viewModel.changeRow(pos) },
+            changeTimer = { timer -> viewModel.onShowTimer(timer, true) },
+            changeMode = { viewModel.onShowMode(true) },
+            goMaintenance = { viewModel.onShowMaintenance(true) },
+            save = { viewModel.saveConfig() },
+            onExit = { viewModel.exitConfig() }
+        )
     }
-//}
+}
 
 // ── Title bar ────────────────────────────────────────────────────────────────
 @Composable

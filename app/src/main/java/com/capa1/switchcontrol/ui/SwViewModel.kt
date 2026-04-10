@@ -74,8 +74,8 @@ class SwViewModel  @Inject constructor(
     var currentId = ""
     var server = ""
     var port = ""
-    var currentSwData: SwData =
-        SwData("", State.OFF, Mode.TIMERS, 0, NO_TIMERS, 0, "", 0, SwStatus.DISCONNECTED)
+    var currentSwData by mutableStateOf (
+        SwData("", State.OFF, Mode.TIMERS, 0, NO_TIMERS, 0, "", 1, SwStatus.DISCONNECTED))
     var dialogState by mutableStateOf(DialogState())
         private set
     var upgrading by mutableStateOf(State.UPGRADE)
@@ -159,6 +159,7 @@ class SwViewModel  @Inject constructor(
         }
         Log.i(TAG, "swScreenList refresh")
         swScreenList = list
+        savedOnce = false
     }
 
     private fun subscribeToChanges() {
@@ -169,7 +170,6 @@ class SwViewModel  @Inject constructor(
                         mqttUp = true
                         initializeSw()
                     }
-
                     MqttState.CONNECTING -> mqttUp = false
                     MqttState.DISCONNECTED -> {
                         mqttManager.connect()
@@ -205,7 +205,6 @@ class SwViewModel  @Inject constructor(
             }
         }
     }
-
 
     private fun initializeSw() {
         for (id in swMap.keys) {
@@ -347,11 +346,11 @@ class SwViewModel  @Inject constructor(
     }
 
     fun saveConfig(){
-        /*if (espMap.getValue(currentId).name != currentSwData.name ||
+        if (swMap.getValue(currentId).name != currentSwData.name ||
             swMap.getValue(currentId).prgs != currentSwData.prgs ||
             swMap.getValue(currentId).mode != currentSwData.mode ||
             swMap.getValue(currentId).secs != currentSwData.secs){
-            val setData = Global.gson.toJson(EspData (  currentSwData.name,
+            val setData = gson.toJson(EspData (  currentSwData.name,
                 State.SET_DATA,
                 currentSwData.mode,
                 currentSwData.secs,
@@ -377,9 +376,8 @@ class SwViewModel  @Inject constructor(
             swMap.getValue(currentId).icon != currentSwData.icon ||
             swMap.getValue(currentId).row != currentSwData.row ){
             swMap[currentId] = currentSwData.copy()
-            refreshScreenInfo()
-            saveData()
-        }*/
+            refreshScreen()
+        }
         dialogState = dialogState.copy(showConfig = false)
     }
 
