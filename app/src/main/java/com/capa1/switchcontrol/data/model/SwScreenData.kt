@@ -1,6 +1,6 @@
 package com.capa1.switchcontrol.data.model
 
-data class ScreenData(
+data class SwScreenData(
     val name: String,
     val id: String,
     val icon: String,

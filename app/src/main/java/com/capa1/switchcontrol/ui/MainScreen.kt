@@ -29,11 +29,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,7 +51,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.IconMapper
-import com.capa1.switchcontrol.data.model.ScreenData
+import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.ui.permissions.PermissionUtils
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -211,9 +208,9 @@ fun ShowTitle(onShowAdd: () -> Unit) {
 // ── Switch list ──────────────────────────────────────────────────────────────
 @Composable
 fun ShowSwitches(
-    switches: List<ScreenData>,
+    switches: List<SwScreenData>,
     click: (String) -> Unit,
-    onConfig: (ScreenData) -> Unit
+    onConfig: (SwScreenData) -> Unit
 ) {
    LazyColumn(
         modifier = Modifier
@@ -222,7 +219,7 @@ fun ShowSwitches(
    ) {
         items(switches) { switch ->
             RowView(
-                screenData = switch,
+                swScreenData = switch,
                 onToggle = { click(switch.id) },
                 onConfig = { item -> onConfig(item) }
             )
@@ -232,12 +229,12 @@ fun ShowSwitches(
 
 @Composable
 fun RowView(
-    screenData: ScreenData,
+    swScreenData: SwScreenData,
     onToggle: (String) -> Unit,
-    onConfig: (ScreenData) -> Unit //onConfigTap: (String) -> Unit,
+    onConfig: (SwScreenData) -> Unit //onConfigTap: (String) -> Unit,
 ) {
-    val isOn = screenData.swOn
-    val connected = screenData.connected
+    val isOn = swScreenData.swOn
+    val connected = swScreenData.connected
 
     // Animaciones de color
     val accentBarColor by animateColorAsState(
@@ -297,8 +294,8 @@ fun RowView(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = IconMapper.fromName(screenData.icon),
-                contentDescription = screenData.name,
+                imageVector = IconMapper.fromName(swScreenData.icon),
+                contentDescription = swScreenData.name,
                 tint = iconTint,
                 modifier = Modifier.size(24.dp)
             )
@@ -308,17 +305,17 @@ fun RowView(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .clickable { onConfig(screenData) },
+                .clickable { onConfig(swScreenData) },
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = screenData.name,
+                text = swScreenData.name,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = if (connected) Color.White else Color.Gray.copy(alpha = 0.7f)
             )
             Text(
-                text = screenData.timerInfo,
+                text = swScreenData.timerInfo,
                 fontSize = 13.sp,
                 fontFamily = FontFamily.Monospace,
                 color = if (isOn) AccentColor.copy(alpha = 0.7f) else Color.Gray.copy(alpha = 0.7f),
@@ -330,7 +327,7 @@ fun RowView(
         ToggleSwitch(
             isOn = isOn,
             isConnected = connected,
-            onToggle = { onToggle(screenData.id) }
+            onToggle = { onToggle(swScreenData.id) }
         )
     }
 }

@@ -14,7 +14,7 @@ import com.capa1.switchcontrol.data.SwDataStore
 import com.capa1.switchcontrol.data.model.DialogState
 import com.capa1.switchcontrol.data.model.EspData
 import com.capa1.switchcontrol.data.model.Mode
-import com.capa1.switchcontrol.data.model.ScreenData
+import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.StoredData
 import com.capa1.switchcontrol.data.model.SwData
@@ -83,7 +83,7 @@ class SwViewModel  @Inject constructor(
         private set
     //var swScreenList = mutableStateListOf<ScreenData>()
 
-    var swScreenList by mutableStateOf<List<ScreenData>>(listOf())
+    var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
         private set
 
     var currentTimer by mutableIntStateOf(0)
@@ -139,10 +139,10 @@ class SwViewModel  @Inject constructor(
     }
 
     private fun refreshScreen() {
-        val list = mutableStateListOf<ScreenData>()
+        val list = mutableStateListOf<SwScreenData>()
         swMap.toList().sortedBy { it.second.row }.forEach { (id, swData) ->
             list.add(
-                ScreenData(
+                SwScreenData(
                     name = swData.name,
                     id = id,
                     icon = swData.icon,
@@ -381,7 +381,7 @@ class SwViewModel  @Inject constructor(
         dialogState = dialogState.copy(showConfig = false)
     }
 
-    fun goConfig(item: ScreenData) {
+    fun goConfig(item: SwScreenData) {
         currentId = item.id
         Log.i(TAG, "_ _ _ _ _ _ _ id: $currentId")
         currentSwData = swMap.getValue(currentId).copy()

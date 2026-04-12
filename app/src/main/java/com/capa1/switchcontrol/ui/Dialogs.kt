@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -595,20 +596,20 @@ fun IconDialog( //6
     onExit:() -> Unit
 ) {
     val icons = IconMapper.getAllIcons()
-    var selectedIcon = currentIcon
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Column{
-                    LazyColumn {
+                Column(modifier = Modifier.fillMaxSize()){
+                    var iconName by remember { mutableStateOf(currentIcon) }
+                    LazyColumn (modifier = Modifier.weight(1f)) {
                         items(icons) { (name, icon) ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable { selectedIcon = name }
-                                    .padding(16.dp),
+                                    .clickable { iconName = name }
+                                    .padding(8.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(text = name)
@@ -623,8 +624,8 @@ fun IconDialog( //6
                     Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
                         TextButton(
                             onClick = {
-
-                                setIcon(selectedIcon)
+                                setIcon(iconName)
+                                onExit()
                             },
                         ) {
                             Icon(
