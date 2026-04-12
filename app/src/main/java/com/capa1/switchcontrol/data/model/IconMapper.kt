@@ -12,7 +12,7 @@ object IconMapper {
         "exclamationmark.triangle"  -> Icons.Rounded.WarningAmber
         "cup.and.saucer"            -> Icons.Rounded.Coffee
         "speedometer"               -> Icons.Rounded.Speed
-        "theatremasks"              -> Icons.Rounded.TheaterComedy
+        "theatermasks"              -> Icons.Rounded.TheaterComedy
         "scope"                     -> Icons.Rounded.FilterAlt
         "drop"                      -> Icons.Rounded.WaterDrop
         "lightbulb"                 -> Icons.Rounded.Lightbulb
@@ -24,13 +24,10 @@ object IconMapper {
         "fan"                       -> Icons.Rounded.WindPower
         else                        -> Icons.Rounded.DeviceUnknown
     }
+    val names = listOf(
+        "wind", "exclamationmark.triangle","cup.and.saucer","speedometer",
+        "theatermasks", "scope", "drop", "lightbulb","lamp.ceiling",
+        "power", "powercord", "thermometer", "tv", "fan"
+    )
 
-    fun getAllIcons(): List<Pair<String, ImageVector>> {
-        val names = listOf(
-            "wind", "exclamationmark.triangle","cup.and.saucer","speedometer",
-            "theatermasks", "scope", "drop", "lightbulb","lamp.ceiling",
-            "power", "powercord", "thermometer", "tv", "fan"
-        )
-        return names.map { it to fromName(it) }
-    }
 }

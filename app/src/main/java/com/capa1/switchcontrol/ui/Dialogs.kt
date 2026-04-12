@@ -3,12 +3,13 @@
 package com.capa1.switchcontrol.ui
 import android.content.res.Configuration
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,7 +26,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.AddCircleOutline
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -77,15 +77,16 @@ import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.IconMapper
+import com.capa1.switchcontrol.data.model.IconMapper.fromName
 import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
+import com.capa1.switchcontrol.ui.theme.AccentColor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.capa1.switchcontrol.ui.theme.*
 
 @Composable
 fun NoPermissionDialog( //0
@@ -595,30 +596,29 @@ fun IconDialog( //6
     setIcon: (String) -> Unit,
     onExit:() -> Unit
 ) {
-    val icons = IconMapper.getAllIcons()
+    var iconName by remember { mutableStateOf(currentIcon) }
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Column(modifier = Modifier.fillMaxSize()){
-                    var iconName by remember { mutableStateOf(currentIcon) }
-                    LazyColumn (modifier = Modifier.weight(1f)) {
-                        items(icons) { (name, icon) ->
-                            Row(
+                Column(modifier = Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+
+                    ) {
+                        items(IconMapper.names) { name ->
+                            Icon(
+                                imageVector = fromName(name),
+                                contentDescription = "",
+                                tint =  if (name == iconName) AccentColor else Color.Gray,
                                 modifier = Modifier
-                                    .fillMaxWidth()
+                                    //.background(color = if (name == currentIcon) AccentColor.copy(alpha = 0.7f) else Color.Gray.copy(alpha = 0.7f))
                                     .clickable { iconName = name }
                                     .padding(8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(text = name)
-                                Icon(
-                                    imageVector = icon,
-                                    contentDescription = name,
-                                    //modifier = Modifier.size(48.dp)
-                                )
-                            }
+                            )
                         }
                     }
                     Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
@@ -1379,7 +1379,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 8) {
+fun ShowDialog(value: Int = 6) {
     //Column
     when (value) {
 
@@ -1388,6 +1388,7 @@ fun ShowDialog(value: Int = 8) {
         3 -> NewIdDialog(show = true, setId = {}, {})
         4 -> NewAllDialog(true, "all", {}, {})
         5 -> NameDialog(true, "kitchen light", {""}, {})
+        6 -> IconDialog(true, "lightbulb", {"theatermasks"}, {})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
         8 -> ModeDialog(true, Mode.TEMP, 10, {  }, {})
         9 -> MaintenanceDialog(true, "1234", State.SERVER_FAIL, "", "", {},"kitchen light", {},{},{})

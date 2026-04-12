@@ -1,6 +1,5 @@
 package com.capa1.switchcontrol.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,8 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChangeCircle
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.ColorLens
-import androidx.compose.material.icons.rounded.Create
 import androidx.compose.material.icons.rounded.DensityMedium
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Handyman
@@ -39,9 +36,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.R
+import com.capa1.switchcontrol.data.model.IconMapper.fromName
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.WeeklyProgram
-import com.capa1.switchcontrol.ui.theme.*
+import com.capa1.switchcontrol.ui.theme.AccentColor
 
 @Composable
 fun ConfigScreen(
@@ -56,7 +54,6 @@ fun ConfigScreen(
     save:()->Unit,
     onExit:()->Unit
 ){
-    var status = data.status
     var row by remember { mutableIntStateOf(data.row) }
     fun hours(min: Int): String{
         return "${min/60}:${min - (min/60)*60}"
@@ -179,22 +176,19 @@ fun ConfigScreen(
                     }
             )
             Spacer(modifier = Modifier.padding(horizontal = 10.dp))
+            Text(
+                text = "icono: ",
+                style = TextStyle(fontSize = 20.sp),
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
             Icon(
-                Icons.Rounded.Create,
+                imageVector = fromName(data.icon),
                 tint = AccentColor,
                 contentDescription = "",
                 modifier = Modifier.padding(horizontal = 10.dp)
-            )
-            Text(text = data.icon,
-                style = TextStyle(fontSize = 16.sp),
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                  //  .background(
-                    //    color = Global.MyColors[data.icon]!!.backColor
-                    //)
                     .clickable { changeIcon() }
-                    .padding(all = 8.dp)
-                    .clip(shape = MaterialTheme.shapes.medium)
             )
         }
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
