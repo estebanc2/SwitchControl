@@ -8,23 +8,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 object IconMapper {
     fun fromName(name: String): ImageVector = when (name) {
-        "air"                -> Icons.Rounded.Air
-        "cafe"               -> Icons.Rounded.Coffee
-        "lamp"               -> Icons.Rounded.Light
-        "lightbulb"          -> Icons.Rounded.Lightbulb
-        "lock"               -> Icons.Rounded.Speed
-        "On"                 -> Icons.Rounded.PowerSettingsNew
-        "power"            -> Icons.Rounded.ElectricalServices
-        "tv"                 -> Icons.Rounded.Tv
-        "thermometer"        -> Icons.Rounded.Thermostat
-        "tree"               -> Icons.Rounded.Forest
-        "filter"             -> Icons.Rounded.FilterAlt
-        "drop"               -> Icons.Rounded.WaterDrop
-        "pump"               -> Icons.Rounded.Water
-        "fan"                -> Icons.Rounded.WindPower
-        "speaker"            -> Icons.Rounded.Speaker
-        "fun"                -> Icons.Rounded.TheaterComedy
-        else                 -> Icons.Rounded.DeviceUnknown
+        "wind"                      -> Icons.Rounded.Air
+        "exclamationmark.triangle"  -> Icons.Rounded.WarningAmber
+        "cup.and.saucer"            -> Icons.Rounded.Coffee
+        "speedometer"               -> Icons.Rounded.Speed
+        "theatremasks"              -> Icons.Rounded.TheaterComedy
+        "scope"                     -> Icons.Rounded.FilterAlt
+        "drop"                      -> Icons.Rounded.WaterDrop
+        "lightbulb"                 -> Icons.Rounded.Lightbulb
+        "lamp.ceiling"              -> Icons.Rounded.Light
+        "power"                     -> Icons.Rounded.PowerSettingsNew
+        "powercord"                 -> Icons.Rounded.ElectricalServices
+        "thermometer"               -> Icons.Rounded.Thermostat
+        "tv"                        -> Icons.Rounded.Tv
+        "fan"                       -> Icons.Rounded.WindPower
+        else                        -> Icons.Rounded.DeviceUnknown
     }
 
     fun getAllIcons(): List<Pair<String, ImageVector>> {
