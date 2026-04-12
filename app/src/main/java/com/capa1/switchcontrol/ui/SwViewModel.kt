@@ -483,7 +483,8 @@ class SwViewModel  @Inject constructor(
         dialogState = dialogState.copy(showAll = false)
     }
     fun localErase(){
-        //swScreenList.removeIf{ it.id == currentId }
+        swMap.remove(currentId)
+        refreshScreen()
         dialogState = dialogState.copy(showMaintenance = false)
         exitConfig()
     }
