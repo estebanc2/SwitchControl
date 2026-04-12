@@ -1,9 +1,6 @@
 package com.capa1.switchcontrol.data.mqtt
 
 import android.util.Log
-import com.capa1.switchcontrol.data.Global.FROM_SW
-import com.capa1.switchcontrol.data.Global.MQTT_HOST_AND_PORT
-import com.capa1.switchcontrol.data.Global.TO_SW
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,12 +18,21 @@ import java.util.UUID
 import javax.inject.Inject
 
 enum class MqttState {
-    UP, DOWN, LOST
+    CONNECTED, CONNECTING, DISCONNECTED
 }
-class MqttManager @Inject constructor() {
+
+class MqttManager @Inject constructor()
+{
+    companion object {
+        const val TO_SW = "/mtc/to_sw/"
+        const val FROM_SW = "/mtc/from_sw/"
+        const val MQTT_HOST_AND_PORT =
+            "tcp://linode.1.poplarlabs.net:1883" //"tcp://test.mosquitto.org:1883"; //
+        const val TAG = "Mqtt"
+    }
     private lateinit var mqttClient: MqttAsyncClient
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    val mqttState: MutableStateFlow<MqttState> = MutableStateFlow(MqttState.DOWN)
+    val mqttState: MutableStateFlow<MqttState> = MutableStateFlow(MqttState.CONNECTING)
     val subscribedId: MutableStateFlow<String> = MutableStateFlow("")
     val arrival: MutableStateFlow<Pair<String, String>> = MutableStateFlow(Pair("", ""))
 
@@ -49,7 +55,7 @@ class MqttManager @Inject constructor() {
             }
 
             override fun connectionLost(cause: Throwable?) {
-                coroutineScope.launch { mqttState.emit(MqttState.DOWN) }
+                coroutineScope.launch { mqttState.emit(MqttState.CONNECTING) }
                 Log.i(TAG, "callback connectionLost $cause")
             }
 
@@ -64,12 +70,12 @@ class MqttManager @Inject constructor() {
         try {
             mqttClient.connect(options, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    coroutineScope.launch { mqttState.emit(MqttState.UP)}
+                    coroutineScope.launch { mqttState.emit(MqttState.CONNECTED)}
                     Log.i(TAG, "callback onSuccess $asyncActionToken")
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    coroutineScope.launch { mqttState.emit(MqttState.DOWN)}
+                    coroutineScope.launch { mqttState.emit(MqttState.CONNECTING)}
                     Log.i(TAG, "callback onFailure $asyncActionToken")
                 }
             })
@@ -132,9 +138,5 @@ class MqttManager @Inject constructor() {
         } catch (e: MqttException) {
             e.printStackTrace()
         }
-    }
-
-    companion object {
-        val TAG = "Mqtt"
     }
 }

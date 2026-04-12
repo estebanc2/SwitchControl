@@ -3,14 +3,16 @@
 package com.capa1.switchcontrol.ui
 import android.content.res.Configuration
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,22 +26,22 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircleOutline
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CheckCircleOutline
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Mode
-import androidx.compose.material.icons.filled.MoodBad
-import androidx.compose.material.icons.filled.PhonelinkErase
-import androidx.compose.material.icons.filled.Upgrade
-import androidx.compose.material.icons.filled.Upload
-import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material.icons.rounded.AddCircleOutline
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.CheckCircleOutline
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.FileDownload
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Mode
+import androidx.compose.material.icons.rounded.MoodBad
+import androidx.compose.material.icons.rounded.PhonelinkErase
+import androidx.compose.material.icons.rounded.Upgrade
+import androidx.compose.material.icons.rounded.Upload
+import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
@@ -73,13 +75,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
-import com.capa1.switchcontrol.data.Global.MyColors
 import com.capa1.switchcontrol.data.Global.TAG
-import com.capa1.switchcontrol.data.model.SwMode
-import com.capa1.switchcontrol.data.model.SwState
+import com.capa1.switchcontrol.data.model.IconMapper
+import com.capa1.switchcontrol.data.model.IconMapper.fromName
+import com.capa1.switchcontrol.data.model.Mode
+import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
+import com.capa1.switchcontrol.ui.theme.AccentColor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -113,7 +117,7 @@ fun AddSwDialog( //1
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.TopEnd//   .Center
@@ -131,7 +135,8 @@ fun AddSwDialog( //1
                             onClick = { addSw() },
                         ) {
                             Icon(
-                                Icons.Default.AddCircleOutline,
+                                Icons.Rounded.AddCircleOutline,
+                                tint = AccentColor,
                                 contentDescription = "",
                             )
                             Text(stringResource(R.string.addNew),
@@ -143,7 +148,8 @@ fun AddSwDialog( //1
                             onClick = { addId()},
                         ) {
                             Icon(
-                                Icons.Default.CheckCircleOutline,
+                                Icons.Rounded.CheckCircleOutline,
+                                tint = AccentColor,
                                 contentDescription = "",
                             )
                             Text(stringResource(R.string.addWithId),
@@ -155,7 +161,8 @@ fun AddSwDialog( //1
                             onClick = { addAll() },
                         ) {
                             Icon(
-                                Icons.Default.FileDownload,
+                                Icons.Rounded.FileDownload,
+                                tint = AccentColor,
                                 contentDescription = "",
                             )
                             Text(stringResource(R.string.wholeConfig),
@@ -168,7 +175,8 @@ fun AddSwDialog( //1
                             onClick = { showHow = true },
                         ) {
                             Icon(
-                                Icons.Default.Mode,
+                                Icons.Rounded.Mode,
+                                tint = AccentColor,
                                 contentDescription = "",
                             )
                             Text(stringResource(R.string.configSw),
@@ -190,7 +198,8 @@ fun AddSwDialog( //1
                             onClick = { onExit() },
                         ) {
                             Icon(
-                                Icons.Default.MoodBad,
+                                Icons.Rounded.MoodBad,
+                                tint = AccentColor,
                                 contentDescription = ""
                              )
                             Text(text = stringResource(R.string.nothing),
@@ -219,7 +228,7 @@ fun NewDialog( //2
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -238,7 +247,7 @@ fun NewDialog( //2
                         if(apData.is5G) {
                             Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    Icons.Default.WarningAmber,
+                                    Icons.Rounded.WarningAmber,
                                     contentDescription = "",
                                     tint = Color.Red
                                 )
@@ -330,7 +339,7 @@ fun NewDialog( //2
                                 },
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Rounded.CheckCircle,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.accept))
@@ -339,7 +348,7 @@ fun NewDialog( //2
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -368,7 +377,7 @@ fun NewIdDialog( //3: Boolean,
      if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -407,7 +416,7 @@ fun NewIdDialog( //3: Boolean,
                                 },
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Rounded.CheckCircle,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.accept))
@@ -416,7 +425,7 @@ fun NewIdDialog( //3: Boolean,
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -438,7 +447,7 @@ fun NewAllDialog( //4
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -486,7 +495,7 @@ fun NewAllDialog( //4
                                 },
                             ) {
                                 Icon(
-                                    Icons.Default.Upload,
+                                    Icons.Rounded.Upload,
                                     contentDescription = "",
                                 )
                                 Text(text = stringResource(R.string.send))
@@ -495,7 +504,7 @@ fun NewAllDialog( //4
                                 onClick = {setId("0")},
                             ) {
                                 Icon(
-                                    Icons.Default.Download,
+                                    Icons.Rounded.Download,
                                     contentDescription = "",
                                 )
                                 Text(text = stringResource(R.string.receive))
@@ -504,7 +513,7 @@ fun NewAllDialog( //4
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -526,7 +535,7 @@ fun NameDialog( //5
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -559,7 +568,7 @@ fun NameDialog( //5
                                 },
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Rounded.CheckCircle,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.accept))
@@ -568,7 +577,7 @@ fun NameDialog( //5
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -581,54 +590,58 @@ fun NameDialog( //5
     }
 }
 @Composable
-fun ColorDialog( //6
+fun IconDialog( //6
     show: Boolean,
-    currentColor: String,
-    setColor: (String) -> Unit,
-    exit:()->Unit
+    currentIcon: String,
+    setIcon: (String) -> Unit,
+    onExit:() -> Unit
 ) {
-    val colorsList = MyColors.entries.toList()
+    var iconName by remember { mutableStateOf(currentIcon) }
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
+                Column(modifier = Modifier.fillMaxSize()) {
                     LazyColumn(
-                        contentPadding = PaddingValues(all = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
+                        modifier = Modifier.weight(1f)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+
                     ) {
-                        items(colorsList){ data->
-                            Row {
-                              Box(
-                                  contentAlignment = Alignment.Center,
-                                  modifier = Modifier
-                                      .size(70.dp, 30.dp)
-                                      .background(
-                                          color = data.value.backColor
-                                      )
-                              ){
-                                  Text(
-                                      text = data.key,
-                                      style = TextStyle(fontSize = 16.sp),
-                                      color = data.value.textColor,
-                                      modifier = Modifier
-                                          .clickable {
-                                              setColor(data.key)
-                                              exit()
-                                          }
-                                          .padding(all = 3.dp)
-                                  )
-                              }
-                              if(data.key == currentColor){
-                                  Icon(
-                                      Icons.Default.Check,
-                                      contentDescription = "",
-                                  )
-                              }
-                          }
+                        items(IconMapper.names) { name ->
+                            Icon(
+                                imageVector = fromName(name),
+                                contentDescription = "",
+                                tint =  if (name == iconName) AccentColor else Color.Gray,
+                                modifier = Modifier
+                                    //.background(color = if (name == currentIcon) AccentColor.copy(alpha = 0.7f) else Color.Gray.copy(alpha = 0.7f))
+                                    .clickable { iconName = name }
+                                    .padding(8.dp),
+                            )
+                        }
+                    }
+                    Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
+                        TextButton(
+                            onClick = {
+                                setIcon(iconName)
+                                onExit()
+                            },
+                        ) {
+                            Icon(
+                                Icons.Rounded.CheckCircle,
+                                contentDescription = "",
+                            )
+                            Text(stringResource(R.string.accept))
+                        }
+                        TextButton(
+                            onClick = { onExit() },
+                        ) {
+                            Icon(
+                                Icons.Rounded.Close,
+                                contentDescription = "",
+                            )
+                            Text(stringResource(R.string.noAccept))
                         }
                     }
                 }
@@ -646,7 +659,7 @@ fun TimerDialog( //7
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -680,7 +693,7 @@ fun TimerDialog( //7
                                 )
                             Column{
                                 Icon(
-                                    Icons.Default.KeyboardArrowUp,
+                                    Icons.Rounded.KeyboardArrowUp,
                                     contentDescription = "",
                                     Modifier.clickable {
                                         if(start < 23*60) start += 60
@@ -688,7 +701,7 @@ fun TimerDialog( //7
                                     }
                                 )
                                 Icon(
-                                    Icons.Default.KeyboardArrowDown,
+                                    Icons.Rounded.KeyboardArrowDown,
                                     contentDescription = "",
                                     Modifier.clickable { if(start > 60) start -= 60 }
                                 )
@@ -701,7 +714,7 @@ fun TimerDialog( //7
                             )
                             Column{
                                 Icon(
-                                    Icons.Default.KeyboardArrowUp,
+                                    Icons.Rounded.KeyboardArrowUp,
                                     contentDescription = "",
                                     Modifier.clickable {
                                         if(getMinutes(start) < 59) start += 1
@@ -709,7 +722,7 @@ fun TimerDialog( //7
                                     }
                                 )
                                 Icon(
-                                    Icons.Default.KeyboardArrowDown,
+                                    Icons.Rounded.KeyboardArrowDown,
                                     contentDescription = "",
                                     Modifier.clickable { if(getMinutes(start) > 0) start -= 1 }
                                 )
@@ -730,12 +743,12 @@ fun TimerDialog( //7
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp))
                             Column{
                                 Icon(
-                                    Icons.Default.KeyboardArrowUp,
+                                    Icons.Rounded.KeyboardArrowUp,
                                     contentDescription = "",
                                     Modifier.clickable { if(stop < 23*60) stop += 60 }
                                 )
                                 Icon(
-                                    Icons.Default.KeyboardArrowDown,
+                                    Icons.Rounded.KeyboardArrowDown,
                                     contentDescription = "",
                                     Modifier.clickable {
                                         if(stop > 60) stop -= 60
@@ -751,12 +764,12 @@ fun TimerDialog( //7
                             )
                             Column{
                                 Icon(
-                                    Icons.Default.KeyboardArrowUp,
+                                    Icons.Rounded.KeyboardArrowUp,
                                     contentDescription = "",
                                     Modifier.clickable { if(getMinutes(stop) < 59) stop += 1 }
                                 )
                                 Icon(
-                                    Icons.Default.KeyboardArrowDown,
+                                    Icons.Rounded.KeyboardArrowDown,
                                     contentDescription = "",
                                     Modifier.clickable {
                                         if(getMinutes(stop) > 0) stop -= 1
@@ -919,7 +932,7 @@ fun TimerDialog( //7
                             },
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Rounded.CheckCircle,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.accept))
@@ -928,7 +941,7 @@ fun TimerDialog( //7
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -943,16 +956,16 @@ fun TimerDialog( //7
 @Composable
 fun ModeDialog( //8
     show: Boolean,
-    currentMode:SwMode,
+    currentMode:Mode,
     currentSecs: Int,
-    setMode: (Pair<SwMode,Int>) -> Unit,
+    setMode: (Pair<Mode,Int>) -> Unit,
     onExit: () -> Unit
 ) {
 
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
@@ -971,7 +984,7 @@ fun ModeDialog( //8
                         var secs by remember { mutableIntStateOf(currentSecs) }
                         var mode by remember { mutableStateOf(currentMode) }
                         val options : MutableList<String> = mutableListOf()
-                        for (eachMode in SwMode.entries){
+                        for (eachMode in Mode.entries){
                             options += eachMode.name
                         }
                         options.forEachIndexed { index, label ->
@@ -980,7 +993,7 @@ fun ModeDialog( //8
                             Column {
                                 Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        Icons.Default.Check,
+                                        Icons.Rounded.Check,
                                         contentDescription = "",
                                         tint = visible
                                     )
@@ -993,7 +1006,7 @@ fun ModeDialog( //8
                                                 vertical = 8.dp
                                             )
                                             .clickable {
-                                                mode = SwMode.entries.toTypedArray()[index]
+                                                mode = Mode.entries.toTypedArray()[index]
                                             }
                                     )
                                     if ((index == 2) || (index == 3)) {
@@ -1008,13 +1021,13 @@ fun ModeDialog( //8
                                         )
                                         Column {
                                             Icon(
-                                                Icons.Default.KeyboardArrowUp,
+                                                Icons.Rounded.KeyboardArrowUp,
                                                 contentDescription = "",
                                                 tint = visible,
                                                 modifier = Modifier.clickable { if (secs < 250) secs += 1 }
                                             )
                                             Icon(
-                                                Icons.Default.KeyboardArrowDown,
+                                                Icons.Rounded.KeyboardArrowDown,
                                                 contentDescription = "",
                                                 tint = visible,
                                                 modifier = Modifier.clickable { if (secs > 0) secs -= 1 }
@@ -1032,13 +1045,13 @@ fun ModeDialog( //8
                                         )
                                         Column {
                                             Icon(
-                                                Icons.Default.KeyboardArrowUp,
+                                                Icons.Rounded.KeyboardArrowUp,
                                                 contentDescription = "",
                                                 tint = visible,
                                                 modifier = Modifier.clickable { if (secs < 220) secs += 10 }
                                             )
                                             Icon(
-                                                Icons.Default.KeyboardArrowDown,
+                                                Icons.Rounded.KeyboardArrowDown,
                                                 contentDescription = "",
                                                 tint = visible,
                                                 modifier = Modifier.clickable { if (secs > 0) secs -= 10 }
@@ -1053,7 +1066,7 @@ fun ModeDialog( //8
                             TextButton(onClick = { setMode(Pair(mode, secs))},
                             ) {
                                 Icon(
-                                    Icons.Default.CheckCircle,
+                                    Icons.Rounded.CheckCircle,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.accept))
@@ -1062,7 +1075,7 @@ fun ModeDialog( //8
                                 onClick = { onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -1078,7 +1091,7 @@ fun ModeDialog( //8
 fun MaintenanceDialog( //9
     show: Boolean,
     id: String,
-    upgrading: Int,
+    upgrading: State,
     lastServer: String,
     lastPort: String,
     upgrade: (Pair<String, String>) -> Unit,
@@ -1093,13 +1106,14 @@ fun MaintenanceDialog( //9
     if (show) {
         Dialog(onDismissRequest = {}) {
             Surface(
-                shape = RoundedCornerShape(16.dp), color = Color(0xFFEEEEEA)
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp)
+                        modifier = Modifier
+                            .padding(20.dp)
                             .verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
@@ -1186,10 +1200,10 @@ fun MaintenanceDialog( //9
                                 )
                             }
                             when(upgrading){
-                                SwState.UPGRADE.ordinal->{
+                                State.UPGRADE->{
                                     showProgress = true
                                 }
-                                SwState.SERVER_FAIL.ordinal->{
+                                State.SERVER_FAIL->{
                                     Text(
                                         text = stringResource(R.string.badPortServer),
                                         style = TextStyle(fontSize = 16.sp),
@@ -1200,7 +1214,7 @@ fun MaintenanceDialog( //9
                                     )
                                     showProgress = false
                                 }
-                                SwState.UPGRADE_FAIL.ordinal->{
+                                State.UPGRADE_FAIL->{
                                     Text(
                                         text = stringResource(R.string.upgradeFails),
                                         style = TextStyle(fontSize = 16.sp),
@@ -1211,7 +1225,7 @@ fun MaintenanceDialog( //9
                                     )
                                     showProgress = false
                                 }
-                                SwState.UPGRADED.ordinal->{
+                                State.UPGRADED->{
                                     Text(
                                         text = stringResource(R.string.upgradeSuccess),
                                         style = TextStyle(fontSize = 16.sp),
@@ -1237,7 +1251,7 @@ fun MaintenanceDialog( //9
                                 onClick = { upgrade(Pair(server, port)) },
                             ) {
                                 Icon(
-                                    Icons.Default.Upgrade,
+                                    Icons.Rounded.Upgrade,
                                     contentDescription = "",
                                 )
                                 Text(text = stringResource(R.string.upgrade))
@@ -1262,7 +1276,7 @@ fun MaintenanceDialog( //9
                             var erasing by remember { mutableStateOf(false)}
                             ElevatedButton(onClick = { erasing = true}) {
                                 Icon(
-                                      Icons.Default.PhonelinkErase,
+                                      Icons.Rounded.PhonelinkErase,
                                             contentDescription = "",
                                 )
                                 Text(
@@ -1298,7 +1312,7 @@ fun MaintenanceDialog( //9
                             var fullErasing by remember { mutableStateOf(false)}
                             ElevatedButton(onClick = { fullErasing = true}){
                                 Icon(
-                                    Icons.Default.Delete,
+                                    Icons.Rounded.Delete,
                                     contentDescription = "",
                                 )
                                 Text(
@@ -1347,7 +1361,7 @@ fun MaintenanceDialog( //9
                                     onExit() },
                             ) {
                                 Icon(
-                                    Icons.Default.Close,
+                                    Icons.Rounded.Close,
                                     contentDescription = "",
                                 )
                                 Text(stringResource(R.string.noAccept))
@@ -1365,7 +1379,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 8) {
+fun ShowDialog(value: Int = 6) {
     //Column
     when (value) {
 
@@ -1374,9 +1388,9 @@ fun ShowDialog(value: Int = 8) {
         3 -> NewIdDialog(show = true, setId = {}, {})
         4 -> NewAllDialog(true, "all", {}, {})
         5 -> NameDialog(true, "kitchen light", {""}, {})
-        6 -> ColorDialog(true, "metal", {},{})
+        6 -> IconDialog(true, "lightbulb", {"theatermasks"}, {})
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
-        8 -> ModeDialog(true, SwMode.TEMP, 10, {  }, {})
-        9 -> MaintenanceDialog(true, "1234", SwState.SERVER_FAIL.ordinal, "", "", {},"kitchen light", {},{},{})
+        8 -> ModeDialog(true, Mode.TEMP, 10, {  }, {})
+        9 -> MaintenanceDialog(true, "1234", State.SERVER_FAIL, "", "", {},"kitchen light", {},{},{})
     }
 }
