@@ -3,8 +3,6 @@
 package com.capa1.switchcontrol.ui
 import android.content.res.Configuration
 import android.util.Log
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -988,7 +986,7 @@ fun ModeDialog( //8
                             options += eachMode.name
                         }
                         options.forEachIndexed { index, label ->
-                            val visible = if (index != mode.ordinal) Color(0xFFEEEEEA)
+                            val visible = if (index != mode.ordinal) MaterialTheme.colorScheme.secondary
                                         else MaterialTheme.colorScheme.primary
                             Column {
                                 Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
@@ -1379,7 +1377,7 @@ fun MaintenanceDialog( //9
     showBackground = true
 )
 @Composable
-fun ShowDialog(value: Int = 6) {
+fun ShowDialog(value: Int = 8) {
     //Column
     when (value) {
 
