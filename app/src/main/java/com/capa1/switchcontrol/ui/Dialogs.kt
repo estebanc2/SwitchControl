@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -471,28 +470,67 @@ fun IconDialog(
     setIcon: (String) -> Unit,
     onExit: () -> Unit
 ) {
-    var iconName by remember { mutableStateOf(currentIcon) }
     if (!show) return
+
+    // Estado DENTRO del bloque: se reinicializa cada vez que el diálogo se abre
+    var iconName by remember(currentIcon) { mutableStateOf(currentIcon) }
+
     Dialog(onDismissRequest = onExit) {
         DialogSurface {
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.padding(vertical = 12.dp)) {
+
+                Text(
+                    text = stringResource(R.string.changeIconTitle), // o el string que uses
+                    style = TextStyle(fontSize = 18.sp),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+
+                // Grilla de íconos
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
                 ) {
-                    items(IconMapper.names) { name ->
-                        Icon(
-                            imageVector = fromName(name),
-                            contentDescription = null,
-                            tint = if (name == iconName) AccentColor else Color.Gray,
-                            modifier = Modifier
-                                .clickable { iconName = name }
-                                .padding(8.dp)
-                        )
+                    // Agrupa de a 4 por fila
+                    val chunked = IconMapper.names.chunked(4)
+                    items(chunked) { rowItems ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            rowItems.forEach { name ->
+                                val isSelected = name == iconName
+                                Box(
+                                    modifier = Modifier
+                                        .size(56.dp)
+                                        .padding(4.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(
+                                            if (isSelected) AccentColor.copy(alpha = 0.15f)
+                                            else Color.Transparent
+                                        )
+                                        .clickable { iconName = name },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = fromName(name),
+                                        contentDescription = null,
+                                        tint = if (isSelected) AccentColor else Color.Gray,
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                }
+                            }
+                            // Rellena celdas vacías para mantener el layout
+                            repeat(4 - rowItems.size) {
+                                Spacer(modifier = Modifier.size(56.dp))
+                            }
+                        }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
                 DialogActions(
                     onAccept = { setIcon(iconName); onExit() },
                     onCancel = onExit
@@ -648,11 +686,6 @@ fun TimerDialog(
 }
 
 // ── 8 ModeDialog ──────────────────────────────────────────────────────────────
-private fun Mode.hasIntValue() = this == Mode.PULSE_NA || this == Mode.PULSE_NC
-        || this == Mode.TIMERS_TEMP || this == Mode.TEMP
-
-private fun Mode.isGradient() = this == Mode.TIMERS_TEMP || this == Mode.TEMP
-
 @Composable
 fun ModeDialog(
     show: Boolean,
@@ -676,8 +709,8 @@ fun ModeDialog(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                var secs by remember { mutableIntStateOf(currentSecs) }
-                var mode by remember { mutableStateOf(currentMode) }
+                var secs by remember(currentSecs) { mutableIntStateOf(currentSecs) }
+                var mode by remember(currentMode) { mutableStateOf(currentMode) }
 
                 Mode.entries.forEach { entry ->
                     ModeRow(

@@ -30,6 +30,7 @@
     <string name="startTime">HORARIO INICIAL</string>
     <string name="finalTime">HORARIO FINAL</string>
     <string name="modeTitle">MODO DE FUNCIONAMIENTO</string>
+    <string name="changeIconTitle">ICONO DEL SWITCH</string>
     <string name="sec">seg.: %1$s</string>
     <string name="grad">grad.: %1$s</string>
     <string name="idToReceive">ID PARA CONFIGURAR EN OTRA APP</string>
