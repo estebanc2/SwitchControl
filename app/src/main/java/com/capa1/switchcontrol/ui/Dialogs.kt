@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -82,6 +83,7 @@ import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.data.wifi.ApData
 import com.capa1.switchcontrol.data.wifi.TouchState
 import com.capa1.switchcontrol.ui.theme.AccentColor
+import com.capa1.switchcontrol.ui.theme.TextPrimary
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -951,140 +953,8 @@ fun TimerDialog( //7
         }
     }
 }
-@Composable
-fun ModeDialog( //8
-    show: Boolean,
-    currentMode:Mode,
-    currentSecs: Int,
-    setMode: (Pair<Mode,Int>) -> Unit,
-    onExit: () -> Unit
-) {
 
-    if (show) {
-        Dialog(onDismissRequest = {}) {
-            Surface(
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.modeTitle),
-                            style = TextStyle(fontSize = 20.sp),
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                        var secs by remember { mutableIntStateOf(currentSecs) }
-                        var mode by remember { mutableStateOf(currentMode) }
-                        val options : MutableList<String> = mutableListOf()
-                        for (eachMode in Mode.entries){
-                            options += eachMode.name
-                        }
-                        options.forEachIndexed { index, label ->
-                            val visible = if (index != mode.ordinal) MaterialTheme.colorScheme.secondary
-                                        else MaterialTheme.colorScheme.primary
-                            Column {
-                                Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Rounded.Check,
-                                        contentDescription = "",
-                                        tint = visible
-                                    )
-                                    Text(label,
-                                        style = TextStyle(fontSize = 18.sp),
-                                        color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier
-                                            .padding(
-                                                horizontal = 8.dp,
-                                                vertical = 8.dp
-                                            )
-                                            .clickable {
-                                                mode = Mode.entries.toTypedArray()[index]
-                                            }
-                                    )
-                                    if ((index == 2) || (index == 3)) {
-                                        Text(
-                                            text = stringResource(R.string.sec, secs),
-                                            style = TextStyle(fontSize = 18.sp),
-                                            color = visible,
-                                            modifier = Modifier.padding(
-                                                horizontal = 8.dp,
-                                                vertical = 0.dp
-                                            ),
-                                        )
-                                        Column {
-                                            Icon(
-                                                Icons.Rounded.KeyboardArrowUp,
-                                                contentDescription = "",
-                                                tint = visible,
-                                                modifier = Modifier.clickable { if (secs < 250) secs += 1 }
-                                            )
-                                            Icon(
-                                                Icons.Rounded.KeyboardArrowDown,
-                                                contentDescription = "",
-                                                tint = visible,
-                                                modifier = Modifier.clickable { if (secs > 0) secs -= 1 }
-                                            )
-                                        }
-                                    } else if ((index == 4) || (index == 5)) {
-                                        Text(
-                                            text = stringResource(R.string.grad, secs / 10),
-                                            style = TextStyle(fontSize = 18.sp),
-                                            color = visible,
-                                            modifier = Modifier.padding(
-                                                horizontal = 16.dp,
-                                                vertical = 0.dp
-                                            ),
-                                        )
-                                        Column {
-                                            Icon(
-                                                Icons.Rounded.KeyboardArrowUp,
-                                                contentDescription = "",
-                                                tint = visible,
-                                                modifier = Modifier.clickable { if (secs < 220) secs += 10 }
-                                            )
-                                            Icon(
-                                                Icons.Rounded.KeyboardArrowDown,
-                                                contentDescription = "",
-                                                tint = visible,
-                                                modifier = Modifier.clickable { if (secs > 0) secs -= 10 }
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
 
-                        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
-                            TextButton(onClick = { setMode(Pair(mode, secs))},
-                            ) {
-                                Icon(
-                                    Icons.Rounded.CheckCircle,
-                                    contentDescription = "",
-                                )
-                                Text(stringResource(R.string.accept))
-                            }
-                            TextButton(
-                                onClick = { onExit() },
-                            ) {
-                                Icon(
-                                    Icons.Rounded.Close,
-                                    contentDescription = "",
-                                )
-                                Text(stringResource(R.string.noAccept))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 @Composable
 fun MaintenanceDialog( //9
     show: Boolean,
@@ -1390,5 +1260,227 @@ fun ShowDialog(value: Int = 8) {
         7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
         8 -> ModeDialog(true, Mode.TEMP, 10, {  }, {})
         9 -> MaintenanceDialog(true, "1234", State.SERVER_FAIL, "", "", {},"kitchen light", {},{},{})
+    }
+}
+
+@Composable
+fun ModeDialog(
+    show: Boolean,
+    currentMode: Mode,
+    currentSecs: Int,
+    setMode: (Pair<Mode, Int>) -> Unit,
+    onExit: () -> Unit
+) {
+    if (!show) return
+
+    Dialog(onDismissRequest = {}) {
+        Surface(shape = RoundedCornerShape(16.dp)) {
+            Column(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.modeTitle),
+                    style = TextStyle(fontSize = 20.sp),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                var secs by remember { mutableIntStateOf(currentSecs) }
+                var mode by remember { mutableStateOf(currentMode) }
+
+                Mode.entries.forEach { entry ->
+                    ModeRow(
+                        entry = entry,
+                        isSelected = entry == mode,
+                        secs = secs,
+                        onSelect = { mode = entry },
+                        onValueChange = { secs = it }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    TextButton(onClick = { setMode(mode to secs) }) {
+                        Icon(Icons.Rounded.CheckCircle, contentDescription = null)
+                        Spacer(Modifier.width(4.dp))
+                        Text(stringResource(R.string.accept))
+                    }
+                    TextButton(onClick = onExit) {
+                        Icon(Icons.Rounded.Close, contentDescription = null)
+                        Spacer(Modifier.width(4.dp))
+                        Text(stringResource(R.string.noAccept))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ModeRow(
+    entry: Mode,
+    isSelected: Boolean,
+    secs: Int,
+    onSelect: () -> Unit,
+    onValueChange: (Int) -> Unit
+) {
+    val backgroundColor = if (isSelected) AccentColor.copy(alpha = 0.15f) else Color.Transparent
+    val contentColor    = if (isSelected) AccentColor else TextPrimary
+    val mutedColor      = if (isSelected) AccentColor.copy(alpha = 0.7f) else Color.Gray
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(backgroundColor)
+            .clickable { onSelect() }
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (isSelected) {
+            Icon(
+                Icons.Rounded.Check,
+                contentDescription = null,
+                tint = AccentColor,
+                modifier = Modifier.size(20.dp)
+            )
+        } else {
+            Spacer(modifier = Modifier.size(20.dp))
+        }
+
+        Text(
+            text = entry.name,
+            style = TextStyle(fontSize = 17.sp),
+            color = contentColor,
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp)
+        )
+
+        if (entry.hasIntValue()) {
+            val displayText = if (entry.isGradient())
+                stringResource(R.string.grad, secs / 10)
+            else
+                stringResource(R.string.sec, secs)
+
+            Text(
+                text = displayText,
+                style = TextStyle(fontSize = 16.sp),
+                color = mutedColor,
+                modifier = Modifier.padding(end = 4.dp)
+            )
+
+            IntPickerButtons(
+                tint = mutedColor,
+                onIncrement = {
+                    val max  = if (entry.isGradient()) 220 else 20
+                    val step = if (entry.isGradient()) 10  else 1
+                    if (secs < max) { onSelect(); onValueChange(secs + step) }
+                },
+                onDecrement = {
+                    val step = if (entry.isGradient()) 10 else 1
+                    if (secs > 0)  { onSelect(); onValueChange(secs - step) }
+                }
+            )
+        }
+    }
+}
+
+/*
+@Composable
+private fun ModeRow(
+    entry: Mode,
+    isSelected: Boolean,
+    secs: Int,
+    onSelect: () -> Unit,
+    onValueChange: (Int) -> Unit
+) {
+    val tint = if (isSelected) MaterialTheme.colorScheme.primary
+    else MaterialTheme.colorScheme.secondary
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onSelect() }
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(Icons.Rounded.Check, contentDescription = null, tint = tint)
+
+        Text(
+            text = entry.name,
+            style = TextStyle(fontSize = 17.sp),
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp)
+        )
+
+        if (entry.hasIntValue()) {
+            val displayText = if (entry.isGradient())
+                stringResource(R.string.grad, secs / 10)
+            else
+                stringResource(R.string.sec, secs)
+
+            Text(
+                text = displayText,
+                style = TextStyle(fontSize = 16.sp),
+                color = tint,
+                modifier = Modifier.padding(end = 4.dp)
+            )
+
+            IntPickerButtons(
+                tint = tint,
+                onIncrement = {
+                    val max = if (entry.isGradient()) 220 else 20
+                    val step = if (entry.isGradient()) 10 else 1
+                    if (secs < max) {
+                        onSelect()
+                        onValueChange(secs + step)
+                    }
+                },
+                onDecrement = {
+                    val step = if (entry.isGradient()) 10 else 1
+                    if (secs > 0) {
+                        onSelect()
+                        onValueChange(secs - step)
+                    }
+                }
+            )
+        }
+    }
+}
+*/
+
+@Composable
+private fun IntPickerButtons(
+    tint: Color,
+    onIncrement: () -> Unit,
+    onDecrement: () -> Unit
+) {
+    Column {
+        Icon(
+            Icons.Rounded.KeyboardArrowUp,
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier
+                .size(22.dp)
+                .clickable { onIncrement() }
+        )
+        Icon(
+            Icons.Rounded.KeyboardArrowDown,
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier
+                .size(22.dp)
+                .clickable { onDecrement() }
+        )
     }
 }
