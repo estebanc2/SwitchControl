@@ -88,7 +88,10 @@ fun MainScreen(
         }
     }
     // All dialogs unchanged
-    NoPermissionDialog(show = !permissionState, onConfirm = { activity?.finish() })
+    NoPermissionDialog(
+        show = !permissionState,
+        onConfirm = { activity?.finish() }
+    )
     AddSwDialog(
         show = viewModel.dialogState.showAdd && permissionState,
         addSw = { viewModel.onShowNew(true) },
