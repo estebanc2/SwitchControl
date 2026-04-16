@@ -192,7 +192,7 @@ fun ShowTitle(onShowAdd: () -> Unit) {
     ) {
         Text(
             text = stringResource(R.string.mainScreenTitle),
-            fontSize = 24.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = TextPrimary,
         )
