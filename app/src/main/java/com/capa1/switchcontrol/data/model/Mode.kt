@@ -12,8 +12,8 @@ enum class Mode {
         fun fromInt(value: Int): Mode = entries.getOrElse(value) { TIMERS }
     }
 
-    fun hasIntValue() = this == Mode.PULSE_NA || this == Mode.PULSE_NC
-            || this == Mode.TIMERS_TEMP || this == Mode.TEMP
+    fun hasIntValue() = this == PULSE_NA || this == PULSE_NC
+            || this == TIMERS_TEMP || this == TEMP
 
-    fun isGradient() = this == Mode.TIMERS_TEMP || this == Mode.TEMP
+    fun isGradient() = this == TIMERS_TEMP || this == TEMP
 }

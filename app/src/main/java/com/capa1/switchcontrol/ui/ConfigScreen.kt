@@ -316,16 +316,6 @@ fun ConfigScreen(
         Spacer(modifier = Modifier.padding(vertical = 25.dp))
         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
             TextButton(
-                onClick = {save()},
-            ) {
-                Icon(
-                    Icons.Rounded.CheckCircle,
-                    tint = AccentColor,
-                    contentDescription = "",
-                )
-                Text(stringResource(R.string.accept))
-            }
-            TextButton(
                 onClick = { onExit() },
             ) {
                 Icon(
@@ -334,6 +324,16 @@ fun ConfigScreen(
                     contentDescription = "",
                 )
                 Text(stringResource(R.string.noAccept))
+            }
+            TextButton(
+                onClick = {save()},
+            ) {
+                Icon(
+                    Icons.Rounded.CheckCircle,
+                    tint = AccentColor,
+                    contentDescription = "",
+                )
+                Text(stringResource(R.string.accept))
             }
         }
     }

@@ -2,6 +2,7 @@ package com.capa1.switchcontrol.data.wifi
 
 import android.content.Context
 import android.util.Log
+import com.capa1.switchcontrol.data.Global.ESPTOUCH_WAIT_IN_SECS
 import com.capa1.switchcontrol.data.Global.TAG
 import com.espressif.iot.esptouch.EsptouchTask
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +19,6 @@ import javax.inject.Inject
 class EspTouch @Inject constructor(
     private val context: Context,
 ) {
-    val ESPTOUCH_WAIT_IN_SECS = 18L
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     val touched: MutableStateFlow<Pair<String, TouchState>> = MutableStateFlow(Pair("", TouchState.IN_PROGRESS))
 

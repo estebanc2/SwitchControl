@@ -116,15 +116,15 @@ private fun DialogActions(
     }
 ) {
     Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
-        TextButton(onClick = onAccept) {
-            acceptIcon()
-            Spacer(Modifier.width(4.dp))
-            acceptLabel()
-        }
         TextButton(onClick = onCancel) {
             cancelIcon()
             Spacer(Modifier.width(4.dp))
             cancelLabel()
+        }
+        TextButton(onClick = onAccept) {
+            acceptIcon()
+            Spacer(Modifier.width(4.dp))
+            acceptLabel()
         }
     }
 }
@@ -354,7 +354,7 @@ fun NewIdDialog(
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 DialogActions(
-                    onAccept = { if (id.length == 12) setId(id) },
+                    onAccept = { if (id.length == 12) setId(id.lowercase()) },
                     onCancel = onExit
                 )
             }

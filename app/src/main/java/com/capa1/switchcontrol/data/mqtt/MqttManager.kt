@@ -123,6 +123,18 @@ class MqttManager @Inject constructor()
             e.printStackTrace()
         }
     }
+    fun unsubscribeFromPhone(id: String) {
+        try {
+            mqttClient.unsubscribe(TO_SW + id, null, object : IMqttActionListener {
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                }
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                }
+            })
+        } catch (e: MqttException) {
+            e.printStackTrace()
+        }
+    }
     fun publish(id: String, msg: String, qos: Int = 1, retained: Boolean = false) {
         try {
             val message = MqttMessage()

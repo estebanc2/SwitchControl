@@ -45,43 +45,41 @@ class SwViewModel  @Inject constructor(
     private val gson: Gson
 ) : ViewModel() {
 
-    val NO_TIMERS: MutableList<WeeklyProgram> = mutableListOf(
+    private val timer0: MutableList<WeeklyProgram> = mutableListOf(
         WeeklyProgram(0, 0, 0),
         WeeklyProgram(0, 0, 0),
         WeeklyProgram(0, 0, 0),
         WeeklyProgram(0, 0, 0)
     )
-    val SEND_ON: String = gson.toJson(
-        EspData("", State.ON, Mode.TIMERS, 0, NO_TIMERS, 0)
+    private val sendOn: String = gson.toJson(
+        EspData("", State.ON, Mode.TIMERS, 0, timer0, 0)
     )
-    val SEND_OFF: String = gson.toJson(
-        EspData("", State.OFF, Mode.TIMERS, 0, NO_TIMERS, 0)
+    private val sendOff: String = gson.toJson(
+        EspData("", State.OFF, Mode.TIMERS, 0, timer0, 0)
     )
-    val SEND_GET: String = gson.toJson(
-        EspData("", State.GET_DATA, Mode.TIMERS, 0, NO_TIMERS, 0)
+    private val sendGet: String = gson.toJson(
+        EspData("", State.GET_DATA, Mode.TIMERS, 0, timer0, 0)
     )
-    val SEND_ERASE: String = gson.toJson(
-        EspData("", State.ERASE, Mode.TIMERS, 0, NO_TIMERS, 0)
+    private val sendErase: String = gson.toJson(
+        EspData("", State.ERASE, Mode.TIMERS, 0, timer0, 0)
     )
     private val swMap = mutableMapOf<String, SwData>()
     val allSwId = Random.nextInt(9).toString() + "0123456789" + Random.nextInt(9).toString()
     private val newSw = mutableListOf<String>()
     private var newSwId = ""
-    private var mqttUp = false
     private var upgradingId = ""
     private var savedOnce = false
     var currentId = ""
     var server = ""
     var port = ""
     var currentSwData by mutableStateOf (
-        SwData("", State.OFF, Mode.TIMERS, 0, NO_TIMERS, 0, "", 1, SwStatus.DISCONNECTED))
+        SwData("", State.OFF, Mode.TIMERS, 0, timer0, 0, "", 1, SwStatus.DISCONNECTED))
     var dialogState by mutableStateOf(DialogState())
         private set
     var upgrading by mutableStateOf(State.UPGRADE)
         private set
     var myAp by mutableStateOf(ApData("", " ", false))
         private set
-    //var swScreenList = mutableStateListOf<ScreenData>()
 
     var swScreenList by mutableStateOf<List<SwScreenData>>(listOf())
         private set
@@ -91,7 +89,11 @@ class SwViewModel  @Inject constructor(
     var touchProgress by mutableStateOf(TouchState.IN_PROGRESS)
         private set
 
+    private var started = false
+
     fun start() {
+        if (started) { return }
+        started = true
         Log.i(TAG, " IN START miercoles 1528!!")
         getStoredData()
         mqttManager.mqttInit()
@@ -101,9 +103,9 @@ class SwViewModel  @Inject constructor(
 
     fun toggle(id: String) {
         if (swMap[id]?.state == State.ON) {
-            mqttManager.publish(id, SEND_OFF)
+            mqttManager.publish(id, sendOff)
         } else if (swMap[id]?.state == State.OFF) {
-            mqttManager.publish(id, SEND_ON)
+            mqttManager.publish(id, sendOn)
         }
     }
 
@@ -122,7 +124,7 @@ class SwViewModel  @Inject constructor(
                                 state = State.OFF,
                                 mode = Mode.TIMERS,
                                 secs = 0,
-                                prgs = NO_TIMERS,
+                                prgs = timer0,
                                 tempX10 = 0,
                                 icon = data.icon,
                                 row = i + 1,
@@ -140,7 +142,8 @@ class SwViewModel  @Inject constructor(
 
     private fun refreshScreen() {
         val list = mutableStateListOf<SwScreenData>()
-        swMap.toList().sortedBy { it.second.row }.forEach { (id, swData) ->
+        swMap.toList().sortedBy { it.second.row }.forEachIndexed { index, (id, swData) ->
+            swMap[id]?.row = index + 1
             list.add(
                 SwScreenData(
                     name = swData.name,
@@ -162,13 +165,13 @@ class SwViewModel  @Inject constructor(
             mqttManager.mqttState.collect { result ->
                 when (result) {
                     MqttState.CONNECTED -> {
-                        mqttUp = true
+                        dialogState = dialogState.copy(mqttUp = true)
                         initializeSw()
                     }
-                    MqttState.CONNECTING -> mqttUp = false
+                    MqttState.CONNECTING -> dialogState = dialogState.copy(mqttUp = false)
                     MqttState.DISCONNECTED -> {
                         mqttManager.connect()
-                        mqttUp = false
+                        dialogState = dialogState.copy(mqttUp = false)
                     }
                 }
             }
@@ -209,7 +212,7 @@ class SwViewModel  @Inject constructor(
     }
 
     private fun initSw(id: String) {
-        val msg = SEND_GET
+        val msg = sendGet
         mqttManager.publish(id, msg)
         //Log.i(TAG, "init Tx: $id -> $msg")
     }
@@ -220,6 +223,7 @@ class SwViewModel  @Inject constructor(
         }
         when (id) {
             allSwId -> {
+                mqttManager.unsubscribeFromPhone(allSwId)
                 val received = gson.fromJson(msg, ToStore::class.java)
                 if (received != null) {
                     received.list.forEachIndexed { i, data ->
@@ -228,7 +232,7 @@ class SwViewModel  @Inject constructor(
                             state = State.OFF,
                             mode = Mode.TIMERS,
                             secs = 0,
-                            prgs = NO_TIMERS,
+                            prgs = timer0,
                             tempX10 = 0,
                             icon = data.icon,
                             row = i + 1,
@@ -318,7 +322,7 @@ class SwViewModel  @Inject constructor(
             swMap.forEach { (id, swData)->
                 if (swData.status == SwStatus.DISCONNECTED) {
                     initSw(id)
-                    Log.i(TAG,"id no connected: ${id})")
+                    //Log.i(TAG,"id no connected: ${id})")
                 }
             }
             for (id in newSw){
@@ -332,7 +336,7 @@ class SwViewModel  @Inject constructor(
         if (!swMap.contains(id)) {
             newSwId = id
             newSw += id
-            if (mqttUp) {
+            if (dialogState.mqttUp) {
                 mqttManager.subscribe(id)
             }
         }
@@ -461,7 +465,7 @@ class SwViewModel  @Inject constructor(
             state = State.UPGRADE,
             mode = Mode.TIMERS,
             secs = port.toInt(),
-            prgs = NO_TIMERS,
+            prgs = timer0,
             tempX10 = 0
         ))
         mqttManager.publish(currentId,setData)
@@ -470,12 +474,13 @@ class SwViewModel  @Inject constructor(
         if(id != "0"){
             viewModelScope.launch(Dispatchers.IO) {
                 swDataStore.myFlashData.collect { flashData ->
-                    mqttManager.publish(id, flashData)
+                    mqttManager.publish(id.lowercase(), flashData)
+                    Log.i(TAG," sale $id, payload $flashData")
                 }
             }
         }
         else{
-            if (mqttUp) {
+            if (dialogState.mqttUp) {
                 mqttManager.subscribeFromPhone(allSwId)
             }
         }
@@ -490,7 +495,7 @@ class SwViewModel  @Inject constructor(
     }
     fun fullErase(){
         localErase()
-        mqttManager.publish(currentId, SEND_ERASE)
+        mqttManager.publish(currentId, sendErase)
         mqttManager.unsubscribe(currentId)
     }
 }

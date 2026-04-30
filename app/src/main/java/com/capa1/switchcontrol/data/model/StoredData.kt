@@ -9,7 +9,7 @@ data class StoredData (
 data class ToStore (
     val list: List<StoredData>
 )
-
+/*
 val TEST: ToStore = ToStore(listOf (
         StoredData(name = "Velador", id = "483fda877368", icon = "lamp.ceiling"),
         StoredData(name = "Luz cocina", id = "98f4abb33d5a", icon = "lightbulb"),
@@ -21,5 +21,5 @@ val TEST: ToStore = ToStore(listOf (
         StoredData(name = "Calefa", id = "a4cf12f00ab0", icon = "speedometer"),
         StoredData(name = "Termo", id = "a5cf12f00ab0", icon = "thermometer")
         )
-    )
+    )*/
 

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,7 +27,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.AddChart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -53,15 +54,17 @@ import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.IconMapper
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.ui.permissions.PermissionUtils
+import com.capa1.switchcontrol.ui.theme.AccentColor
+import com.capa1.switchcontrol.ui.theme.BgCard
+import com.capa1.switchcontrol.ui.theme.BgPage
+import com.capa1.switchcontrol.ui.theme.TextPrimary
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.capa1.switchcontrol.ui.theme.*
 
 // ── Main entry point ─────────────────────────────────────────────────────────
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun MainScreen(
-    viewModel: SwViewModel = hiltViewModel())
+fun MainScreen( viewModel: SwViewModel = hiltViewModel())
 {
     val lifecycleOwner = LocalLifecycleOwner.current
     val permissionState =
@@ -69,6 +72,7 @@ fun MainScreen(
     LaunchedEffect(key1 = permissionState) {
         if (permissionState)  {
             viewModel.start()
+            Log.i(TAG, " - - - - CON PERMISO PERO 1 VEZ!! - - - - - - ")
         } else {
             Log.i(TAG, " - - - - -sin permisos!! - - - - - - ")
         }
@@ -156,7 +160,10 @@ fun MainScreen(
     )
     if (!viewModel.dialogState.showConfig) {
         Column {
-            ShowTitle(onShowAdd = { viewModel.onShowAdd(true) })
+            ShowTitle(
+                mqttUp = viewModel.dialogState.mqttUp,
+                onShowAdd = { viewModel.onShowAdd(true) }
+            )
             ShowSwitches(
                 switches = viewModel.swScreenList,
                 click = { id -> viewModel.toggle(id) },
@@ -181,7 +188,9 @@ fun MainScreen(
 
 // ── Title bar ────────────────────────────────────────────────────────────────
 @Composable
-fun ShowTitle(onShowAdd: () -> Unit) {
+fun ShowTitle(
+    mqttUp: Boolean,
+    onShowAdd: () -> Unit) {
     Row(
         modifier = Modifier
             .background(BgCard)
@@ -190,21 +199,23 @@ fun ShowTitle(onShowAdd: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = stringResource(R.string.mainScreenTitle),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = TextPrimary,
-        )
         IconButton (  onClick = { onShowAdd() } )
         {
             Icon(
-                imageVector = Icons.Rounded.Add,
+                imageVector = Icons.Rounded.AddChart,
                 contentDescription = "Agregar",
-                tint = AccentColor,
+                tint = if (mqttUp) AccentColor else Color.Red,
                 modifier = Modifier.size(22.dp)
             )
         }
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = stringResource(R.string.mainScreenTitle),
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextPrimary,
+        )
+        Spacer(modifier = Modifier.width(10.dp))
     }
 }
 

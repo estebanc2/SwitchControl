@@ -11,4 +11,5 @@ data class DialogState (
     val showIcon: Boolean = false,
     val showMaintenance: Boolean = false,
     val showConfig: Boolean = false,
+    val mqttUp: Boolean = false,
 )
