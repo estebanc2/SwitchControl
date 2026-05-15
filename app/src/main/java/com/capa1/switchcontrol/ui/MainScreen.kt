@@ -1,6 +1,7 @@
 package com.capa1.switchcontrol.ui
 
 //import androidx.hilt.navigation.compose.hiltViewModel
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.animateColorAsState
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -267,6 +269,7 @@ fun RowView(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .wrapContentHeight()
             .padding(vertical = 6.dp)
             .background(
                 color = Color.White.copy(alpha = bgAlpha),
@@ -319,6 +322,7 @@ fun RowView(
         Column(
             modifier = Modifier
                 .weight(1f)
+                .wrapContentHeight()
                 .clickable { onConfig(swScreenData) },
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -347,6 +351,7 @@ fun RowView(
 }
 
 
+@SuppressLint("UseOfNonLambdaOffsetOverload")
 @Composable
 fun ToggleSwitch(
     isOn: Boolean,

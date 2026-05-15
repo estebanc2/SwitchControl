@@ -52,7 +52,7 @@
     <string name="inactive">inactivo</string>
     <string name="noInfo">Sin Información</string>
     <string name="changeMore24">Cambia en más de 24 h%1$s</string>
-    <string name="turnIf"><![CDATA[Enciende si temp < %02d°]]></string>
+    <string name="turnIf"><![CDATA[Enciende si temp < %02d°. Actual: %d]]></string>
     <string name="pulse">Pulso de %d segundos</string>
     <string name="changeIn">Cambia en %d : %02d h %s</string>
     <string name="ifTemp"><![CDATA[" si temp < %d°. Actual: %d"]]></string>
