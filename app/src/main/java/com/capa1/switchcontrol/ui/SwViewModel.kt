@@ -31,6 +31,8 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlin.concurrent.fixedRateTimer
@@ -90,6 +92,8 @@ class SwViewModel  @Inject constructor(
         private set
 
     private var started = false
+    private val retryCount = ConcurrentHashMap<String, Int>()
+
 
     fun start() {
         if (started) { return }
@@ -165,7 +169,9 @@ class SwViewModel  @Inject constructor(
             mqttManager.mqttState.collect { result ->
                 when (result) {
                     MqttState.CONNECTED -> {
-                        dialogState = dialogState.copy(mqttUp = true)
+                        withContext(Dispatchers.Main) {
+                            dialogState = dialogState.copy(mqttUp = true)
+                        }
                         initializeSw()
                     }
                     MqttState.CONNECTING -> dialogState = dialogState.copy(mqttUp = false)
@@ -298,7 +304,9 @@ class SwViewModel  @Inject constructor(
             }
         }
         Log.i(TAG, "Rx: $id -> $msg")
-        refreshScreen()
+        viewModelScope.launch(Dispatchers.Main) {
+            refreshScreen()
+        }
     }
 
     fun saveData() {
@@ -318,30 +326,39 @@ class SwViewModel  @Inject constructor(
 
     private fun checkSwitches() {
         val timerInSec = 1L
+        val maxRetries = 4
+
         fixedRateTimer("timer", false, timerInSec * 1000, timerInSec * 1000) {
-            swMap.forEach { (id, swData)->
+            val currentMap = HashMap(swMap)
+            currentMap.forEach { (id, swData) ->
                 if (swData.status == SwStatus.DISCONNECTED) {
-                    initSw(id)
-                    //Log.i(TAG,"id no connected: ${id})")
+                    val attempts = retryCount.getOrDefault(id, 0)
+                    if (attempts < maxRetries) {
+                        initSw(id)
+                        retryCount[id] = attempts + 1
+                    }
+                } else {
+                    retryCount.remove(id)
                 }
             }
-            for (id in newSw){
+
+            val pendingNew = ArrayList(newSw)
+            for (id in pendingNew) {
                 initSw(id)
             }
         }
     }
 
-
     fun setSwWithId(id: String) {
         if (!swMap.contains(id)) {
             newSwId = id
             newSw += id
+            retryCount.remove(id) // Reset para que tenga sus 4 intentos frescos
             if (dialogState.mqttUp) {
                 mqttManager.subscribe(id)
             }
         }
-        dialogState = dialogState.copy(showNewId = false)
-        dialogState = dialogState.copy(showAdd = false)
+        dialogState = dialogState.copy(showNewId = false, showAdd = false)
     }
 
     fun saveConfig(){
@@ -484,8 +501,7 @@ class SwViewModel  @Inject constructor(
                 mqttManager.subscribeFromPhone(allSwId)
             }
         }
-        dialogState = dialogState.copy(showAdd = false)
-        dialogState = dialogState.copy(showAll = false)
+        dialogState = dialogState.copy(showAdd = false, showAll = false)
     }
     fun localErase(){
         swMap.remove(currentId)

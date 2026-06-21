@@ -54,7 +54,7 @@ fun ConfigScreen(
     save:()->Unit,
     onExit:()->Unit
 ){
-    var row by remember { mutableIntStateOf(data.row) }
+    var row by remember(data.row) { mutableIntStateOf(data.row) }
     fun hours(min: Int): String{
         return "${min/60}:${min - (min/60)*60}"
     }
