@@ -730,11 +730,11 @@ fun ModeDialog(
                             stringResource(R.string.duration),
                         value = secs,
                         displayText = if (mode.isGradient())
-                            stringResource(R.string.grad, secs / 10)
+                            stringResource(R.string.grad, secs / 10.0)
                         else
                             stringResource(R.string.sec, secs),
                         max = if (mode.isGradient()) 800 else 20,
-                        step = if (mode.isGradient()) 10 else 1,
+                        step = 1,
                         onValueChange = { secs = it }
                     )
                 }

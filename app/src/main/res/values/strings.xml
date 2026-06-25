@@ -51,11 +51,11 @@
     <string name="mainScreenTitle">Interruptores WiFi</string>
     <string name="inactive">inactivo</string>
     <string name="noInfo">Sin Información</string>
-    <string name="changeMore24">Cambia en más de 24 h%1$s</string>
-    <string name="turnIf"><![CDATA[Enciende si temp < %02d°. Actual: %d]]></string>
+    <string name="changeMore24">Cambia en más de 24 h %1$s</string>
+    <string name="turnIf"><![CDATA[Enciende si temp < %.1f°. Actual: %.1f°]]></string>
     <string name="pulse">Pulso de %d segundos</string>
     <string name="changeIn">Cambia en %d : %02d h %s</string>
-    <string name="ifTemp"><![CDATA[" si temp < %d°. Actual: %d"]]></string>
+    <string name="ifTemp"><![CDATA[si temp < %.1f°. Actual: %.1f°]]></string>
     <string name="no_sensor">sensor de temperatura no conectado</string>
     <string name="addTimer">add</string>
     <string name="deleteTimer">borrar</string>

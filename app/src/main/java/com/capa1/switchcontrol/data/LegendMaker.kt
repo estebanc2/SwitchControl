@@ -27,7 +27,7 @@ class LegendMaker @Inject constructor(
                 return if (swData.tempX10 == -800) {
                     context.getString(R.string.no_sensor)
                 } else {
-                    context.getString(R.string.turnIf, swData.secs/10, swData.tempX10/10 )
+                    context.getString(R.string.turnIf, swData.secs/10.0, swData.tempX10/10.0 )
                 }
             }
             else -> {
@@ -75,7 +75,7 @@ class LegendMaker @Inject constructor(
                     if (swData.tempX10 == -800) {
                         context.getString(R.string.no_sensor)
                     } else {
-                        context.getString(R.string.ifTemp, swData.secs / 10, swData.tempX10 / 10)
+                        context.getString(R.string.ifTemp, swData.secs / 10.0, swData.tempX10 / 10.0)
                     }
                 } else {
                     ""
