@@ -55,6 +55,7 @@ import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.Global.TAG
 import com.capa1.switchcontrol.data.model.IconMapper
 import com.capa1.switchcontrol.data.model.SwScreenData
+import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.ui.permissions.PermissionUtils
 import com.capa1.switchcontrol.ui.theme.AccentColor
 import com.capa1.switchcontrol.ui.theme.BgCard
@@ -137,8 +138,13 @@ fun MainScreen( viewModel: SwViewModel = hiltViewModel())
     )
     TimerDialog(
         show = viewModel.dialogState.showTimer,
-        currentWP = viewModel.currentSwData.prgs[viewModel.currentTimer],
+        currentWP = if (viewModel.currentTimer < viewModel.currentSwData.prgs.size)
+            viewModel.currentSwData.prgs[viewModel.currentTimer]
+        else
+            WeeklyProgram(0, 60 * 8, 60 * 9 ),
+        isNew = viewModel.currentTimer >= viewModel.currentSwData.prgs.size,
         setTimer = { timer -> viewModel.newTimer(timer) },
+        deleteTimer = { viewModel.deleteTimer(viewModel.currentTimer) },
         onExit = { viewModel.onShowTimer(0, false) }
     )
     ModeDialog(

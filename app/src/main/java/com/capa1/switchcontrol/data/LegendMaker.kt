@@ -24,7 +24,7 @@ class LegendMaker @Inject constructor(
             Mode.PULSE_NA,
             Mode.PULSE_NC -> return context.getString(R.string.pulse, swData.secs)
             Mode.TEMP -> {
-                return if (swData.tempX10 == -700) {
+                return if (swData.tempX10 == -800) {
                     context.getString(R.string.no_sensor)
                 } else {
                     context.getString(R.string.turnIf, swData.secs/10, swData.tempX10/10 )
@@ -72,7 +72,11 @@ class LegendMaker @Inject constructor(
                 val deltaHours = delta / 60
                 val deltaMin = delta % 60
                 val tempText = if (swData.mode == Mode.TIMERS_TEMP) {
+                    if (swData.tempX10 == -800) {
+                        context.getString(R.string.no_sensor)
+                    } else {
                         context.getString(R.string.ifTemp, swData.secs / 10, swData.tempX10 / 10)
+                    }
                 } else {
                     ""
                 }

@@ -9,7 +9,8 @@ enum class State {
     UPGRADE,
     SERVER_FAIL,
     UPGRADE_FAIL,
-    UPGRADED;
+    UPGRADED,
+    ALREADY_LATEST;
     companion object {
         fun fromInt(value: Int): State = entries.getOrElse(value) { OFF }
     }

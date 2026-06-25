@@ -5,6 +5,8 @@ package com.capa1.switchcontrol.ui
 import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -38,6 +41,7 @@ import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Mode
 import androidx.compose.material.icons.rounded.MoodBad
 import androidx.compose.material.icons.rounded.PhonelinkErase
+import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material.icons.rounded.Upgrade
 import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material.icons.rounded.WarningAmber
@@ -46,6 +50,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -59,6 +64,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,7 +72,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -86,6 +95,7 @@ import com.capa1.switchcontrol.ui.theme.AccentColor
 import com.capa1.switchcontrol.ui.theme.BgCard
 import com.capa1.switchcontrol.ui.theme.TextPrimary
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -545,7 +555,9 @@ fun IconDialog(
 fun TimerDialog(
     show: Boolean,
     currentWP: WeeklyProgram,
+    isNew: Boolean,
     setTimer: (WeeklyProgram) -> Unit,
+    deleteTimer: () -> Unit,
     onExit: () -> Unit
 ) {
     if (!show) return
@@ -567,31 +579,19 @@ fun TimerDialog(
                 fun getMinutes(min: Int) = min - (min / 60) * 60
 
                 // Hora inicio
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "hora: ${start / 60}",
-                        style = TextStyle(fontSize = 20.sp),
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                    TimeStepper(
+                        label = "hora",
+                        value = start / 60,
+                        onIncrement = { if (start < 23 * 60) { start += 60; checkMinStop() } },
+                        onDecrement = { if (start > 60) start -= 60 }
                     )
-                    Column {
-                        Icon(Icons.Rounded.KeyboardArrowUp,   contentDescription = null, tint = AccentColor,
-                            modifier = Modifier.clickable { if (start < 23 * 60) { start += 60; checkMinStop() } })
-                        Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = null, tint = AccentColor,
-                            modifier = Modifier.clickable { if (start > 60) start -= 60 })
-                    }
-                    Text(
-                        text = "min.: ${getMinutes(start)}",
-                        style = TextStyle(fontSize = 20.sp),
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                    TimeStepper(
+                        label = "min.",
+                        value = getMinutes(start),
+                        onIncrement = { if (getMinutes(start) < 59) { start += 1; checkMinStop() } },
+                        onDecrement = { if (getMinutes(start) > 0) start -= 1 }
                     )
-                    Column {
-                        Icon(Icons.Rounded.KeyboardArrowUp,   contentDescription = null, tint = AccentColor,
-                            modifier = Modifier.clickable { if (getMinutes(start) < 59) { start += 1; checkMinStop() } })
-                        Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = null, tint = AccentColor,
-                            modifier = Modifier.clickable { if (getMinutes(start) > 0) start -= 1 })
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -603,31 +603,19 @@ fun TimerDialog(
                 )
 
                 // Hora fin
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "hora: ${stop / 60}",
-                        style = TextStyle(fontSize = 20.sp),
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                    TimeStepper(
+                        label = "hora",
+                        value = stop / 60,
+                        onIncrement = { if (stop < 23 * 60) stop += 60 },
+                        onDecrement = { if (stop > 60) { stop -= 60; checkMinStop() } }
                     )
-                    Column {
-                        Icon(Icons.Rounded.KeyboardArrowUp,   contentDescription = null, tint = AccentColor,
-                            modifier = Modifier.clickable { if (stop < 23 * 60) stop += 60 })
-                        Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = null, tint = AccentColor,
-                            modifier = Modifier.clickable { if (stop > 60) { stop -= 60; checkMinStop() } })
-                    }
-                    Text(
-                        text = "min.: ${getMinutes(stop)}",
-                        style = TextStyle(fontSize = 20.sp),
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                    TimeStepper(
+                        label = "min.",
+                        value = getMinutes(stop),
+                        onIncrement = { if (getMinutes(stop) < 59) stop += 1 },
+                        onDecrement = { if (getMinutes(stop) > 0) { stop -= 1; checkMinStop() } }
                     )
-                    Column {
-                        Icon(Icons.Rounded.KeyboardArrowUp,   contentDescription = null, tint = AccentColor,
-                            modifier = Modifier.clickable { if (getMinutes(stop) < 59) stop += 1 })
-                        Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = null, tint = AccentColor,
-                            modifier = Modifier.clickable { if (getMinutes(stop) > 0) { stop -= 1; checkMinStop() } })
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -676,6 +664,17 @@ fun TimerDialog(
                 fun Boolean.toInt() = if (this) 1 else 0
                 val daysValue = dom.toInt() + lu.toInt()*2 + ma.toInt()*4 + mi.toInt()*8 +
                         ju.toInt()*16 + vi.toInt()*32 + sa.toInt()*64
+
+                if (!isNew) {
+                    Row(Modifier.fillMaxWidth(), Arrangement.Center) {
+                        TextButton(onClick = { deleteTimer() }) {
+                            Icon(Icons.Rounded.Delete, contentDescription = null, tint = Color.Red)
+                            Spacer(Modifier.width(4.dp))
+                            Text(stringResource(R.string.deleteTimer), color = Color.Red)
+                        }
+                    }
+                }
+
                 DialogActions(
                     onAccept = { setTimer(WeeklyProgram(start, stop, daysValue)) },
                     onCancel = onExit
@@ -716,8 +715,26 @@ fun ModeDialog(
                     ModeRow(
                         entry = entry,
                         isSelected = entry == mode,
-                        secs = secs,
-                        onSelect = { mode = entry },
+                        onSelect = { mode = entry }
+                    )
+                }
+
+                if (mode.hasIntValue()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    HorizontalDivider()
+                    Spacer(modifier = Modifier.height(12.dp))
+                    SecsControl(
+                        label = if (mode.isGradient())
+                            stringResource(R.string.temperature)
+                        else
+                            stringResource(R.string.duration),
+                        value = secs,
+                        displayText = if (mode.isGradient())
+                            stringResource(R.string.grad, secs / 10)
+                        else
+                            stringResource(R.string.sec, secs),
+                        max = if (mode.isGradient()) 800 else 20,
+                        step = if (mode.isGradient()) 10 else 1,
                         onValueChange = { secs = it }
                     )
                 }
@@ -733,16 +750,42 @@ fun ModeDialog(
 }
 
 @Composable
+private fun TimeStepper(
+    label: String,
+    value: Int,
+    onIncrement: () -> Unit,
+    onDecrement: () -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = "$label: $value",
+            style = TextStyle(fontSize = 18.sp),
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+            RepeatableIconButton(
+                icon = Icons.Rounded.KeyboardArrowDown,
+                enabled = true,
+                onTrigger = onDecrement
+            )
+            RepeatableIconButton(
+                icon = Icons.Rounded.KeyboardArrowUp,
+                enabled = true,
+                onTrigger = onIncrement
+            )
+        }
+    }
+}
+
+@Composable
 private fun ModeRow(
     entry: Mode,
     isSelected: Boolean,
-    secs: Int,
-    onSelect: () -> Unit,
-    onValueChange: (Int) -> Unit
+    onSelect: () -> Unit
 ) {
     val bgColor      = if (isSelected) AccentColor.copy(alpha = 0.15f) else Color.Transparent
     val contentColor = if (isSelected) AccentColor else TextPrimary
-    val mutedColor   = if (isSelected) AccentColor.copy(alpha = 0.7f) else Color.Gray
 
     Row(
         modifier = Modifier
@@ -750,7 +793,7 @@ private fun ModeRow(
             .clip(RoundedCornerShape(8.dp))
             .background(bgColor)
             .clickable { onSelect() }
-            .padding(horizontal = 8.dp, vertical = 6.dp),
+            .padding(horizontal = 8.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (isSelected) {
@@ -758,51 +801,95 @@ private fun ModeRow(
         } else {
             Spacer(modifier = Modifier.size(20.dp))
         }
-
         Text(
             text = entry.name,
             style = TextStyle(fontSize = 17.sp),
             color = contentColor,
             modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
         )
+    }
+}
 
-        if (entry.hasIntValue()) {
-            val displayText = if (entry.isGradient())
-                stringResource(R.string.grad, secs / 10)
-            else
-                stringResource(R.string.sec, secs)
-
-            Text(text = displayText, style = TextStyle(fontSize = 16.sp), color = mutedColor,
-                modifier = Modifier.padding(end = 4.dp))
-
-            IntPickerButtons(
-                tint = mutedColor,
-                onIncrement = {
-                    val max  = if (entry.isGradient()) 220 else 20
-                    val step = if (entry.isGradient()) 10  else 1
-                    if (secs < max) { onSelect(); onValueChange(secs + step) }
-                },
-                onDecrement = {
-                    val step = if (entry.isGradient()) 10 else 1
-                    if (secs > 0) { onSelect(); onValueChange(secs - step) }
-                }
+@Composable
+private fun SecsControl(
+    label: String,
+    value: Int,
+    displayText: String,
+    max: Int,
+    step: Int,
+    onValueChange: (Int) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            style = TextStyle(fontSize = 14.sp),
+            color = Color.Gray
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            RepeatableIconButton(
+                icon = Icons.Rounded.RemoveCircleOutline,
+                enabled = value > 0,
+                onTrigger = { onValueChange((value - step).coerceAtLeast(0)) }
+            )
+            Text(
+                text = displayText,
+                style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold),
+                color = AccentColor,
+                modifier = Modifier.widthIn(min = 80.dp),
+                textAlign = TextAlign.Center
+            )
+            RepeatableIconButton(
+                icon = Icons.Rounded.AddCircleOutline,
+                enabled = value < max,
+                onTrigger = { onValueChange((value + step).coerceAtMost(max)) }
             )
         }
     }
 }
 
 @Composable
-private fun IntPickerButtons(
-    tint: Color,
-    onIncrement: () -> Unit,
-    onDecrement: () -> Unit
+private fun RepeatableIconButton(
+    icon: ImageVector,
+    enabled: Boolean,
+    onTrigger: () -> Unit
 ) {
-    Column {
-        Icon(Icons.Rounded.KeyboardArrowUp, contentDescription = null, tint = tint,
-            modifier = Modifier.size(22.dp).clickable { onIncrement() })
-        Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = null, tint = tint,
-            modifier = Modifier.size(22.dp).clickable { onDecrement() })
-    }
+    val tint = if (enabled) AccentColor else Color.Gray.copy(alpha = 0.4f)
+    val currentEnabled by rememberUpdatedState(enabled)
+    val currentOnTrigger by rememberUpdatedState(onTrigger)
+    val scope = rememberCoroutineScope()
+
+    Icon(
+        icon,
+        contentDescription = null,
+        tint = tint,
+        modifier = Modifier
+            .size(48.dp)
+            .pointerInput(Unit) {
+                while (true) {
+                    awaitPointerEventScope { awaitFirstDown() }
+                    if (!currentEnabled) continue
+                    val job = scope.launch {
+                        currentOnTrigger()
+                        delay(450)
+                        var intervalMs = 150L
+                        while (true) {
+                            currentOnTrigger()
+                            delay(intervalMs)
+                            if (intervalMs > 40L) intervalMs -= 10L
+                        }
+                    }
+                    awaitPointerEventScope { waitForUpOrCancellation() }
+                    job.cancel()
+                }
+            }
+    )
 }
 
 // ── 9 MaintenanceDialog ───────────────────────────────────────────────────────
@@ -819,7 +906,8 @@ fun MaintenanceDialog(
     full: () -> Unit,
     onExit: () -> Unit
 ) {
-    var showProgress by remember { mutableStateOf(false) }
+    var showProgress by remember(id) { mutableStateOf(false) }
+    var hasStarted by remember(id) { mutableStateOf(false) }
     var server by remember { mutableStateOf(lastServer) }
     var port   by remember { mutableStateOf(lastPort)   }
     if (!show) return
@@ -870,17 +958,29 @@ fun MaintenanceDialog(
                             onValueChange = { port = it }
                         )
                     }
+                    // hasStarted/showProgress se activan al tocar el botón (feedback inmediato);
+                    // el when solo decide cuándo OCULTARLA y qué mensaje final mostrar.
                     when (upgrading) {
-                        State.UPGRADE      -> { showProgress = true }
-                        State.SERVER_FAIL  -> { showProgress = false
+                        State.SERVER_FAIL -> {
+                            showProgress = false; hasStarted = false
                             Text(stringResource(R.string.badPortServer), style = TextStyle(fontSize = 16.sp),
-                                color = Color.Red, modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) }
-                        State.UPGRADE_FAIL -> { showProgress = false
+                                color = Color.Red, modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+                        }
+                        State.UPGRADE_FAIL -> {
+                            showProgress = false; hasStarted = false
                             Text(stringResource(R.string.upgradeFails), style = TextStyle(fontSize = 16.sp),
-                                color = Color.Red, modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) }
-                        State.UPGRADED     -> { showProgress = false
+                                color = Color.Red, modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+                        }
+                        State.UPGRADED -> {
+                            showProgress = false; hasStarted = false
                             Text(stringResource(R.string.upgradeSuccess), style = TextStyle(fontSize = 16.sp),
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp)) }
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+                        }
+                        State.ALREADY_LATEST -> {
+                            showProgress = false; hasStarted = false
+                            Text(stringResource(R.string.alreadyLatest), style = TextStyle(fontSize = 16.sp),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+                        }
                         else -> {}
                     }
                     if (showProgress) {
@@ -892,7 +992,14 @@ fun MaintenanceDialog(
                                 .clip(RoundedCornerShape(16.dp))
                         )
                     }
-                    ElevatedButton(onClick = { upgrade(Pair(server, port)) }) {
+                    ElevatedButton(
+                        enabled = !showProgress,
+                        onClick = {
+                            hasStarted = true
+                            showProgress = true   // feedback inmediato, no espera al ESP
+                            upgrade(Pair(server, port))
+                        }
+                    ) {
                         Icon(Icons.Rounded.Upgrade, contentDescription = null)
                         Text(stringResource(R.string.upgrade))
                     }
@@ -937,19 +1044,23 @@ fun MaintenanceDialog(
                     }
                 }
 
-                // ── Cerrar ──
-                Row(Modifier.fillMaxWidth(), Arrangement.End) {
-                    TextButton(onClick = { showProgress = false; onExit() }) {
+                // ── Cerrar / Aceptar ──
+                Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween) {
+                    TextButton(onClick = { showProgress = false; hasStarted = false; onExit() }) {
                         Icon(Icons.Rounded.Close, contentDescription = null, tint = AccentColor)
                         Spacer(Modifier.width(4.dp))
                         Text(stringResource(R.string.noAccept))
+                    }
+                    TextButton(onClick = { showProgress = false; hasStarted = false; onExit() }) {
+                        Icon(Icons.Rounded.CheckCircle, contentDescription = null, tint = AccentColor)
+                        Spacer(Modifier.width(4.dp))
+                        Text(stringResource(R.string.accept))
                     }
                 }
             }
         }
     }
 }
-
 // Helpers internos para MaintenanceDialog
 @Composable
 private fun SectionLabel(text: String) {
@@ -989,7 +1100,7 @@ fun ShowDialog(value: Int = 8) {
         4 -> NewAllDialog(true, "all", {}, {})
         5 -> NameDialog(true, "kitchen light", { "" }, {})
         6 -> IconDialog(true, "lightbulb", { "theatermasks" }, {})
-        7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), {}, {})
+        7 -> TimerDialog(true, WeeklyProgram(2, 3, 1), false, {}, {}, {})
         8 -> ModeDialog(true, Mode.TEMP, 10, {}, {})
         9 -> MaintenanceDialog(true, "1234", State.SERVER_FAIL, "", "", {}, "kitchen light", {}, {}, {})
     }

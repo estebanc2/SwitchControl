@@ -57,4 +57,9 @@
     <string name="changeIn">Cambia en %d : %02d h %s</string>
     <string name="ifTemp"><![CDATA[" si temp < %d°. Actual: %d"]]></string>
     <string name="no_sensor">sensor de temperatura no conectado</string>
+    <string name="addTimer">add</string>
+    <string name="deleteTimer">borrar</string>
+    <string name="temperature">Temperatura</string>
+    <string name="duration">Duración</string>
+    <string name="alreadyLatest">El firmware ya está en la última versión</string>
 </resources>

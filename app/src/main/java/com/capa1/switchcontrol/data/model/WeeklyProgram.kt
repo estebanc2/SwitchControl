@@ -1,7 +1,7 @@
 package com.capa1.switchcontrol.data.model
 
-data class WeeklyProgram(
+data class WeeklyProgram (
+    val days: Int,
     val start: Int,
-    val stop: Int,
-    val days: Int
+    val stop: Int
 )

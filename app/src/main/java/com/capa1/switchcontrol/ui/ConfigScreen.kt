@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AddCircleOutline
 import androidx.compose.material.icons.rounded.ChangeCircle
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.capa1.switchcontrol.R
 import com.capa1.switchcontrol.data.model.IconMapper.fromName
+import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.ui.theme.AccentColor
@@ -191,83 +193,58 @@ fun ConfigScreen(
                     .clickable { changeIcon() }
             )
         }
-        Spacer(modifier = Modifier.padding(vertical = 15.dp))
-        Text(
-            text = "TIMERS",
-            style = TextStyle(fontSize = 16.sp),
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
-        )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape = MaterialTheme.shapes.medium)
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Row {
-                Icon(
-                    Icons.Rounded.Restore,
-                    tint = AccentColor,
-                    contentDescription = "",
-                    modifier = Modifier.clickable { changeTimer(0)}
-                )
-                Text(
-                    text = getTimersInfo(data.prgs[0]),
-                    style = TextStyle(fontSize = 16.sp),
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .clickable { changeTimer(0) }
-                )
-            }
-            Row {
-                Icon(
-                    Icons.Rounded.Restore,
-                    contentDescription = "",
-                    tint = AccentColor,
-                    modifier = Modifier.clickable {  changeTimer(1)}
-                )
-                Text(
-                    text = getTimersInfo(data.prgs[1]),
-                    style = TextStyle(fontSize = 16.sp),
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .clickable { changeTimer(1) }
-                )
-            }
-            Row {
-                Icon(
-                    Icons.Rounded.Restore,
-                    tint = AccentColor,
-                    contentDescription = "",
-                    modifier = Modifier.clickable { changeTimer(2)}
-                )
-                Text(
-                    text = getTimersInfo(data.prgs[2]),
-                    style = TextStyle(fontSize = 16.sp),
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .clickable {  changeTimer(2) }
-                )
-            }
-            Row {
-                Icon(
-                    Icons.Rounded.Restore,
-                    tint = AccentColor,
-                    contentDescription = "",
-                    modifier = Modifier.clickable {  changeTimer(3)}
-                )
-                Text(
-                    text = getTimersInfo(data.prgs[3]),
-                    style = TextStyle(fontSize = 16.sp),
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .clickable {  changeTimer(3) }
-                )
+        val usaTimers = data.mode != Mode.TEMP && data.mode != Mode.PULSE_NA && data.mode != Mode.PULSE_NC
+        if (usaTimers) {
+            Spacer(modifier = Modifier.padding(vertical = 15.dp))
+            Text(
+                text = "TIMERS",
+                style = TextStyle(fontSize = 16.sp),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape = MaterialTheme.shapes.medium)
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                data.prgs.forEachIndexed { i, prg ->
+                    Row {
+                        Icon(
+                            Icons.Rounded.Restore,
+                            tint = AccentColor,
+                            contentDescription = "",
+                            modifier = Modifier.clickable { changeTimer(i) }
+                        )
+                        Text(
+                            text = getTimersInfo(prg),
+                            style = TextStyle(fontSize = 16.sp),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp)
+                                .clickable { changeTimer(i) }
+                        )
+                    }
+                }
+                if (data.prgs.size < 8) {
+                    Row {
+                        Icon(
+                            Icons.Rounded.AddCircleOutline,
+                            tint = AccentColor,
+                            contentDescription = "",
+                            modifier = Modifier.clickable { changeTimer(data.prgs.size) }
+                        )
+                        Text(
+                            text = stringResource(R.string.addTimer),
+                            style = TextStyle(fontSize = 16.sp),
+                            color = AccentColor,
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp)
+                                .clickable { changeTimer(data.prgs.size) }
+                        )
+                    }
+                }
             }
         }
         Spacer(modifier = Modifier.padding(vertical = 15.dp))
