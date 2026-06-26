@@ -36,6 +36,9 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlin.concurrent.fixedRateTimer
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SwViewModel  @Inject constructor(
@@ -65,6 +68,7 @@ class SwViewModel  @Inject constructor(
     private val newSw = mutableListOf<String>()
     private var newSwId = ""
     private var upgradingId = ""
+    private var upgradeTimeoutJob: Job? = null
     private var savedOnce = false
     var currentId = ""
     var server = ""
@@ -271,6 +275,7 @@ class SwViewModel  @Inject constructor(
                     upgrading == State.ALREADY_LATEST ||
                     upgrading == State.SERVER_FAIL ||
                     upgrading == State.UPGRADE_FAIL) {
+                    upgradeTimeoutJob?.cancel()
                     upgradingId = ""
                 }
             }
@@ -495,6 +500,12 @@ class SwViewModel  @Inject constructor(
         this.port = port
         this.server = server
         upgradingId = currentId
+        upgradeTimeoutJob?.cancel()
+        upgradeTimeoutJob = viewModelScope.launch {
+            delay(40_000)
+            upgrading = State.UPGRADE_FAIL
+            upgradingId = ""
+        }
         val setData = gson.toJson( EspData(
             state = State.UPGRADE,
             mode = Mode.TIMERS,
