@@ -17,6 +17,7 @@ import com.capa1.switchcontrol.data.model.Mode
 import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.StoredData
+import com.capa1.switchcontrol.data.model.SimpleCmd
 import com.capa1.switchcontrol.data.model.SwData
 import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.data.model.ToStore
@@ -51,18 +52,10 @@ class SwViewModel  @Inject constructor(
 ) : ViewModel() {
 
     private val timer0: MutableList<WeeklyProgram> = mutableListOf()
-    private val sendOn: String = gson.toJson(
-        EspData( State.ON, Mode.TIMERS, 0, timer0, 0 )
-    )
-    private val sendOff: String = gson.toJson(
-        EspData( State.OFF, Mode.TIMERS, 0, timer0, 0 )
-    )
-    private val sendGet: String = gson.toJson(
-        EspData( State.GET_DATA, Mode.TIMERS, 0, timer0, 0 )
-    )
-    private val sendErase: String = gson.toJson(
-        EspData( State.ERASE, Mode.TIMERS, 0, timer0, 0 )
-    )
+    private val sendOn: String = gson.toJson(SimpleCmd(State.ON))
+    private val sendOff: String = gson.toJson(SimpleCmd(State.OFF))
+    private val sendGet: String = gson.toJson(SimpleCmd(State.GET_DATA))
+    private val sendErase: String = gson.toJson(SimpleCmd(State.ERASE))
     private val swMap = mutableMapOf<String, SwData>()
     val allSwId = Random.nextInt(9).toString() + "0123456789" + Random.nextInt(9).toString()
     private val newSw = mutableListOf<String>()
@@ -109,6 +102,13 @@ class SwViewModel  @Inject constructor(
             mqttManager.publish(id, sendOff)
         } else if (swMap[id]?.state == State.OFF) {
             mqttManager.publish(id, sendOn)
+        }
+    }
+
+    fun onAppForeground() {
+        Log.i(TAG, "app foreground, mqttUp=${dialogState.mqttUp}")
+        if (!dialogState.mqttUp) {
+            mqttManager.connect()
         }
     }
 

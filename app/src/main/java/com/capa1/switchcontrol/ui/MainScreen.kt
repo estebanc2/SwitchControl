@@ -86,6 +86,7 @@ fun MainScreen( viewModel: SwViewModel = hiltViewModel())
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> viewModel.saveData()
+                Lifecycle.Event.ON_RESUME -> viewModel.onAppForeground()
                 else -> Unit
             }
         }

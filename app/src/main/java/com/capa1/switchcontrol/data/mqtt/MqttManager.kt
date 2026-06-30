@@ -9,7 +9,7 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient
-import org.eclipse.paho.client.mqttv3.MqttCallback
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttMessage
@@ -42,7 +42,12 @@ class MqttManager @Inject constructor()
             UUID.randomUUID().toString(),
             MemoryPersistence()
         )
-        mqttClient.setCallback(object : MqttCallback {
+        mqttClient.setCallback(object : MqttCallbackExtended {
+            override fun connectComplete(reconnect: Boolean, serverURI: String?) {
+                coroutineScope.launch { mqttState.emit(MqttState.CONNECTED) }
+                Log.i(TAG, "callback connectComplete reconnect=$reconnect serverURI=$serverURI")
+            }
+
             override fun messageArrived(topic: String, message: MqttMessage?) {
                 coroutineScope.launch {
                     arrival.emit(
@@ -55,7 +60,7 @@ class MqttManager @Inject constructor()
             }
 
             override fun connectionLost(cause: Throwable?) {
-                coroutineScope.launch { mqttState.emit(MqttState.CONNECTING) }
+                coroutineScope.launch { mqttState.emit(MqttState.DISCONNECTED) }
                 Log.i(TAG, "callback connectionLost $cause")
             }
 
@@ -67,6 +72,7 @@ class MqttManager @Inject constructor()
     }
     fun connect() {
         val options = MqttConnectOptions()
+        options.isAutomaticReconnect = true
         try {
             mqttClient.connect(options, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
