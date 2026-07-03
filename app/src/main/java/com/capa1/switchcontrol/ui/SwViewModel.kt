@@ -85,6 +85,7 @@ class SwViewModel  @Inject constructor(
 
     private var started = false
     private val retryCount = ConcurrentHashMap<String, Int>()
+    private var checkTimer: java.util.Timer? = null
 
 
     fun start() {
@@ -329,7 +330,11 @@ class SwViewModel  @Inject constructor(
         val timerInSec = 1L
         val maxRetries = 4
 
-        fixedRateTimer("timer", false, timerInSec * 1000, timerInSec * 1000) {
+        if (checkTimer != null) return   // ya hay un timer corriendo, no crear otro
+
+        checkTimer = fixedRateTimer("timer", false, timerInSec * 1000, timerInSec * 1000) {
+            if (!dialogState.mqttUp) return@fixedRateTimer   // MQTT desconectado, no publicar
+
             val currentMap = HashMap(swMap)
             currentMap.forEach { (id, swData) ->
                 if (swData.status == SwStatus.DISCONNECTED) {
@@ -452,6 +457,7 @@ class SwViewModel  @Inject constructor(
         )
         Log.i(TAG, "setMode terminó, currentSwData.mode DESPUÉS=${currentSwData.mode}")
         dialogState = dialogState.copy(showMode = false)
+        saveConfig()
     }
 
 
