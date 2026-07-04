@@ -14,6 +14,7 @@ import androidx.core.view.WindowCompat
 val BgPage      = Color(0xFF1C1C1E)
 val BgCard      = Color(0xFF2C2C2E)
 val AccentColor = Color(0xFF34C759)
+val AccentColor2 = Color(0xFFFFB750)
 val TextPrimary = Color(0xFFFFFFFF)
 
 private val AppColorScheme = darkColorScheme(

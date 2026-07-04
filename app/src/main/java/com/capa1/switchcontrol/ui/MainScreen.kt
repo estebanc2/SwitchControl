@@ -1,5 +1,6 @@
 package com.capa1.switchcontrol.ui
 
+//import androidx.hilt.navigation.compose.hiltViewModel
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.LocalActivity
@@ -64,6 +65,7 @@ import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.WeeklyProgram
 import com.capa1.switchcontrol.ui.permissions.PermissionUtils
 import com.capa1.switchcontrol.ui.theme.AccentColor
+import com.capa1.switchcontrol.ui.theme.AccentColor2
 import com.capa1.switchcontrol.ui.theme.BgCard
 import com.capa1.switchcontrol.ui.theme.BgPage
 import com.capa1.switchcontrol.ui.theme.TextPrimary
@@ -266,17 +268,17 @@ fun RowView(
     val connected = swScreenData.connected
     val activeColor = when {
         isOn                        -> AccentColor
-        swScreenData.waitingTemp    -> Color(0xFFFF9800)  // naranja: apagado esperando temp
+        swScreenData.waitingTemp    -> Color(0xFFFF453A)  // rojo: apagado esperando temp
         else                        -> AccentColor        // gris lo maneja el alpha/opacity
     }
 
     // Animaciones de color
     val accentBarColor by animateColorAsState(
-        targetValue = if (isOn) activeColor else if (swScreenData.waitingTemp) Color(0xFFFF9800).copy(alpha = 0.4f) else Color.White.copy(alpha = 0.1f),
+        targetValue = if (isOn) activeColor else if (swScreenData.waitingTemp) Color(0xFFFF453A).copy(alpha = 0.4f) else Color.White.copy(alpha = 0.1f),
         animationSpec = tween(300), label = "barColor"
     )
     val borderColor by animateColorAsState(
-        targetValue = if (isOn) activeColor.copy(alpha = 0.2f) else if (swScreenData.waitingTemp) Color(0xFFFF9800).copy(alpha = 0.15f) else Color.White.copy(alpha = 0.06f),
+        targetValue = if (isOn) activeColor.copy(alpha = 0.2f) else if (swScreenData.waitingTemp) Color(0xFFFF453A).copy(alpha = 0.15f) else Color.White.copy(alpha = 0.06f),
         animationSpec = tween(300), label = "borderColor"
     )
     val bgAlpha by animateFloatAsState(
@@ -316,7 +318,7 @@ fun RowView(
         // Ícono
         val iconBgColor by animateColorAsState(
             targetValue = if (isOn) activeColor.copy(alpha = 0.18f)
-            else if (swScreenData.waitingTemp) Color(0xFFFF9800).copy(alpha = 0.12f)
+            else if (swScreenData.waitingTemp) Color(0xFFFF453A).copy(alpha = 0.12f)
             else Color.White.copy(alpha = 0.06f),
             animationSpec = tween(300), label = "iconBg"
         )
@@ -366,8 +368,8 @@ fun RowView(
                 text = swScreenData.timerInfo,
                 fontSize = 13.sp,
                 fontFamily = FontFamily.Monospace,
-                color = if (isOn) activeColor.copy(alpha = 0.7f)
-                else if (swScreenData.waitingTemp) Color(0xFFFF9800).copy(alpha = 0.6f)
+                color = if (isOn) AccentColor2.copy(alpha = 0.85f)
+                else if (swScreenData.waitingTemp) Color(0xFFFF453A).copy(alpha = 0.6f)
                 else Color.Gray.copy(alpha = 0.7f),
                 maxLines = 3
             )
