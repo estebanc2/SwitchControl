@@ -6,5 +6,6 @@ data class SwScreenData(
     val icon: String,
     val timerInfo: String,
     val swOn: Boolean,
-    val connected: Boolean
+    val connected: Boolean,
+    val waitingTemp: Boolean = false
 )

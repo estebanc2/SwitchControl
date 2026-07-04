@@ -14,11 +14,11 @@ import com.capa1.switchcontrol.data.SwDataStore
 import com.capa1.switchcontrol.data.model.DialogState
 import com.capa1.switchcontrol.data.model.EspData
 import com.capa1.switchcontrol.data.model.Mode
-import com.capa1.switchcontrol.data.model.SwScreenData
+import com.capa1.switchcontrol.data.model.SimpleCmd
 import com.capa1.switchcontrol.data.model.State
 import com.capa1.switchcontrol.data.model.StoredData
-import com.capa1.switchcontrol.data.model.SimpleCmd
 import com.capa1.switchcontrol.data.model.SwData
+import com.capa1.switchcontrol.data.model.SwScreenData
 import com.capa1.switchcontrol.data.model.SwStatus
 import com.capa1.switchcontrol.data.model.ToStore
 import com.capa1.switchcontrol.data.model.WeeklyProgram
@@ -31,15 +31,14 @@ import com.capa1.switchcontrol.data.wifi.WifiCredentials
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
-import kotlin.random.Random
 import kotlin.concurrent.fixedRateTimer
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @HiltViewModel
 class SwViewModel  @Inject constructor(
@@ -155,7 +154,8 @@ class SwViewModel  @Inject constructor(
                     icon = swData.icon,
                     timerInfo = legendMaker.legend(swData),
                     swOn = swData.state == State.ON,
-                    connected = swData.status == SwStatus.CONNECTED
+                    connected = swData.status == SwStatus.CONNECTED,
+                    waitingTemp = swData.state == State.AUTO_OFF
                 )
             )
         }
@@ -172,7 +172,16 @@ class SwViewModel  @Inject constructor(
                         withContext(Dispatchers.Main) {
                             dialogState = dialogState.copy(mqttUp = true)
                         }
-                        initializeSw()
+                        if (checkTimer == null) {
+                            // Primera conexión: inicializar todo
+                            initializeSw()
+                        } else {
+                            // Reconexión: solo re-suscribir, el timer ya existe
+                            for (id in swMap.keys) {
+                                mqttManager.subscribe(id)
+                                retryCount.remove(id) // fresh retries tras reconexión
+                            }
+                        }
                     }
                     MqttState.CONNECTING -> dialogState = dialogState.copy(mqttUp = false)
                     MqttState.DISCONNECTED -> {

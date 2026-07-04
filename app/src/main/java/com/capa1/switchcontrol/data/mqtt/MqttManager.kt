@@ -75,6 +75,10 @@ class MqttManager @Inject constructor()
             Log.i(TAG, "connect() llamado antes de mqttInit(), ignorando")
             return
         }
+        if (mqttClient.isConnected) {
+            Log.i(TAG, "connect() ignorado, ya conectado")
+            return
+        }
         val options = MqttConnectOptions()
         options.isAutomaticReconnect = true
         try {
