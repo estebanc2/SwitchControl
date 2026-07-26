@@ -511,6 +511,16 @@ class SwViewModel  @Inject constructor(
     }
 
     fun firmwareUpgrade(server: String, port: String) {
+        upgrading = State.UPGRADE
+        val parts = server.split(".")
+        if (parts.size != 4 || parts.any { it.toIntOrNull() == null || it.toInt() !in 0..255 }) {
+            upgrading = State.SERVER_FAIL
+            return
+        }
+        if (port.toIntOrNull() == null || port.toInt() !in 1..65535) {
+            upgrading = State.SERVER_FAIL
+            return
+        }
         val bytes = server.split(".").map { it.toInt() }
         this.port = port
         this.server = server
